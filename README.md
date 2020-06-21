@@ -1,14 +1,14 @@
 # Cryologger - Glacier Velocity Measurement System
-
-A low-cost, open-source glacier velocity measurement system based on the u-blox ZED-F9P GNSS receiver. Intended for use with Precise Point Positioning (PPP) techniques.
+![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/master/Images/DSC_1890.JPG)
 
 ## Background
 
 ## Objective
 
 ## Design
+A low-cost, open-source glacier velocity measurement system based intended for use with Precise Point Positioning (PPP) techniques.
 
-### Measurements
+## Measurements
 
 ## Repository Contents
 * **/Arduino** - Contains the Arduino code.
@@ -21,7 +21,7 @@ A low-cost, open-source glacier velocity measurement system based on the u-blox 
 * Currently in progress
 
 ## License Information
-This project is distributed under the GNU General Public License v3.0
+This project is distributed under the GNU General Public License v3.0.
 
 Cheers,
 
