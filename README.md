@@ -24,7 +24,7 @@ Intended for use with Precise Point Positioning (PPP) techniques.
 * Currently in progress
 
 ## License Information
-This project is distributed under the GNU General Public License v3.0.
+This project is released under the MIT License (http://opensource.org/licenses/MIT).
 
 Cheers,
 
