@@ -1,21 +1,24 @@
 # Cryologger - Glacier Velocity Measurement System
-![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/master/Images/DSC_1890.JPG)
+
 
 ## Background
 
 ## Objective
 
 ## Design
-A low-cost, open-source glacier velocity measurement system based intended for use with Precise Point Positioning (PPP) techniques.
+A low-cost, open-source glacier velocity measurement system based on the SparkFun ZED-F9P and OpenLog Artemis. 
+Intended for use with Precise Point Positioning (PPP) techniques.
 
 ## Measurements
 
 ## Repository Contents
-* **/Arduino** - Contains the Arduino code.
+* **/Software** - Contains the Arduino code
 
-* **/Bill of Materials** - Information on all components used construction and their associated costs.
+* **/Software** - Eagle PCB schematic and board design files
 
-* **/Archive** - Contains information on previous iterations of the Cryologger design.
+* **/Bill of Materials** - Information on components and their associated costs
+
+* **/Archive** - Previous design iterations
 
 ## Documentation
 * Currently in progress
