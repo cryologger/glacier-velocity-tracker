@@ -14,9 +14,9 @@ bool beginSensors()
 
   determineMaxI2CSpeed(); // Try for 400kHz but reduce if the user has selected a slower speed
 
-  if (qwiicAvailable.uBlox && (!qwiicOnline.uBlox || gnssSettingsChanged)) // Only do this if the sensor is not online
+  if (qwiicAvailable.uBlox && (!qwiicOnline.uBlox || gnssSettingsFlag)) // Only do this if the sensor is not online
   {
-    gnssSettingsChanged = false;
+    gnssSettingsFlag = false;
     if (gnss.begin(qwiic, settings.sensor_uBlox.ubloxI2Caddress)) // Wire port, Address. Default is 0x42.
     {
       // Try up to three times to get the module info
@@ -344,7 +344,7 @@ bool detectQwiicDevices()
 }
 
 // Close the current log file and reset the GNSS
-void resetGNSS()
+void resetGnss()
 {
   if (settings.logData && online.microSd && online.dataLogging) // Check if we are logging
   {

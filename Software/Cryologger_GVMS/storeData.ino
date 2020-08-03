@@ -34,8 +34,8 @@ const size_t UBXbufferSize = 4096;
 char UBXbuffer[UBXbufferSize];
 size_t UBXpointer = 0;
 
-//Storage for the SD packet
-//Define packet size, buffer and buffer pointer for SD card writes
+// Storage for the SD packet
+// Define packet size, buffer and buffer pointer for SD card writes
 const size_t SDpacket = 512;
 uint8_t SDbuffer[SDpacket];
 size_t SDpointer = 0;
@@ -169,7 +169,7 @@ TRY_AGAIN:
         {
           uint8_t incoming = qwiic.read(); //Grab the actual character
 
-          processUBX(incoming); //Process the incoming byte. This will update ubx_state
+          processUbx(incoming); //Process the incoming byte. This will update parseUbxState
 
           UBXbuffer[UBXpointer] = incoming; //Store incoming in the UBX buffer
           UBXpointer++; //Increment the pointer
@@ -180,13 +180,13 @@ TRY_AGAIN:
               ;
           }
 
-          if (ubx_state == sync_lost) //If the UBX frame was invalid or we lost sync
+          if (parseUbxState == SYNC_LOST) //If the UBX frame was invalid or we lost sync
           {
-            //TO DO: close the current file and open a new one when ubx_state == sync_lost ?
+            //TO DO: close the current file and open a new one when parseUbxState == SYNC_LOST ?
             UBXpointer = 0; //Discard the frame by resetting the UBXpointer
-            ubx_state = looking_for_B5; //Start looking for the start of a new frame
+            parseUbxState = PARSE_UBX_SYNC_CHAR_1; //Start looking for the start of a new frame
           }
-          else if (ubx_state == frame_valid) //If the UBX frame is valid
+          else if (parseUbxState == FRAME_VALID) //If the UBX frame is valid
           {
             if (UBXbuffer[2] != UBX_CLASS_ACK) //If the frame is not an ACK/NACK
             {
@@ -303,9 +303,9 @@ TRY_AGAIN:
               {
                 if (UBXbuffer[3] == UBX_NAV_TIMEUTC) //ID 0x21
                 {
-                  if (rtcNeedsSync) //Do we need to sync the RTC
+                  if (rtcSyncRequiredFlag) //Do we need to sync the RTC
                   {
-                    if (((UBXbuffer[25] & 0x04) == 0x04) && (rtcNeedsSync))//If the validUTC flag bit is set and a sync is needed
+                    if (((UBXbuffer[25] & 0x04) == 0x04) && (rtcSyncRequiredFlag))//If the validUTC flag bit is set and a sync is needed
                     {
                       uint16_t rtcYear = ((uint16_t)UBXbuffer[18]) | (((uint16_t)UBXbuffer[19]) << 8); //RTC year
                       union {
@@ -322,7 +322,7 @@ TRY_AGAIN:
                       uint8_t centis = (uint8_t)(nanos.unsigned32 / 10000000); //Convert nanos to hundredths (centiseconds)
                       rtc.setTime(UBXbuffer[22], UBXbuffer[23], UBXbuffer[24], centis, UBXbuffer[21], UBXbuffer[20], (rtcYear - 2000)); //Set the RTC
                       rtcSyncFlag = true; // Set rtcSyncFlag to show RTC has been synced
-                      rtcNeedsSync = false; // Clear rtcNeedsSync so we don't set the RTC multiple times
+                      rtcSyncRequiredFlag = false; // Clear rtcSyncRequiredFlag so we don't set the RTC multiple times
                       if (settings.printMinorDebugMessages)
                       {
                         Serial.printf("storeData: RTC synced to %04d-%02d-%02d %02d:%02d:%02d.%02d\n",
@@ -359,7 +359,7 @@ TRY_AGAIN:
               }
             }
             UBXpointer = 0; //Reset the UBXpointer
-            ubx_state = looking_for_B5; //Start looking for the start of a new frame
+            parseUbxState = PARSE_UBX_SYNC_CHAR_1; //Start looking for the start of a new frame
           }
         }
       }

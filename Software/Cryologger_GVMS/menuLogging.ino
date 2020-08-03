@@ -122,7 +122,7 @@ void menuLogging()
         settings.usBetweenReadings = 1000000UL / tempRPS;
       }
 
-      gnssSettingsChanged = true; // Mark GNSS settings as changed so it will be started with new settings
+      gnssSettingsFlag = true; // Mark GNSS settings as changed so it will be started with new settings
       //qwiicOnline.uBlox = false; // Mark as offline so it will be started with new settings
     }
     else if (incoming == '5')
@@ -135,7 +135,7 @@ void menuLogging()
         //settings.recordPerSecond = tempRPS;
         settings.usBetweenReadings = 1000000ULL * tempSeconds;
 
-      gnssSettingsChanged = true; // Mark GNSS settings as changed so it will be started with new settings
+      gnssSettingsFlag = true; // Mark GNSS settings as changed so it will be started with new settings
       //qwiicOnline.uBlox = false; // Mark as offline so it will be started with new settings
     }
     else if (incoming == '6')

@@ -190,6 +190,6 @@ void menuConfigureGnss()
       printUnknown(incoming);
   }
 
-  gnssSettingsChanged = true; // Mark GNSS settings as changed so it will be started with new settings
+  gnssSettingsFlag = true; // Mark GNSS settings as changed so it will be started with new settings
   //qwiicOnline.uBlox = false; // Mark as offline so it will be started with new settings
 }

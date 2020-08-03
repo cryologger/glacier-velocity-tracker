@@ -1,29 +1,33 @@
-// processUBX states
-#define looking_for_B5          0
-#define looking_for_62          1
-#define looking_for_class       2
-#define looking_for_ID          3
-#define looking_for_length_LSB  4
-#define looking_for_length_MSB  5
-#define processing_payload      6
-#define looking_for_checksum_A  7
-#define looking_for_checksum_B  8
-#define sync_lost               9
-#define frame_valid             10
+// processUbx states
+enum ParseUbxSwitch {
+  PARSE_UBX_SYNC_CHAR_1,
+  PARSE_UBX_SYNC_CHAR_2,
+  PARSE_UBX_CLASS,
+  PARSE_UBX_ID,
+  PARSE_UBX_LENGTH_LSB,
+  PARSE_UBX_LENGTH_MSB,
+  PARSE_UBX_PAYLOAD,
+  PARSE_UBX_CHECKSUM_A,
+  PARSE_UBX_CHECKSUM_B,
+  SYNC_LOST,
+  FRAME_VALID
+};
+
+// Default switch case
+ParseUbxSwitch parseUbxState = PARSE_UBX_SYNC_CHAR_1;
 
 // Global variables for UBX parsing
-int ubx_state               = looking_for_B5;
-int ubx_length              = 0;
-int ubx_class               = 0;
-int ubx_ID                  = 0;
-int ubx_checksum_A          = 0;
-int ubx_checksum_B          = 0;
-int ubx_expected_checksum_A = 0;
-int ubx_expected_checksum_B = 0;
+int ubxLength             = 0;
+int ubxClass              = 0;
+int ubxId                 = 0;
+int ubxChecksumA          = 0;
+int ubxChecksumB          = 0;
+int ubxExpectedChecksumA  = 0;
+int ubxExpectedChecksumB  = 0;
 
-// Process incoming data bytes according to ubx_state
-// Only allow a new file to be opened when a complete packet has been processed and ubx_state has returned to "looking_for_B5"
-// Or when a data error is detected (sync_lost)
+// Process incoming data bytes according to parseUbxState
+// Only allow a new file to be opened when a complete packet has been processed and parseUbxState has returned to "PARSE_UBX_SYNC_CHAR_1"
+// Or when a data error is detected (SYNC_LOST)
 
 // UBX Frame Structure:
 // Sync Char 1: 1-byte  0xB5
@@ -36,106 +40,106 @@ int ubx_expected_checksum_B = 0;
 // CK_B:        1-byte
 // Example:     B5 62 02 15 0010 4E621058395C5C40000012000101C6BC 06 00
 
-bool processUBX(char c)
+bool processUbx(char c)
 {
-  switch (ubx_state) {
-    case (looking_for_B5):
+  switch (parseUbxState) {
+    case (PARSE_UBX_SYNC_CHAR_1):
       {
         if (c == 0xB5) // Have we found Sync Char 1 (0xB5) if we were expecting one?
         {
-          ubx_state = looking_for_62; // Now look for Sync Char 2 (0x62)
+          parseUbxState = PARSE_UBX_SYNC_CHAR_2; // Now look for Sync Char 2 (0x62)
         }
         else
         {
           if (settings.printMajorDebugMessages)
           {
-            Serial.println(F("processUBX: expecting Sync Char 0xB5 but did not receive one"));
+            Serial.println(F("processUbx: expecting Sync Char 0xB5 but did not receive one"));
           }
-          ubx_state = sync_lost;
+          parseUbxState = SYNC_LOST;
         }
       }
       break;
-    case (looking_for_62):
+    case (PARSE_UBX_SYNC_CHAR_2):
       {
         if (c == 0x62) // Have we found Sync Char 2 (0x62) when we were expecting one?
         {
-          ubx_expected_checksum_A = 0; // Reset the expected checksum
-          ubx_expected_checksum_B = 0;
-          ubx_state = looking_for_class; // Now look for Class byte
+          ubxExpectedChecksumA = 0; // Reset the expected checksum
+          ubxExpectedChecksumB = 0;
+          parseUbxState = PARSE_UBX_CLASS; // Now look for Class byte
         }
         else
         {
           if (settings.printMajorDebugMessages)
           {
-            Serial.println(F("processUBX: expecting Sync Char 0x62 but did not receive one"));
+            Serial.println(F("processUbx: expecting Sync Char 0x62 but did not receive one"));
           }
-          ubx_state = sync_lost;
+          parseUbxState = SYNC_LOST;
         }
       }
       break;
-    case (looking_for_class):
+    case (PARSE_UBX_CLASS):
       {
-        ubx_class = c;
-        ubx_expected_checksum_A = ubx_expected_checksum_A + c; // Update the expected checksum
-        ubx_expected_checksum_B = ubx_expected_checksum_B + ubx_expected_checksum_A;
-        ubx_state = looking_for_ID; // Now look for ID byte
+        ubxClass = c;
+        ubxExpectedChecksumA = ubxExpectedChecksumA + c; // Update the expected checksum
+        ubxExpectedChecksumB = ubxExpectedChecksumB + ubxExpectedChecksumA;
+        parseUbxState = PARSE_UBX_ID; // Now look for ID byte
       }
       break;
-    case (looking_for_ID):
+    case (PARSE_UBX_ID):
       {
-        ubx_ID = c;
-        ubx_expected_checksum_A = ubx_expected_checksum_A + c; // Update the expected checksum
-        ubx_expected_checksum_B = ubx_expected_checksum_B + ubx_expected_checksum_A;
-        ubx_state = looking_for_length_LSB; // Now look for length LSB
+        ubxId = c;
+        ubxExpectedChecksumA = ubxExpectedChecksumA + c; // Update the expected checksum
+        ubxExpectedChecksumB = ubxExpectedChecksumB + ubxExpectedChecksumA;
+        parseUbxState = PARSE_UBX_LENGTH_LSB; // Now look for length LSB
       }
       break;
-    case (looking_for_length_LSB):
+    case (PARSE_UBX_LENGTH_LSB):
       {
-        ubx_length = c; // Store the length LSB
-        ubx_expected_checksum_A = ubx_expected_checksum_A + c; // Update the expected checksum
-        ubx_expected_checksum_B = ubx_expected_checksum_B + ubx_expected_checksum_A;
-        ubx_state = looking_for_length_MSB; // Now look for length MSB
+        ubxLength = c; // Store the length LSB
+        ubxExpectedChecksumA = ubxExpectedChecksumA + c; // Update the expected checksum
+        ubxExpectedChecksumB = ubxExpectedChecksumB + ubxExpectedChecksumA;
+        parseUbxState = PARSE_UBX_LENGTH_MSB; // Now look for length MSB
       }
       break;
-    case (looking_for_length_MSB):
+    case (PARSE_UBX_LENGTH_MSB):
       {
-        ubx_length = ubx_length + (c * 256); // Add the length MSB
-        ubx_expected_checksum_A = ubx_expected_checksum_A + c; // Update the expected checksum
-        ubx_expected_checksum_B = ubx_expected_checksum_B + ubx_expected_checksum_A;
-        ubx_state = processing_payload; // Now look for payload bytes (length: ubx_length)
+        ubxLength = ubxLength + (c * 256); // Add the length MSB
+        ubxExpectedChecksumA = ubxExpectedChecksumA + c; // Update the expected checksum
+        ubxExpectedChecksumB = ubxExpectedChecksumB + ubxExpectedChecksumA;
+        parseUbxState = PARSE_UBX_PAYLOAD; // Now look for payload bytes (length: ubxLength)
       }
       break;
-    case (processing_payload):
+    case (PARSE_UBX_PAYLOAD):
       {
-        // TO DO: extract useful things from the incoming message based on ubx_class, ubx_ID and ubx_length (byte count)
-        ubx_length = ubx_length - 1; // Decrement length by one
-        ubx_expected_checksum_A = ubx_expected_checksum_A + c; // Update the expected checksum
-        ubx_expected_checksum_B = ubx_expected_checksum_B + ubx_expected_checksum_A;
-        if (ubx_length == 0)
+        // TO DO: extract useful things from the incoming message based on ubxClass, ubxId and ubxLength (byte count)
+        ubxLength = ubxLength - 1; // Decrement length by one
+        ubxExpectedChecksumA = ubxExpectedChecksumA + c; // Update the expected checksum
+        ubxExpectedChecksumB = ubxExpectedChecksumB + ubxExpectedChecksumA;
+        if (ubxLength == 0)
         {
-          ubx_expected_checksum_A = ubx_expected_checksum_A & 0xff; // Limit checksums to 8-bits
-          ubx_expected_checksum_B = ubx_expected_checksum_B & 0xff;
-          ubx_state = looking_for_checksum_A; // If we have received length payload bytes, look for checksum bytes
+          ubxExpectedChecksumA = ubxExpectedChecksumA & 0xff; // Limit checksums to 8-bits
+          ubxExpectedChecksumB = ubxExpectedChecksumB & 0xff;
+          parseUbxState = PARSE_UBX_CHECKSUM_A; // If we have received length payload bytes, look for checksum bytes
         }
       }
       break;
-    case (looking_for_checksum_A):
+    case (PARSE_UBX_CHECKSUM_A):
       {
-        ubx_checksum_A = c;
-        ubx_state = looking_for_checksum_B;
+        ubxChecksumA = c;
+        parseUbxState = PARSE_UBX_CHECKSUM_B;
       }
       break;
-    case (looking_for_checksum_B):
+    case (PARSE_UBX_CHECKSUM_B):
       {
-        ubx_checksum_B = c;
-        ubx_state = looking_for_B5; // All bytes received so go back to looking for a new Sync Char 1 unless there is a checksum error
-        if ((ubx_expected_checksum_A != ubx_checksum_A) or (ubx_expected_checksum_B != ubx_checksum_B))
+        ubxChecksumB = c;
+        parseUbxState = PARSE_UBX_SYNC_CHAR_1; // All bytes received so go back to looking for a new Sync Char 1 unless there is a checksum error
+        if ((ubxExpectedChecksumA != ubxChecksumA) or (ubxExpectedChecksumB != ubxChecksumB))
         {
           if (settings.printMajorDebugMessages)
           {
-            Serial.println(F("processUBX: UBX checksum error"));
+            Serial.println(F("processUbx: UBX checksum error"));
           }
-          ubx_state = sync_lost;
+          parseUbxState = SYNC_LOST;
         }
         else
         {
@@ -148,13 +152,13 @@ bool processUBX(char c)
                           rtc.hour, rtc.minute, rtc.seconds, rtc.hundredths);
 
             // Print UBX frame information
-            Serial.printf("UBX Class: 0x%02X ID: 0x%02X", ubx_class, ubx_ID);
+            Serial.printf("UBX Class: 0x%02X ID: 0x%02X", ubxClass, ubxId);
 
-            switch (ubx_class)
+            switch (ubxClass)
             {
               case UBX_CLASS_NAV:
                 {
-                  switch (ubx_ID)
+                  switch (ubxId)
                   {
                     case UBX_NAV_CLOCK:
                       Serial.print(F(" NAV-CLOCK"));
@@ -197,7 +201,7 @@ bool processUBX(char c)
                 break;
               case UBX_CLASS_RXM:
                 {
-                  switch (ubx_ID)
+                  switch (ubxId)
                   {
                     case UBX_RXM_RAWX:
                       Serial.print(F(" RXM-RAWX"));
@@ -210,7 +214,7 @@ bool processUBX(char c)
                 break;
               case UBX_CLASS_TIM:
                 {
-                  switch (ubx_ID)
+                  switch (ubxId)
                   {
                     case UBX_TIM_TM2:
                       Serial.print(F(" TIM-TM2"));
@@ -221,7 +225,7 @@ bool processUBX(char c)
             }
             Serial.println();
           }
-          ubx_state = frame_valid;
+          parseUbxState = FRAME_VALID;
         }
       }
       break;

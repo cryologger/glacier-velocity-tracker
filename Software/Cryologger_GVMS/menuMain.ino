@@ -13,7 +13,7 @@ void menuMain()
     Serial.println(F("Menu: Main Menu"));
     Serial.println(F("1) Configure Logging"));
     Serial.println(F("2) Configure RTC"));
-    Serial.println(F("3) Configure GNSS Device"));
+    Serial.println(F("3) Configure GNSS"));
     Serial.println(F("4) Configure Qwiic Bus"));
     Serial.println(F("5) Configure Power Options"));
 
@@ -64,7 +64,7 @@ void menuMain()
       byte gContinue = getByteChoice(menuTimeout);
       if (gContinue == 'y')
       {
-        resetGNSS();
+        resetGnss();
         Serial.print(F("GNSS reset. Please reset OpenLog Artemis and open a terminal at "));
         Serial.print((String)settings.serialTerminalBaudRate);
         Serial.println(F("bps..."));

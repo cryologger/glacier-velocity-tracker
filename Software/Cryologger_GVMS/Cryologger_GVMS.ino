@@ -79,8 +79,8 @@ TwoWire       qwiic(1); // Pads 8/9
 volatile bool alarmFlag             = false;  // Flag to indicate if RTC ISR triggered
 volatile bool stopLoggingFlag       = false;  // Flag to indicate if data logging should be halted
 bool          rtcSyncFlag           = false;  // Flag to indicate if the RTC has synced to GNSS
-bool          rtcNeedsSync          = true;   // Flag to indicate if the RTC needs to be synced (after sleep)
-bool          gnssSettingsChanged   = false;  // Flag to indicate if the GNSS settings have been changed
+bool          rtcSyncRequiredFlag   = true;   // Flag to indicate if the RTC needs to be synced (after sleep)
+bool          gnssSettingsFlag      = false;  // Flag to indicate if the GNSS settings have been changed
 bool          ledState              = LOW;    // Flag to indicate state of LED in blinkLed() function
 bool          watchdogFlag          = false;  // Flag to indicate if WDT ISR triggered
 char          dirName[9]            = "";     // Log file directory name. Format: YYYYMMDD/HHMMSS.ubx
@@ -244,7 +244,7 @@ void loop()
     openNewLogFile(); // Create new log file
     setRtcAlarm(); // Set RTC alarm
     alarmFlag = false; // Clear alarm flag
-    rtcNeedsSync = true; // Set flag to indicate RTC sync is required
+    rtcSyncRequiredFlag = true; // Set flag to indicate RTC sync is required
   }
 
   uint64_t timeNow = rtcMillis();
@@ -263,7 +263,7 @@ void loop()
     // Update measurementStartTime to calculate when to return to sleep
     measurementStartTime = measurementStartTime + (settings.usLoggingDuration / 1000ULL) + (settings.usSleepDuration / 1000ULL);
 
-    rtcNeedsSync = true; // Set flag to sync RTC after sleep
+    rtcSyncRequiredFlag = true; // Set flag to sync RTC after sleep
   }
 }
 
@@ -355,7 +355,7 @@ void beginDataLogging()
     bool dateValid = false,
          timeValid = false;
     rtcSyncFlag = false;
-    rtcNeedsSync = true;
+    rtcSyncRequiredFlag = true;
 
     // Attempt to sync RTC with GNSS for up to 5 minutes
     Serial.println("Attempting to sync RTC with GNSS. Type any character to abort.");
