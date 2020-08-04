@@ -1,4 +1,7 @@
 # Cryologger - Glacier Velocity Measurement System
+
+<img src="https://cdn.sparkfun.com//assets/parts/1/5/3/5/2/16481-SparkFun_GPS-RTK-SMA_Breakout_-_ZED-F9P__Qwiic_-01a.jpg" height="360">
+
 A low-cost, open-source glacier velocity measurement system based on the u-blox ZED-F9P intended for use with Precise Point Positioning (PPP) techniques.
 
 ## Background
