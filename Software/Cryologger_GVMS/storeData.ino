@@ -75,9 +75,9 @@ bool storeData(void)
   bool ret_val = true; // Return value
 
   if (!qwiicOnline.uBlox || !qwiicAvailable.uBlox)
-    goto SD_WRITE; // uBlox is offline so let's not try to talk to it. But we will still try to save any remaining data to SD.
+    goto SD_WRITE; // u-blox is offline so let's not try to talk to it. Still try to save any remaining data to SD.
 
-  //Check for new I2C data three times faster than usBetweenReadings to avoid pounding the I2C bus
+  // Check for new I2C data three times faster than usBetweenReadings to avoid pounding the I2C bus
   if ((micros() - lastReadTime) > (settings.usBetweenReadings / 3))
   {
     // **** Start of code taken from checkUbloxI2C ****
@@ -129,7 +129,7 @@ bool storeData(void)
     // Or pull-ups? (PaulZC)
     if (bytesAvailable & ((uint16_t)1 << 15))
     {
-      //Clear the MSbit
+      // Clear the MSbit
       bytesAvailable &= ~((uint16_t)1 << 15);
 
       if (settings.printMajorDebugMessages)
@@ -148,14 +148,14 @@ bool storeData(void)
     while (bytesAvailable)
     {
       qwiic.beginTransmission(settings.sensor_uBlox.ubloxI2Caddress);
-      qwiic.write(0xFF);                     //0xFF is the register to read data from
-      if (qwiic.endTransmission(false) != 0) //Send a restart command. Do not release bus.
+      qwiic.write(0xFF);                     // 0xFF is the register to read data from
+      if (qwiic.endTransmission(false) != 0) // Send a restart command. Do not release bus.
       {
         ret_val = false;
-        goto SD_WRITE; //Sensor did not ACK so bail
+        goto SD_WRITE; // Sensor did not ACK so bail
       }
 
-      //Limit to 32 bytes or whatever the buffer limit is for given platform
+      // Limit to 32 bytes or whatever the buffer limit is for given platform
       uint16_t bytesToRead = bytesAvailable;
       if (bytesToRead > I2C_BUFFER_LENGTH)
         bytesToRead = I2C_BUFFER_LENGTH;
@@ -167,40 +167,40 @@ TRY_AGAIN:
       {
         for (uint16_t x = 0; x < bytesToRead; x++)
         {
-          uint8_t incoming = qwiic.read(); //Grab the actual character
+          uint8_t incoming = qwiic.read(); // Grab the actual character
 
-          processUbx(incoming); //Process the incoming byte. This will update parseUbxState
+          processUbx(incoming); // Process the incoming byte. This will update parseUbxState
 
-          UBXbuffer[UBXpointer] = incoming; //Store incoming in the UBX buffer
-          UBXpointer++; //Increment the pointer
-          if (UBXpointer == UBXbufferSize) //This should never happen!
+          UBXbuffer[UBXpointer] = incoming; // Store incoming in the UBX buffer
+          UBXpointer++; // Increment the pointer
+          if (UBXpointer == UBXbufferSize) // This should never happen!
           {
             Serial.print(F("storeData: UBXbuffer overflow! You need to increase the size of UBXbufferSize in storeData. Freezing..."));
             while (1)
               ;
           }
 
-          if (parseUbxState == SYNC_LOST) //If the UBX frame was invalid or we lost sync
+          if (parseUbxState == SYNC_LOST) // If the UBX frame was invalid or we lost sync
           {
-            //TO DO: close the current file and open a new one when parseUbxState == SYNC_LOST ?
-            UBXpointer = 0; //Discard the frame by resetting the UBXpointer
-            parseUbxState = PARSE_UBX_SYNC_CHAR_1; //Start looking for the start of a new frame
+            // TO DO: close the current file and open a new one when parseUbxState == SYNC_LOST ?
+            UBXpointer = 0; // Discard the frame by resetting the UBXpointer
+            parseUbxState = PARSE_UBX_SYNC_CHAR_1; // Start looking for the start of a new frame
           }
-          else if (parseUbxState == FRAME_VALID) //If the UBX frame is valid
+          else if (parseUbxState == FRAME_VALID) // If the UBX frame is valid
           {
-            if (UBXbuffer[2] != UBX_CLASS_ACK) //If the frame is not an ACK/NACK
+            if (UBXbuffer[2] != UBX_CLASS_ACK) // If the frame is not an ACK/NACK
             {
-              //Check for a RAWX frame so we can calculate the frame rate
-              if (UBXbuffer[2] == UBX_CLASS_RXM) //Class 0x02
+              // Check for a RAWX frame so we can calculate the frame rate
+              if (UBXbuffer[2] == UBX_CLASS_RXM) // Class 0x02
               {
-                if (UBXbuffer[3] == UBX_RXM_RAWX) //ID 0x15
+                if (UBXbuffer[3] == UBX_RXM_RAWX) // ID 0x15
                 {
-                  lastRAWXmicros5 = lastRAWXmicros4; //Update lastRAWXmicros
+                  lastRAWXmicros5 = lastRAWXmicros4; // Update lastRAWXmicros
                   lastRAWXmicros4 = lastRAWXmicros3;
                   lastRAWXmicros3 = lastRAWXmicros2;
                   lastRAWXmicros2 = lastRAWXmicros1;
                   lastRAWXmicros1 = micros();
-                  if ((millis() - lastRAWXdebug) > 5000UL) //Print a debug message every 5 secs if enabled
+                  if ((millis() - lastRAWXdebug) > 5000UL) // Print a debug message every 5 secs if enabled
                   {
                     if (settings.printMinorDebugMessages)
                     {
@@ -212,22 +212,22 @@ TRY_AGAIN:
                       float interval = (interval1 + interval2 + interval3 + interval4) / 4;
                       Serial.println(interval, 3);
                     }
-                    lastRAWXdebug = millis(); //Update lastRAWXdebug
+                    lastRAWXdebug = millis(); // Update lastRAWXdebug
                   }
                 }
               }
 
-              //Check for a PVT frame so we can calculate the frame rate
-              if (UBXbuffer[2] == UBX_CLASS_NAV) //Class 0x01
+              // Check for a PVT frame so we can calculate the frame rate
+              if (UBXbuffer[2] == UBX_CLASS_NAV) // Class 0x01
               {
-                if (UBXbuffer[3] == UBX_NAV_PVT) //ID 0x07
+                if (UBXbuffer[3] == UBX_NAV_PVT) // ID 0x07
                 {
-                  lastPVTmicros5 = lastPVTmicros4; //Update lastPVTmicros
+                  lastPVTmicros5 = lastPVTmicros4; // Update lastPVTmicros
                   lastPVTmicros4 = lastPVTmicros3;
                   lastPVTmicros3 = lastPVTmicros2;
                   lastPVTmicros2 = lastPVTmicros1;
                   lastPVTmicros1 = micros();
-                  if ((millis() - lastPVTdebug) > 5000UL) //Print a debug message every 5 secs if enabled
+                  if ((millis() - lastPVTdebug) > 5000UL) // Print a debug message every 5 secs if enabled
                   {
                     if (settings.printMinorDebugMessages)
                     {
@@ -239,22 +239,22 @@ TRY_AGAIN:
                       float interval = (interval1 + interval2 + interval3 + interval4) / 4;
                       Serial.println(interval, 3);
                     }
-                    lastPVTdebug = millis(); //Update lastPVTdebug
+                    lastPVTdebug = millis(); // Update lastPVTdebug
                   }
                 }
               }
 
-              //Check for a HPPOSLLH frame so we can calculate the frame rate
-              if (UBXbuffer[2] == UBX_CLASS_NAV) //Class 0x01
+              // Check for a HPPOSLLH frame so we can calculate the frame rate
+              if (UBXbuffer[2] == UBX_CLASS_NAV) // Class 0x01
               {
-                if (UBXbuffer[3] == UBX_NAV_HPPOSLLH) //ID 0x14
+                if (UBXbuffer[3] == UBX_NAV_HPPOSLLH) // ID 0x14
                 {
-                  lastHPPOSLLHmicros5 = lastHPPOSLLHmicros4; //Update lastHPPOSLLHmicros
+                  lastHPPOSLLHmicros5 = lastHPPOSLLHmicros4; // Update lastHPPOSLLHmicros
                   lastHPPOSLLHmicros4 = lastHPPOSLLHmicros3;
                   lastHPPOSLLHmicros3 = lastHPPOSLLHmicros2;
                   lastHPPOSLLHmicros2 = lastHPPOSLLHmicros1;
                   lastHPPOSLLHmicros1 = micros();
-                  if ((millis() - lastHPPOSLLHdebug) > 5000UL) //Print a debug message every 5 secs if enabled
+                  if ((millis() - lastHPPOSLLHdebug) > 5000UL) // Print a debug message every 5 secs if enabled
                   {
                     if (settings.printMinorDebugMessages)
                     {
@@ -266,22 +266,22 @@ TRY_AGAIN:
                       float interval = (interval1 + interval2 + interval3 + interval4) / 4;
                       Serial.println(interval, 3);
                     }
-                    lastHPPOSLLHdebug = millis(); //Update lastHPPOSLLHdebug
+                    lastHPPOSLLHdebug = millis(); // Update lastHPPOSLLHdebug
                   }
                 }
               }
 
-              //Check for a RELPOSNED frame so we can calculate the frame rate
-              if (UBXbuffer[2] == UBX_CLASS_NAV) //Class 0x01
+              // Check for a RELPOSNED frame so we can calculate the frame rate
+              if (UBXbuffer[2] == UBX_CLASS_NAV) // Class 0x01
               {
-                if (UBXbuffer[3] == UBX_NAV_RELPOSNED) //ID 0x3C
+                if (UBXbuffer[3] == UBX_NAV_RELPOSNED) // ID 0x3C
                 {
-                  lastRELPOSNEDmicros5 = lastRELPOSNEDmicros4; //Update lastRELPOSNEDmicros
+                  lastRELPOSNEDmicros5 = lastRELPOSNEDmicros4; // Update lastRELPOSNEDmicros
                   lastRELPOSNEDmicros4 = lastRELPOSNEDmicros3;
                   lastRELPOSNEDmicros3 = lastRELPOSNEDmicros2;
                   lastRELPOSNEDmicros2 = lastRELPOSNEDmicros1;
                   lastRELPOSNEDmicros1 = micros();
-                  if ((millis() - lastRELPOSNEDdebug) > 5000UL) //Print a debug message every 5 secs if enabled
+                  if ((millis() - lastRELPOSNEDdebug) > 5000UL) // Print a debug message every 5 secs if enabled
                   {
                     if (settings.printMinorDebugMessages)
                     {
@@ -293,34 +293,34 @@ TRY_AGAIN:
                       float interval = (interval1 + interval2 + interval3 + interval4) / 4;
                       Serial.println(interval, 3);
                     }
-                    lastRELPOSNEDdebug = millis(); //Update lastRELPOSNEDdebug
+                    lastRELPOSNEDdebug = millis(); // Update lastRELPOSNEDdebug
                   }
                 }
               }
 
-              //Check for a UBX-NAV-TIMEUTC frame so we can set the RTC
-              if (UBXbuffer[2] == UBX_CLASS_NAV) //Class 0x01
+              // Check for a UBX-NAV-TIMEUTC frame so we can set the RTC
+              if (UBXbuffer[2] == UBX_CLASS_NAV) // Class 0x01
               {
-                if (UBXbuffer[3] == UBX_NAV_TIMEUTC) //ID 0x21
+                if (UBXbuffer[3] == UBX_NAV_TIMEUTC) // ID 0x21
                 {
-                  if (rtcSyncRequiredFlag) //Do we need to sync the RTC
+                  if (rtcSyncRequiredFlag) // Do we need to sync the RTC
                   {
-                    if (((UBXbuffer[25] & 0x04) == 0x04) && (rtcSyncRequiredFlag))//If the validUTC flag bit is set and a sync is needed
+                    if (((UBXbuffer[25] & 0x04) == 0x04) && (rtcSyncRequiredFlag)) // If the validUTC flag bit is set and a sync is needed
                     {
                       uint16_t rtcYear = ((uint16_t)UBXbuffer[18]) | (((uint16_t)UBXbuffer[19]) << 8); //RTC year
                       union {
                         int32_t signed32;
                         uint32_t unsigned32;
-                      } nanos; //union for accurate conversion to int32_t without needing a cast
-                      //Assemble the nanos
+                      } nanos; // Union for accurate conversion to int32_t without needing a cast
+                      // Assemble the nanos
                       nanos.unsigned32 = ((uint32_t)UBXbuffer[14]) | (((uint32_t)UBXbuffer[15]) << 8) | (((uint32_t)UBXbuffer[16]) << 16) | (((uint32_t)UBXbuffer[17]) << 24);
-                      //If nanos is negative, set it to zero
-                      //The ZED-F9P Integration Manual says: "the nano value can range from -5000000 (i.e. -5 ms) to +994999999 (i.e. nearly 995 ms)."
-                      //"if a resolution of one hundredth of a second is adequate, negative nano values can simply be rounded up to 0 and effectively ignored."
+                      // If nanos is negative, set it to zero
+                      // The ZED-F9P Integration Manual says: "the nano value can range from -5000000 (i.e. -5 ms) to +994999999 (i.e. nearly 995 ms)."
+                      // "if a resolution of one hundredth of a second is adequate, negative nano values can simply be rounded up to 0 and effectively ignored."
                       if (nanos.signed32 < 0)
                         nanos.signed32 = 0;
-                      uint8_t centis = (uint8_t)(nanos.unsigned32 / 10000000); //Convert nanos to hundredths (centiseconds)
-                      rtc.setTime(UBXbuffer[22], UBXbuffer[23], UBXbuffer[24], centis, UBXbuffer[21], UBXbuffer[20], (rtcYear - 2000)); //Set the RTC
+                      uint8_t centis = (uint8_t)(nanos.unsigned32 / 10000000); // Convert nanos to hundredths (centiseconds)
+                      rtc.setTime(UBXbuffer[22], UBXbuffer[23], UBXbuffer[24], centis, UBXbuffer[21], UBXbuffer[20], (rtcYear - 2000)); // Set the RTC
                       rtcSyncFlag = true; // Set rtcSyncFlag to show RTC has been synced
                       rtcSyncRequiredFlag = false; // Clear rtcSyncRequiredFlag so we don't set the RTC multiple times
                       if (settings.printMinorDebugMessages)
@@ -358,8 +358,8 @@ TRY_AGAIN:
                 Serial.println(UBXbuffer[7], HEX);
               }
             }
-            UBXpointer = 0; //Reset the UBXpointer
-            parseUbxState = PARSE_UBX_SYNC_CHAR_1; //Start looking for the start of a new frame
+            UBXpointer = 0; // Reset the UBXpointer
+            parseUbxState = PARSE_UBX_SYNC_CHAR_1; // Start looking for the start of a new frame
           }
         }
       }
@@ -400,15 +400,15 @@ SD_WRITE:
     while (keep_going)
     {
       uint8_t c = GNSSbuffer.read_char(); // Read a char from the buffer
-      SDbuffer[SDpointer] = c; // Store it in the SDbuffer
-      SDpointer++; // Increment the SDpointer
-      if (SDpointer == SDpacket) // Have we reached SDpacket (512) bytes?
+      SDbuffer[SDpointer] = c;            // Store it in the SDbuffer
+      SDpointer++;                        // Increment the SDpointer
+      if (SDpointer == SDpacket)          // Have we reached SDpacket (512) bytes?
       {
-        SDpointer = 0; // Reset the SDpointer
+        SDpointer = 0;                    // Reset the SDpointer
         digitalWrite(PIN_STAT_LED, HIGH); // Flash the LED while writing
-        file.write(SDbuffer, SDpacket); // Record the buffer to the card
+        file.write(SDbuffer, SDpacket);   // Record the buffer to the card
         digitalWrite(PIN_STAT_LED, LOW);
-        keep_going = false; // Stop now that we have written one packet
+        keep_going = false;               // Stop now that we have written one packet
       }
 
       bufAvail--; // Decrement bufAvail
@@ -422,14 +422,14 @@ SD_WRITE:
     if (millis() - lastDataLogSyncTime > 500)
     {
       lastDataLogSyncTime = millis();
-      digitalWrite(PIN_STAT_LED, HIGH); // Flash the LED while writing
-      if (SDpointer > 0) // Check if we have any 'extra' bytes in SDbuffer
+      digitalWrite(PIN_STAT_LED, HIGH);   // Flash the LED while writing
+      if (SDpointer > 0)                  // Check if we have any 'extra' bytes in SDbuffer
       {
-        file.write(SDbuffer, SDpointer); // Write the 'extra' bytes
-        SDpointer = 0; // Reset the SDpointer
+        file.write(SDbuffer, SDpointer);  // Write the 'extra' bytes
+        SDpointer = 0;                    // Reset the SDpointer
       }
-      file.sync(); // Sync the file system
-      updateDataFileAccess(); // Update the file access timestamp
+      file.sync();                        // Sync the file system
+      //updateDataFileAccess();             // Update the file access timestamp
       digitalWrite(PIN_STAT_LED, LOW);
     }
 

@@ -83,13 +83,13 @@ bool beginSensors()
       }
 
       // Set I2C port to output UBX only (turn off NMEA noise)
-      gnss.newCfgValset8(0x10720001, 1, VAL_LAYER_RAM | VAL_LAYER_BBR); // CFG-I2COUTPROT-UBX : Enable UBX output on the I2C port (in RAM and BBR)
-      gnss.addCfgValset8(0x10720002, 0); // CFG-I2COUTPROT-NMEA : Disable NMEA output on the I2C port
+      gnss.newCfgValset8(0x10720001, 1, VAL_LAYER_RAM | VAL_LAYER_BBR); // CFG-I2COUTPROT-UBX     : Enable UBX output on the I2C port (in RAM and BBR)
+      gnss.addCfgValset8(0x10720002, 0);                                // CFG-I2COUTPROT-NMEA    : Disable NMEA output on the I2C port
       if (minfo.HPG)
       {
-        gnss.addCfgValset8(0x10720004, 0); // CFG-I2COUTPROT-RTCM3X : Disable RTCM3 output on the I2C port (Precision modules only)
+        gnss.addCfgValset8(0x10720004, 0);                              // CFG-I2COUTPROT-RTCM3X  : Disable RTCM3 output on the I2C port (Precision modules only)
       }
-      uint8_t success = gnss.sendCfgValset8(0x20920001, 0, 2100); // CFG-INFMSG-UBX_I2C : Disable UBX INFO messages on the I2C port (maxWait 2100ms)
+      uint8_t success = gnss.sendCfgValset8(0x20920001, 0, 2100);       // CFG-INFMSG-UBX_I2C     : Disable UBX INFO messages on the I2C port (maxWait 2100ms)
       if (success == 0)
       {
         if (settings.printMajorDebugMessages)
@@ -191,38 +191,40 @@ bool beginSensors()
       // Update settings.sensor_uBlox.minMeasIntervalGps and settings.sensor_uBlox.minMeasIntervalAll according to module type
       if (strcmp(minfo.mod, "ZED-F9P") == 0)            // Is this a ZED-F9P?
       {
-        settings.sensor_uBlox.minMeasIntervalGps = 50;  // ZED-F9P can do 20Hz RTK (***Change 40 to push RAWX logging to 25Hz for non-RTK applications***)
-        settings.sensor_uBlox.minMeasIntervalAll = 125; // ZED-F9P can do 8Hz RTK
+        // GPS + GLO RAW = 25 Hz = 1 / 25 * 1000 = 40 ms
+        // GPS + GLO + GAL + BDS = 20 Hz = 1 / 20 * 1000 = 50 ms
+        settings.sensor_uBlox.minMeasIntervalGps = 40;  // ZED-F9P can do 20 Hz RTK
+        settings.sensor_uBlox.minMeasIntervalAll = 50; // ZED-F9P can do 8 Hz RTK
       }
       else if (strcmp(minfo.mod, "ZED-F9K") == 0)       // Is this a ZED-F9K?
       {
-        settings.sensor_uBlox.minMeasIntervalGps = 33;  // ZED-F9K can do 30Hz
-        settings.sensor_uBlox.minMeasIntervalAll = 100; // ZED-F9K can do 10Hz (Guess!)
+        settings.sensor_uBlox.minMeasIntervalGps = 33;  // ZED-F9K can do 30 Hz
+        settings.sensor_uBlox.minMeasIntervalAll = 100; // ZED-F9K can do 10 Hz (Guess!)
       }
       else if (strcmp(minfo.mod, "ZED-F9R") == 0)       // Is this a ZED-F9R?
       {
-        settings.sensor_uBlox.minMeasIntervalGps = 33;  // ZED-F9R can do 30Hz
-        settings.sensor_uBlox.minMeasIntervalAll = 100; // ZED-F9R can do 10Hz (Guess!)
+        settings.sensor_uBlox.minMeasIntervalGps = 33;  // ZED-F9R can do 30 Hz
+        settings.sensor_uBlox.minMeasIntervalAll = 100; // ZED-F9R can do 10 Hz (Guess!)
       }
       else if (strcmp(minfo.mod, "ZED-F9H") == 0)       // Is this a ZED-F9H?
       {
-        settings.sensor_uBlox.minMeasIntervalGps = 33;  // ZED-F9H can do 30Hz
-        settings.sensor_uBlox.minMeasIntervalAll = 100; // ZED-F9H can do 10Hz (Guess!)
+        settings.sensor_uBlox.minMeasIntervalGps = 33;  // ZED-F9H can do 30 Hz
+        settings.sensor_uBlox.minMeasIntervalAll = 100; // ZED-F9H can do 10 Hz (Guess!)
       }
       else if (strcmp(minfo.mod, "ZED-F9T") == 0)       // Is this a ZED-F9T?
       {
-        settings.sensor_uBlox.minMeasIntervalGps = 50;  // ZED-F9T can do 20Hz
-        settings.sensor_uBlox.minMeasIntervalAll = 125; // ZED-F9T can do 8Hz
+        settings.sensor_uBlox.minMeasIntervalGps = 50;  // ZED-F9T can do 20 Hz
+        settings.sensor_uBlox.minMeasIntervalAll = 125; // ZED-F9T can do 8 Hz
       }
       else if (strcmp(minfo.mod, "NEO-M9N") == 0)       // Is this a NEO-M9N?
       {
-        settings.sensor_uBlox.minMeasIntervalGps = 40;  // NEO-M9N can do 25Hz
-        settings.sensor_uBlox.minMeasIntervalAll = 40;  // NEO-M9N can do 25Hz
+        settings.sensor_uBlox.minMeasIntervalGps = 40;  // NEO-M9N can do 25 Hz
+        settings.sensor_uBlox.minMeasIntervalAll = 40;  // NEO-M9N can do 25 Hz
       }
       else
       {
-        settings.sensor_uBlox.minMeasIntervalGps = 50;  // Default to 20Hz
-        settings.sensor_uBlox.minMeasIntervalAll = 125; // Default to 8Hz
+        settings.sensor_uBlox.minMeasIntervalGps = 50;  // Default to 20 Hz
+        settings.sensor_uBlox.minMeasIntervalAll = 125; // Default to 8 Hz
       }
 
       // Calculate measurement rate
@@ -244,10 +246,10 @@ bool beginSensors()
       // If measurement interval is less than minMeasIntervalRawxAll and RAWX is enabled then also disable all constellations except GPS to limit I2C traffic
       if ((measRate < settings.sensor_uBlox.minMeasIntervalAll) || ((measRate < settings.sensor_uBlox.minMeasIntervalRawxAll) && (settings.sensor_uBlox.logUBXRXMRAWX)))
       {
-        gnss.newCfgValset8(0x10310021, 0, VAL_LAYER_RAM);    // CFG-SIGNAL-GAL_ENA : Disable Galileo (in RAM only)
-        gnss.addCfgValset8(0x10310022, 0);                   // CFG-SIGNAL-BDS_ENA : Disable BeiDou
+        gnss.newCfgValset8(0x10310021, 0, VAL_LAYER_RAM);    // CFG-SIGNAL-GAL_ENA  : Disable Galileo (in RAM only)
+        gnss.addCfgValset8(0x10310022, 0);                   // CFG-SIGNAL-BDS_ENA  : Disable BeiDou
         gnss.addCfgValset8(0x10310024, 0);                   // CFG-SIGNAL-QZSS_ENA : Disable QZSS
-        success = gnss.sendCfgValset8(0x10310025, 0, 2100);  // CFG-SIGNAL-GLO_ENA : Disable GLONASS (maxWait 2100ms)
+        success = gnss.sendCfgValset8(0x10310025, 0, 2100);  // CFG-SIGNAL-GLO_ENA  : Disable GLONASS (maxWait 2100ms)
         if (success == 0)
         {
           if (settings.printMajorDebugMessages)
@@ -265,10 +267,10 @@ bool beginSensors()
       }
       else
       {
-        gnss.newCfgValset8(0x10310021, 1, VAL_LAYER_RAM);    // CFG-SIGNAL-GAL_ENA : Enable Galileo (in RAM only)
-        gnss.addCfgValset8(0x10310022, 1);                   // CFG-SIGNAL-BDS_ENA : Enable BeiDou
+        gnss.newCfgValset8(0x10310021, 1, VAL_LAYER_RAM);    // CFG-SIGNAL-GAL_ENA  : Enable Galileo (in RAM only)
+        gnss.addCfgValset8(0x10310022, 1);                   // CFG-SIGNAL-BDS_ENA  : Enable BeiDou
         gnss.addCfgValset8(0x10310024, 1);                   // CFG-SIGNAL-QZSS_ENA : Enable QZSS
-        success = gnss.sendCfgValset8(0x10310025, 1, 2100);  // CFG-SIGNAL-GLO_ENA : Enable GLONASS (maxWait 2100ms)
+        success = gnss.sendCfgValset8(0x10310025, 1, 2100);  // CFG-SIGNAL-GLO_ENA  : Enable GLONASS (maxWait 2100ms)
         if (success == 0)
         {
           if (settings.printMajorDebugMessages)
@@ -286,8 +288,8 @@ bool beginSensors()
       }
 
       // Set output rate
-      gnss.newCfgValset16(0x30210001, measRate, VAL_LAYER_RAM); // CFG-RATE-MEAS : Configure measurement period (in RAM only)
-      success = gnss.sendCfgValset16(0x30210002, 1, 2100); // CFG-RATE-NAV : 1 measurement per navigation solution (maxWait 2100ms)
+      gnss.newCfgValset16(0x30210001, measRate, VAL_LAYER_RAM); // CFG-RATE-MEAS  : Configure measurement period (in RAM only)
+      success = gnss.sendCfgValset16(0x30210002, 1, 2100);      // CFG-RATE-NAV   : 1 measurement per navigation solution (maxWait 2100ms)
       if (success == 0)
       {
         if (settings.printMajorDebugMessages)
@@ -302,6 +304,9 @@ bool beginSensors()
           Serial.println(F("beginSensors: sendCfgValset was successful when setting message interval"));
         }
       }
+
+      // Enable the selected messages in RAM (MaxWait 2100)
+      enableConstellations(2100);
 
       // Enable the selected messages in RAM (MaxWait 2100)
       enableMessages(2100);
@@ -323,7 +328,7 @@ bool detectQwiicDevices()
 
   // Depending on what hardware is configured, the Qwiic bus may have only been turned on a few ms ago
   // Give sensors, specifically those with a low I2C address, time to turn on
-  //delay(100); //SCD30 required >50ms to turn on (commented by PaulZC - we always wait for 250ms after turning on the Qwiic power)
+  //delay(100); // SCD30 required >50ms to turn on (commented by PaulZC - we always wait for 250ms after turning on the Qwiic power)
 
   uint8_t address = settings.sensor_uBlox.ubloxI2Caddress;
 
@@ -460,6 +465,32 @@ uint8_t enableMessages(uint16_t maxWait)
     if (settings.printMajorDebugMessages)
     {
       Serial.println(F("enableMessages: sendCfgValset failed when enabling messages"));
+    }
+  }
+  return (success);
+}
+
+uint8_t enableConstellations(uint16_t maxWait)
+{
+  // Enable the selected constellations
+  uint8_t success = true;
+  success &= gnss.newCfgValset8(0x1031001f, settings.sensor_uBlox.enableGPS, VAL_LAYER_RAM);  // CFG-SIGNAL-GPS_ENA   : Enable GPS (in RAM only)
+  success &= gnss.addCfgValset8(0x2091003d, settings.sensor_uBlox.enableGLO);                 // CFG-SIGNAL-GLO_ENA   : Enable GLONASS
+  success &= gnss.addCfgValset8(0x20910042, settings.sensor_uBlox.enableGAL);                 // CFG-SIGNAL-GAL_ENA   : Enable Galileo
+  success &= gnss.addCfgValset8(0x20910231, settings.sensor_uBlox.enableBDS);                 // CFG-SIGNAL-BDS_ENA   : Enable BeiDou
+  success &= gnss.sendCfgValset8(0x20910231, settings.sensor_uBlox.enableQZSS, maxWait);      // CFG-SIGNAL-QZSS_ENA  : Enable QZSS (maxWait 2100 ms)
+  if (success > 0)
+  {
+    if (settings.printMinorDebugMessages)
+    {
+      Serial.println(F("enableConstellations: sendCfgValset was successful when enabling constellations"));
+    }
+  }
+  else if (maxWait > 0) // If maxWait was zero then we expect success to be false
+  {
+    if (settings.printMajorDebugMessages)
+    {
+      Serial.println(F("enableConstellations: sendCfgValset failed when enabling constellations"));
     }
   }
   return (success);

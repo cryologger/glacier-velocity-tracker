@@ -16,6 +16,11 @@
 struct struct_uBlox {
   bool      log                     = true;
   bool      powerManagement         = true;
+  bool      enableGPS               = true;
+  bool      enableGLO               = true;
+  bool      enableGAL               = false;
+  bool      enableBDS               = false;
+  bool      enableQZSS              = false;
   bool      logUBXNAVCLOCK          = false;
   bool      logUBXNAVHPPOSECEF      = false;
   bool      logUBXNAVHPPOSLLH       = false;
@@ -36,13 +41,13 @@ struct struct_uBlox {
   bool      enableUART2             = false;
   bool      enableSPI               = false;
   uint8_t   ubloxI2Caddress         = ADR_UBLOX;  // Store in case we want to change it at some point with CFG-I2C-ADDRESS (0x20510001)
-  uint16_t  minMeasIntervalGps      = 50;         // Minimum measurement interval in ms when tracking GPS only (20Hz for ZED-F9P)
-  uint16_t  minMeasIntervalAll      = 125;        // Minimum measurement interval in ms when tracking all constallations (8Hz for ZED-F9P)
+  uint16_t  minMeasIntervalGps      = 40;         // Minimum measurement interval in ms when tracking GPS only (25 Hz for ZED-F9P RAW)
+  uint16_t  minMeasIntervalAll      = 50;         // Minimum measurement interval in ms when tracking all constallations (20 Hz for ZED-F9P RAW)
   uint16_t  minMeasIntervalRawxAll  = 200;        // Minimum measurement interval in ms when tracking all constallations and logging RAWX
-  
-  // Note: High-rate RAWX logging is tricky. The ZED-F9P seems happy to log RAWX for all constellations slightly above 5Hz but only USB, UARTs and SPI are disabled.
+
+  // Note: High-rate RAWX logging is tricky. The ZED-F9P seems happy to log RAWX for all constellations slightly above 5 Hz but only if USB, UARTs and SPI are disabled.
   // Likely more to do with not overloading the I2C bus, rather than not overloading the module core. RAWX frames can be over 2KB in size.
-  // At 5Hz we are getting very close to overloading the I2C bus at 100kHz. TO DO: set this according to module type?
+  // At 5 Hz we are getting very close to overloading the I2C bus at 100 kHz. TO DO: set this according to module type?
 };
 
 // OpenLog Artemis settings recorded to NVM and configuration file
@@ -59,12 +64,12 @@ struct struct_settings {
   bool      logData                       = true;
   int       serialTerminalBaudRate        = 115200;
   bool      showHelperText                = true;
-  bool      printMajorDebugMessages       = false;
-  bool      printMinorDebugMessages       = false;
+  bool      printMajorDebugMessages       = true;
+  bool      printMinorDebugMessages       = true;
   bool      powerDownQwiicBusBetweenReads = false;          // 29 chars!
-  int       qwiicBusMaxSpeed              = 100000;         // 400 kHz with no pullups causes problems, so default to 100kHz. User can select 400 later if required.
+  int       qwiicBusMaxSpeed              = 100000;         // 400 kHz with no pullups causes problems, so default to 100 kHz. User can select 400 later if required.
   bool      enablePwrLedDuringSleep       = true;
-  bool      useGPIO32ForStopLogging       = false;          // If true, use GPIO as a stop logging button
+  bool      useGPIO32ForStopLogging       = true;          // If true, use GPIO as a stop logging button
   struct_uBlox sensor_uBlox;
 } settings;
 
