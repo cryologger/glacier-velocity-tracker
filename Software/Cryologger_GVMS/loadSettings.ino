@@ -29,7 +29,7 @@ void loadSettings()
   EEPROM.get(sizeof(int), tempIdentifier); // Load the identifier from the EEPROM location after sizeOfSettings (int)
   if (tempIdentifier != OLA_IDENTIFIER)
   {
-    Serial.println("Settings are not valid for this variant of the OLA. Default settings applied");
+    Serial.println(F("Settings are not valid for this variant of the OLA. Default settings applied"));
     recordSettings(); // Record default settings to EEPROM and config file. At power on, settings are in default state
   }
 
@@ -61,7 +61,7 @@ void recordSettingsToFile()
     SdFile settingsFile;
     if (!settingsFile.open("OLA_GNSS_settings.cfg", O_CREAT | O_APPEND | O_WRITE))
     {
-      Serial.println("Failed to create settings file");
+      Serial.println(F("Failed to create settings file"));
       return;
     }
 
@@ -174,7 +174,7 @@ bool loadSettingsFromFile()
       SdFile settingsFile;
       if (!settingsFile.open("OLA_GNSS_settings.cfg", O_READ))
       {
-        Serial.println("Failed to open settings file");
+        Serial.println(F("Failed to open settings file"));
         return (false);
       }
 
@@ -194,7 +194,7 @@ bool loadSettingsFromFile()
           if (lineNumber == 0)
           {
             // If we can't read the first line of the settings file, give up
-            Serial.println("Giving up on settings file");
+            Serial.println(F("Giving up on settings file"));
             return (false);
           }
         }
@@ -204,7 +204,7 @@ bool loadSettingsFromFile()
           if (lineNumber == 0)
           {
             // If we can't read the first line of the settings file, give up
-            Serial.println("Giving up on settings file");
+            Serial.println(F("Giving up on settings file"));
             return (false);
           }
         }
@@ -212,19 +212,19 @@ bool loadSettingsFromFile()
         lineNumber++;
       }
 
-      Serial.println("Config file read complete");
+      Serial.println(F("Config file read complete"));
       settingsFile.close();
       return (true);
     }
     else
     {
-      Serial.println("No config file found. Using settings from EEPROM.");
+      Serial.println(F("No config file found. Using settings from EEPROM."));
       // The defaults of the struct will be recorded to a file later on.
       return (false);
     }
   }
 
-  Serial.println("Config file read failed: SD offline");
+  Serial.println(F("Config file read failed: SD offline"));
   return (false); // SD offline
 }
 
@@ -276,7 +276,7 @@ bool parseLine(char* str)
     {
       EEPROM.erase();
       sd.remove("OLA_GNSS_settings.cfg");
-      Serial.println("OpenLog Artemis has been factory reset. Freezing. Please restart and open terminal at 115200bps.");
+      Serial.println(F("OpenLog Artemis has been factory reset. Freezing. Please restart and open terminal at 115200bps."));
       while (1);
     }
 
@@ -322,7 +322,7 @@ bool parseLine(char* str)
     settings.useGPIO32ForStopLogging = d;
   else
   {
-    Serial.print("Unknown setting: ");
+    Serial.print(F("Unknown setting: "));
     Serial.println(settingName);
   }
 

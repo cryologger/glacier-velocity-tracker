@@ -1,3 +1,57 @@
+// Checks EEPROM for the next available log file name
+// Updates EEPROM and appends to the new log file
+char* findNextAvailableLog(int &newFileNumber, const char *fileLeader)
+{
+  SdFile newFile; // Contain file for SD writing
+
+  if (newFileNumber < 2) // If the settings have been reset, warn user of delay
+  {
+    Serial.println(F("Finding next available log file name"));
+  }
+
+  if (newFileNumber > 0)
+  {
+    newFileNumber--; // Check if last log file was empty
+  }
+
+  // Search for next available log spot
+  static char newFileName[40];
+  while (1)
+  {
+    sprintf(newFileName, "%s%05u.ubx", fileLeader, newFileNumber); // Splice the new file number into this file name
+
+    if (settings.printMinorDebugMessages)
+    {
+      Serial.print(F("findNextAvailableLog: trying "));
+      Serial.println(newFileName);
+    }
+
+    if (sd.exists(newFileName))
+    {
+      break; // File name not found so we will use it
+    }
+
+    // File exists so open and see if it is empty. If so, use it
+    newFile.open(newFileName, O_READ);
+    if (newFile.fileSize() == 0)
+    {
+      break; // File is empty so we will use it
+    }
+
+    newFile.close(); // Close existing file
+    newFileNumber++; // Try next number
+  }
+  newFile.close(); // Close new file
+
+  newFileNumber++; // Increment so the next power up uses the next file #
+  recordSettings(); // Record new file number to EEPROM and to config file (newFileNumber points to settings.nextDataLogNumber)
+
+  Serial.print(F("Created log file: "));
+  Serial.println(newFileName);
+
+  return (newFileName);
+}
+
 // Create new log file
 bool createLogFile()
 {
@@ -8,11 +62,11 @@ bool createLogFile()
   sprintf(dirName, "20%02d%02d%02d", rtc.year, rtc.month, rtc.dayOfMonth);
   if (sd.mkdir(dirName))
   {
-    Serial.print("Created folder: "); Serial.println(dirName);
+    Serial.print(F("Created folder: ")); Serial.println(dirName);
   }
   else
   {
-    Serial.println("Warning: Unable to create new folder");
+    Serial.println(F("Warning: Unable to create new folder"));
   }
 
   // Create log file
@@ -22,11 +76,11 @@ bool createLogFile()
 
   if (file.open(fileName, O_CREAT | O_WRITE | O_EXCL))
   {
-    Serial.print("Logging to file: "); Serial.println(fileName);
+    Serial.print(F("Logging to file: ")); Serial.println(fileName);
   }
   else
   {
-    Serial.println("Warning: Unable to create new log file");
+    Serial.println(F("Warning: Unable to create new log file"));
     online.dataLogging = false;
     return (false);
   }
@@ -46,7 +100,7 @@ void openNewLogFile()
     {
       // Disable all messages in RAM (maxWait 0)
       disableMessages(0);
-      // A maxWait of zero indicates to not wait for ACK/NACK and success will always be false 
+      // A maxWait of zero indicates to not wait for ACK/NACK and success will always be false
       // sendCommand returns SFE_UBLOX_STATUS_SUCCESS not SFE_UBLOX_STATUS_DATA_SENT
 
       unsigned long pauseUntil = millis() + 2100UL; // Wait > 500 ms so we can be sure SD data is synced
@@ -56,7 +110,7 @@ void openNewLogFile()
       }
 
       // Close the current log file
-      Serial.print("Closing: "); Serial.println(fileName);
+      Serial.print(F("Closing: ")); Serial.println(fileName);
       file.sync();
       updateDataFileAccess(); // Update file access and write timestamps
       file.close();
@@ -65,6 +119,10 @@ void openNewLogFile()
 
       // Re-enable selected messages in RAM (MaxWait 2100)
       enableMessages(2100);
+    }
+    else
+    {
+      
     }
   }
 }
@@ -78,7 +136,7 @@ void closeLogFile()
     {
       // Disable all messages in RAM (maxWait 0)
       disableMessages(0);
-      // A maxWait of zero indicates to not wait for ACK/NACK and success will always be false 
+      // A maxWait of zero indicates to not wait for ACK/NACK and success will always be false
       // sendCommand returns SFE_UBLOX_STATUS_SUCCESS not SFE_UBLOX_STATUS_DATA_SENT
 
       unsigned long pauseUntil = millis() + 2100UL; // Wait > 500 ms to ensure SD data is synced
@@ -88,7 +146,7 @@ void closeLogFile()
       }
 
       // Close the current log file
-      Serial.print("Closing: "); Serial.println(fileName);
+      Serial.print(F("Closing: ")); Serial.println(fileName);
       file.sync();
       updateDataFileAccess(); // Update the file access and write timestamps
       file.close();

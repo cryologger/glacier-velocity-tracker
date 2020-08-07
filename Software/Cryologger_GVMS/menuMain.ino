@@ -101,7 +101,7 @@ void menuMain()
     }
     else if (incoming == 'q')
     {
-      Serial.println("\n\rQuit? Press 'y' to confirm:");
+      Serial.println(F("\n\rQuit? Press 'y' to confirm:"));
       byte bContinue = getByteChoice(menuTimeout);
       if (bContinue == 'y')
       {

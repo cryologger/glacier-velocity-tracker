@@ -4,33 +4,33 @@ void menuPower()
   while (1)
   {
     Serial.println();
-    Serial.println("Menu: Configure Power Options");
+    Serial.println(F("Menu: Configure Power Options"));
 
 #if(HARDWARE_VERSION_MAJOR >= 1) || (HARDWARE_VERSION_MAJOR == 0 && HARDWARE_VERSION_MINOR == 6)
-    Serial.print("1) Turn off Qwiic bus power when sleeping: ");
+    Serial.print(F("1) Turn off Qwiic bus power when sleeping: "));
     if (settings.powerDownQwiicBusBetweenReads)
     {
-      Serial.println("Yes");
+      Serial.println(F("Yes"));
     }
     else
     {
-      Serial.println("No");
+      Serial.println(F("No"));
     }
 #endif
 
 #if(HARDWARE_VERSION_MAJOR >= 1)
-    Serial.print("2) Power LED During Sleep: ");
+    Serial.print(F("2) Power LED During Sleep: "));
     if (settings.enablePwrLedDuringSleep)
     {
-      Serial.println("Enabled");
+      Serial.println(F("Enabled"));
     }
     else
     {
-      Serial.println("Disabled");
+      Serial.println(F("Disabled"));
     }
 #endif
 
-    Serial.println("x) Exit");
+    Serial.println(F("x) Exit"));
 
     byte incoming = getByteChoice(menuTimeout); // Timeout after x seconds
 

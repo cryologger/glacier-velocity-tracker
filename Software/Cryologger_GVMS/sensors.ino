@@ -6,13 +6,13 @@ bool beginSensors()
   {
     if (settings.printMajorDebugMessages)
     {
-      Serial.println(F("beginSensors: no Qwiic devices detected!"));
+      Serial.println(F("beginSensors: No Qwiic devices detected!"));
     }
     qwiicOnline.uBlox = false;
     return (false);
   }
 
-  determineMaxI2CSpeed(); // Try for 400kHz but reduce if the user has selected a slower speed
+  determineMaxI2CSpeed(); // Try for 400 kHz but reduce if the user has selected a slower speed
 
   if (qwiicAvailable.uBlox && (!qwiicOnline.uBlox || gnssSettingsFlag)) // Only do this if the sensor is not online
   {
@@ -191,10 +191,8 @@ bool beginSensors()
       // Update settings.sensor_uBlox.minMeasIntervalGps and settings.sensor_uBlox.minMeasIntervalAll according to module type
       if (strcmp(minfo.mod, "ZED-F9P") == 0)            // Is this a ZED-F9P?
       {
-        // GPS + GLO RAW = 25 Hz = 1 / 25 * 1000 = 40 ms
-        // GPS + GLO + GAL + BDS = 20 Hz = 1 / 20 * 1000 = 50 ms
-        settings.sensor_uBlox.minMeasIntervalGps = 40;  // ZED-F9P can do 20 Hz RTK
-        settings.sensor_uBlox.minMeasIntervalAll = 50; // ZED-F9P can do 8 Hz RTK
+        settings.sensor_uBlox.minMeasIntervalGps = 40;  // GPS + GLO RAW = 25 Hz = 1 / 25 * 1000 = 40 ms
+        settings.sensor_uBlox.minMeasIntervalAll = 50;  // GPS + GLO + GAL + BDS RAW = 20 Hz = 1 / 20 * 1000 = 50 ms
       }
       else if (strcmp(minfo.mod, "ZED-F9K") == 0)       // Is this a ZED-F9K?
       {
@@ -367,7 +365,7 @@ void resetGnss()
       }
 
       // Close the current log file
-      Serial.print("Closing: "); Serial.println(fileName);
+      Serial.print(F("Closing: ")); Serial.println(fileName);
       file.sync();
       updateDataFileAccess(); // Update the file access and write timestamps
       file.close(); // Close the log file
@@ -475,10 +473,10 @@ uint8_t enableConstellations(uint16_t maxWait)
   // Enable the selected constellations
   uint8_t success = true;
   success &= gnss.newCfgValset8(0x1031001f, settings.sensor_uBlox.enableGPS, VAL_LAYER_RAM);  // CFG-SIGNAL-GPS_ENA   : Enable GPS (in RAM only)
-  success &= gnss.addCfgValset8(0x2091003d, settings.sensor_uBlox.enableGLO);                 // CFG-SIGNAL-GLO_ENA   : Enable GLONASS
-  success &= gnss.addCfgValset8(0x20910042, settings.sensor_uBlox.enableGAL);                 // CFG-SIGNAL-GAL_ENA   : Enable Galileo
-  success &= gnss.addCfgValset8(0x20910231, settings.sensor_uBlox.enableBDS);                 // CFG-SIGNAL-BDS_ENA   : Enable BeiDou
-  success &= gnss.sendCfgValset8(0x20910231, settings.sensor_uBlox.enableQZSS, maxWait);      // CFG-SIGNAL-QZSS_ENA  : Enable QZSS (maxWait 2100 ms)
+  success &= gnss.addCfgValset8(0x10310025, settings.sensor_uBlox.enableGLO);                 // CFG-SIGNAL-GLO_ENA   : Enable GLONASS
+  success &= gnss.addCfgValset8(0x10310021, settings.sensor_uBlox.enableGAL);                 // CFG-SIGNAL-GAL_ENA   : Enable Galileo
+  success &= gnss.addCfgValset8(0x10310022, settings.sensor_uBlox.enableBDS);                 // CFG-SIGNAL-BDS_ENA   : Enable BeiDou
+  success &= gnss.sendCfgValset8(0x10310024, settings.sensor_uBlox.enableQZSS, maxWait);      // CFG-SIGNAL-QZSS_ENA  : Enable QZSS (maxWait 2100 ms)
   if (success > 0)
   {
     if (settings.printMinorDebugMessages)

@@ -69,7 +69,7 @@ struct struct_settings {
   bool      powerDownQwiicBusBetweenReads = false;          // 29 chars!
   int       qwiicBusMaxSpeed              = 100000;         // 400 kHz with no pullups causes problems, so default to 100 kHz. User can select 400 later if required.
   bool      enablePwrLedDuringSleep       = true;
-  bool      useGPIO32ForStopLogging       = true;          // If true, use GPIO as a stop logging button
+  bool      useGPIO32ForStopLogging       = false;          // If true, use GPIO as a stop logging button
   struct_uBlox sensor_uBlox;
 } settings;
 

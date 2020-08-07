@@ -103,12 +103,6 @@ bool storeData(void)
         {
           Serial.println(F("storeData: Ublox bug, length lsb is 0xFF"));
         }
-        if (PIN_LOGIC_DEBUG >= 0)
-        {
-          digitalWrite((uint8_t)PIN_LOGIC_DEBUG, LOW);
-          delay(1);
-          digitalWrite((uint8_t)PIN_LOGIC_DEBUG, HIGH);
-        }
         lastReadTime = micros(); // Put off checking to avoid I2C bus traffic
         ret_val = false;
         goto SD_WRITE; // Bail
@@ -136,12 +130,6 @@ bool storeData(void)
       {
         Serial.print(F("storeData: Bytes available error:"));
         Serial.println(bytesAvailable);
-        if (PIN_LOGIC_DEBUG >= 0)
-        {
-          digitalWrite((uint8_t)PIN_LOGIC_DEBUG, LOW);
-          delay(1);
-          digitalWrite((uint8_t)PIN_LOGIC_DEBUG, HIGH);
-        }
       }
     }
 
@@ -327,7 +315,7 @@ TRY_AGAIN:
                       {
                         Serial.printf("storeData: RTC synced to %04d-%02d-%02d %02d:%02d:%02d.%02d\n",
                                       rtcYear, UBXbuffer[20], UBXbuffer[21], UBXbuffer[22], UBXbuffer[23], UBXbuffer[24], centis);
-                        Serial.print("storeData: RTC time is "); printDateTime();
+                        Serial.print(F("storeData: RTC time is ")); printDateTime();
                       }
                     }
                   }

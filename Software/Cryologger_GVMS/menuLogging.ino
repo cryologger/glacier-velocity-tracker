@@ -72,11 +72,11 @@ void menuLogging()
     Serial.print(F("9) Use pin 32 to Stop Logging                             : "));
     if (settings.useGPIO32ForStopLogging)
     {
-      Serial.println("Yes");
+      Serial.println(F("Yes"));
     }
     else
     {
-      Serial.println("No");
+      Serial.println(F("No"));
     }
     Serial.println(F("x) Exit"));
 

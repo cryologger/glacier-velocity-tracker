@@ -44,7 +44,6 @@ void powerDown()
   for (int x = 0; x < 50; x++)
   {
     if ((x != ap3_gpio_pin2pad(PIN_POWER_LOSS)) &&
-        //(x != ap3_gpio_pin2pad(PIN_LOGIC_DEBUG)) &&
         (x != ap3_gpio_pin2pad(PIN_MICROSD_POWER)) &&
         (x != ap3_gpio_pin2pad(PIN_QWIIC_POWER)) &&
         (x != ap3_gpio_pin2pad(PIN_IMU_POWER)))
@@ -98,6 +97,11 @@ void powerDown()
 // Power down and await interrupt wakeup
 void goToSleep()
 {
+  if (settings.printMajorDebugMessages)
+  {
+    Serial.println(F("Entering deep sleep..."));
+  }
+
   uint32_t msToSleep = (uint32_t)(settings.usSleepDuration / 1000ULL);
 
   // Counter/Timer 6 will use the 32kHz clock
@@ -183,7 +187,6 @@ void goToSleep()
   for (int x = 0; x < 50; x++)
   {
     if ((x != ap3_gpio_pin2pad(PIN_POWER_LOSS)) &&
-        //(x != ap3_gpio_pin2pad(PIN_LOGIC_DEBUG)) &&
         (x != ap3_gpio_pin2pad(PIN_MICROSD_POWER)) &&
         (x != ap3_gpio_pin2pad(PIN_QWIIC_POWER)) &&
         (x != ap3_gpio_pin2pad(PIN_IMU_POWER)))
@@ -309,12 +312,6 @@ void wakeFromSleep()
 
   powerLedOn(); // Turn ON PWR LED
 
-  if (PIN_LOGIC_DEBUG >= 0)
-  {
-    pinMode(PIN_LOGIC_DEBUG, OUTPUT); // Debug pin
-    digitalWrite(PIN_LOGIC_DEBUG, HIGH); // Set pin HIGH. Trigger debug on falling edge
-  }
-
   Serial.begin(settings.serialTerminalBaudRate);
 
   SPI.begin(); // Required if SD is disabled
@@ -361,9 +358,9 @@ void stopLogging(void)
     file.close();
   }
 
-  Serial.print("Logging is stopped. Please reset OpenLog Artemis and open a terminal at ");
+  Serial.print(F("Logging is stopped. Please reset OpenLog Artemis and open a terminal at "));
   Serial.print((String)settings.serialTerminalBaudRate);
-  Serial.println("bps...");
+  Serial.println(F("bps..."));
   digitalWrite(PIN_STAT_LED, HIGH); // Turn ON STAT LED to indicate logging has stopped
   delay(sdPowerDownDelay); // Give the SD card time to shut down and for the serial message to send
   powerDown();

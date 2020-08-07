@@ -13,7 +13,7 @@ void menuDebug(bool *printMajorDebugMessages, bool *printMinorDebugMessages)
     }
     else
     {
-      Serial.println("Disabled");
+      Serial.println(F("Disabled"));
     }
 
     Serial.print(F("2) Minor Debug Messages : "));

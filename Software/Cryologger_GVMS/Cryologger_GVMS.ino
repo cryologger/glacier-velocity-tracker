@@ -1,8 +1,14 @@
 /*
   Title:    Cryologger - Glacier Velocity Measurement System (GVMS)
   Author:   Adam Garbo
-  Date:     August 3rd, 2020
+  Date:     August 7th, 2020
   Version:  2.0
+
+  Based extensively on:
+    OpenLog Artemis GNSS Logging
+    By: Paul Clark (PaulZC)
+    Date: July 18th, 2020
+    Version: V1.1
 
   Components:
   - SparkFun GPS-RTK2 Board ZED-F9P
@@ -10,11 +16,11 @@
   - SparkFun OpenLog Artemis
 
   Comments:
-  - Based extensively on:
-    OpenLog Artemis GNSS Logging
-    By: Paul Clark (PaulZC)
-    Date: July 18th, 2020
-    Version: V1.1
+  - Current under development
+
+  License:
+  - This project is released under the MIT License (http://opensource.org/licenses/MIT)
+
 */
 
 // Define firmware version
@@ -39,7 +45,6 @@
 #define PIN_MICROSD_CHIP_SELECT 10
 #define PIN_IMU_POWER           22
 #define PIN_POWER_LOSS          3
-#define PIN_LOGIC_DEBUG         -1
 #define PIN_MICROSD_POWER       15
 #define PIN_QWIIC_POWER         18
 #define PIN_STAT_LED            19
@@ -116,13 +121,12 @@ uint8_t customPayload[MAX_PAYLOAD_SIZE]; // Array to hold payload data bytes
 // Create and initialise packet information that wraps around the payload
 ubxPacket customCfg = {0, 0, 0, 0, 0, customPayload, 0, 0, SFE_UBLOX_PACKET_VALIDITY_NOT_DEFINED, SFE_UBLOX_PACKET_VALIDITY_NOT_DEFINED};
 
-#define DUMP(varname) {Serial.printf("%s: %llu\n", #varname, varname);}
-
 // Setup
 void setup()
 {
   // If 3.3V rail drops below 3V the system will power down and maintain RTC
   pinMode(PIN_POWER_LOSS, INPUT); // BD49K30G-TL has CMOS output and does not need a pull-up
+  pinMode(PIN_STAT_LED, OUTPUT);
   delay(1); // Let PIN_POWER_LOSS stabilize
 
   if (digitalRead(PIN_POWER_LOSS) == LOW)
@@ -132,69 +136,51 @@ void setup()
   }
   attachInterrupt(digitalPinToInterrupt(PIN_POWER_LOSS), powerDown, FALLING);
 
-  powerLedOn(); // Turn on PWR LED
-
-  pinMode(PIN_STAT_LED, OUTPUT);
-
-  if (PIN_LOGIC_DEBUG >= 0)
-  {
-    pinMode(PIN_LOGIC_DEBUG, OUTPUT); // Debug pin
-    digitalWrite(PIN_LOGIC_DEBUG, HIGH); // Set HIGH and trigger debug on falling edge
-  }
-
+  analogReadResolution(14); // Default: 10-bit
+  
   Serial.begin(115200); // Start Serial at 115200 baud for initial debug messages
-
-  SPI.begin(); // Required if SD disabled
-  beginSd();
-  loadSettings(); // Load settings
-
   Serial.flush(); // Wait for outgoing serial data to complete
   Serial.begin(settings.serialTerminalBaudRate); // Start Serial at specified baud rate
-  Serial.printf("\nCryologger - Glacier Velocity Measurement System v%d.%d\n", FIRMWARE_VERSION_MAJOR, FIRMWARE_VERSION_MINOR);
+  Serial.printf("Cryologger - Glacier Velocity Measurement System v%d.%d\n", FIRMWARE_VERSION_MAJOR, FIRMWARE_VERSION_MINOR);
 
   if (settings.useGPIO32ForStopLogging)
   {
-    Serial.println("Data logging stop button enabled. Pull GPIO pin 32 to GND to stop logging.");
+    Serial.println(F("Data logging stop button enabled. Pull GPIO pin 32 to GND to stop logging."));
     pinMode(PIN_STOP_LOGGING, INPUT_PULLUP);
     delay(1); // Allow pin to stabilize
     attachInterrupt(digitalPinToInterrupt(PIN_STOP_LOGGING), stopLoggingIsr, FALLING); // Enable the interrupt
     stopLoggingFlag = false; // Clear the flag
   }
 
+  // Turn on PWR LED
+  powerLedOn();
+
+  // Required if SD disabled
+  SPI.begin();
+
+  // Initialize microSD
+  beginSd();
+
+  // Load settings
+  loadSettings();
+
+  // Initialize I2C
   beginQwiic();
-  analogReadResolution(14); // Default: 10-bit
 
-  disableImu(); // Disable IMU
-  setRtcAlarm(); // Set RTC alarm
+  // Disable IMU
+  disableImu();
 
-  if (beginSensors())
-  {
-    Serial.println("Sensor(s) online");
-  }
-  else
-  {
-    Serial.println("Warning: No sensors detected");
-  }
+  // Initialize sensor(s)
+  beginSensors();
 
-  beginDataLogging(); // Start data logging
+  // Initialize RTC
+  beginRtc();
 
-  if (online.microSd)
-  {
-    Serial.println("microSD online");
-  }
-  else
-  {
-    Serial.println("Warning: SD card offline");
-  }
+  // Sync RTC
+  syncRtc();
 
-  if (online.dataLogging)
-  {
-    Serial.println("Data logging online");
-  }
-  else
-  {
-    Serial.println("Warning: Data logging offline");
-  }
+  // Start data logging
+  beginDataLogging();
 
   if (!settings.enableTerminalOutput && settings.logData)
   {
@@ -210,7 +196,7 @@ void setup()
   // Use RTC clock if sleeping between readings. millis() powers down during sleep.
   measurementStartTime = rtcMillis();
 
-  // Blink to indicate completion of setup
+  // Blink upon completion of setup
   blinkLed(20, 50);
 
   // If entering sleep after first measurement, present user with configuration menu
@@ -223,27 +209,29 @@ void setup()
 // Loop
 void loop()
 {
-  // If Serial Monitor present user menu
+  // If Serial Monitor is open, present menu
   if (Serial.available())
   {
     menuMain();
   }
 
-  storeData(); // Read I2C data and write to SD
-
-  // Check if user pressed the stop logging button
-  if (settings.useGPIO32ForStopLogging && stopLoggingFlag)
+  // Read I2C data and write to SD
+  if (online.dataLogging)
   {
-    digitalWrite(PIN_STAT_LED, HIGH);
-    stopLogging();
+    storeData();
   }
 
+  // Check if stop logging button was pressed
+  if (settings.useGPIO32ForStopLogging && stopLoggingFlag)
+  {
+    stopLogging();
+  }
   // Check if RTC alarm ISR triggered
   if (alarmFlag)
   {
-    openNewLogFile(); // Create new log file
-    setRtcAlarm(); // Set RTC alarm
-    alarmFlag = false; // Clear alarm flag
+    openNewLogFile();           // Create new log file
+    //beginRtc();                 // Set RTC alarm
+    alarmFlag = false;          // Clear alarm flag
     rtcSyncRequiredFlag = true; // Set flag to indicate RTC sync is required
   }
 
@@ -252,13 +240,7 @@ void loop()
   // Check if sleep conditions are met
   if ((settings.usSleepDuration > 0) && (timeNow > (measurementStartTime + (settings.usLoggingDuration / 1000ULL))))
   {
-    if (settings.printMajorDebugMessages)
-    {
-      Serial.println(F("Entering deep sleep"));
-    }
-
-    // Enter deep sleep
-    goToSleep();
+    goToSleep(); // Enter deep sleep
 
     // Update measurementStartTime to calculate when to return to sleep
     measurementStartTime = measurementStartTime + (settings.usLoggingDuration / 1000ULL) + (settings.usSleepDuration / 1000ULL);
@@ -267,7 +249,7 @@ void loop()
   }
 }
 
-// Enable I2C
+// Initialize I2C
 void beginQwiic()
 {
   pinMode(PIN_QWIIC_POWER, OUTPUT);
@@ -277,7 +259,7 @@ void beginQwiic()
   delay(250); // Allow extra time for the Qwiic sensors to power up
 }
 
-// Enable microSD
+// Initialize microSD
 void beginSd()
 {
   pinMode(PIN_MICROSD_POWER, OUTPUT);
@@ -308,6 +290,7 @@ void beginSd()
         Serial.println(F("Warning: SD initialization failed. Check if SD card is present and formatted."));
         digitalWrite(PIN_MICROSD_CHIP_SELECT, HIGH); // Ensure SD is deselected
         online.microSd = false;
+        Serial.println(F("Warning: microSD offline"));
         return;
       }
     }
@@ -317,15 +300,18 @@ void beginSd()
     {
       Serial.println(F("Warning: SD change directory failed"));
       online.microSd = false;
+      Serial.println(F("Warning: microSD offline"));
       return;
     }
 
     online.microSd = true;
+    Serial.println(F("microSD online"));
   }
   else
   {
     microSdPowerOff();
     online.microSd = false;
+    Serial.println(F("Warning: microSD offline"));
   }
 }
 
@@ -338,27 +324,34 @@ void disableImu()
   imuPowerOff();
 }
 
-// Set RTC alarm
-void setRtcAlarm()
+// Initialize RTC
+void beginRtc()
 {
-  rtc.setAlarm(0, 0, 0, 0, 0, 0); // Set RTC alarm to trigger at day rollover (00:00:00)
-  rtc.setAlarmMode(4); // Alarm match every day (hundredths, seconds, minutes, hour)
+  rtc.setAlarm(0, 0, 0, 0, 0, 0); // Set RTC alarm to trigger at day/hour/minute rollover (00:00:00)
+  // 0: Alarm interrupt disabled
+  // 1: Alarm match every year   (hundredths, seconds, minutes, hour, day, month)
+  // 2: Alarm match every month  (hundredths, seconds, minutes, hours, day)
+  // 3: Alarm match every week   (hundredths, seconds, minutes, hours, weekday)
+  // 4: Alarm match every day    (hundredths, seconds, minute, hours)
+  // 5: Alarm match every hour   (hundredths, seconds, minutes)
+  // 6: Alarm match every minute (hundredths, seconds)
+  // 7: Alarm match every second (hundredths)
+  rtc.setAlarmMode(5);
   rtc.attachInterrupt(); // Attach RTC alarm interrupt
 }
 
-// Start data logging
-void beginDataLogging()
+// Sync RTC date and time with GNSS
+void syncRtc()
 {
-  if (online.microSd && settings.logData)
+  if (qwiicOnline.uBlox)
   {
     uint32_t loopStartTime = millis();
     bool dateValid = false,
          timeValid = false;
     rtcSyncFlag = false;
-    rtcSyncRequiredFlag = true;
 
     // Attempt to sync RTC with GNSS for up to 5 minutes
-    Serial.println("Attempting to sync RTC with GNSS. Type any character to abort.");
+    Serial.println(F("Attempting to sync RTC with GNSS. Type any character to abort."));
 
     while ((!dateValid || !timeValid) && millis() - loopStartTime < 5UL * 60UL * 1000UL)
     {
@@ -370,16 +363,11 @@ void beginDataLogging()
       // Check if GNSS date and time are valid and sync RTC
       if (dateValid && timeValid)
       {
-        rtc.setTime(gnss.getHour(),
-                    gnss.getMinute(),
-                    gnss.getSecond(),
-                    gnss.getMillisecond() / 10,
-                    gnss.getDay(),
-                    gnss.getMonth(),
-                    gnss.getYear() - 2000);
+        rtc.setTime(gnss.getHour(), gnss.getMinute(),  gnss.getSecond(), gnss.getMillisecond() / 10,
+                    gnss.getDay(), gnss.getMonth(), gnss.getYear() - 2000);
 
         rtcSyncFlag = true; // Set flag
-        Serial.println("Success: RTC time synced");
+        Serial.println(F("Success: RTC time synced"));
         printDateTime();
       }
 
@@ -388,20 +376,52 @@ void beginDataLogging()
       {
         break;
       }
-
     }
 
     if (!rtcSyncFlag)
     {
-      Serial.println("Warning: RTC sync failed");
+      Serial.println(F("Warning: RTC sync failed"));
     }
+  }
+  else
+  {
+    Serial.println(F("Warning: No device detected on Qwiic bus"));
+  }
+}
 
-    createLogFile();
+// Start data logging
+void beginDataLogging()
+{
+  if (online.microSd && settings.logData && qwiicOnline.uBlox)
+  {
+    if (rtcSyncFlag)
+    {
+      createLogFile();
+    }
+    else
+    {
+      // If we don't have a file yet, create one. Otherwise, re-open the last used file
+      if ((strlen(fileName) == 0) || (settings.openNewLogFile == true))
+      {
+        strcpy(fileName, findNextAvailableLog(settings.nextDataLogNumber, "dataLog"));
+      }
+
+      if (file.open(fileName, O_CREAT | O_APPEND | O_WRITE) == false)
+      {
+        Serial.println(F("Failed to create sensor data file"));
+        online.dataLogging = false;
+        return;
+      }
+
+      updateDataFileCreate(); // Update the data file creation time stamp
+    }
     online.dataLogging = true;
+    Serial.println(F("Data logging online"));
   }
   else
   {
     online.dataLogging = false;
+    Serial.println(F("Warning: Data logging offline"));
   }
 }
 
@@ -451,7 +471,7 @@ extern "C" void am_watchdog_isr(void)
 {
   wdt.clear(); // Clear the watchdog interrupt
   wdt.restart(); // "Pet" the dog
-  watchdogFlag = true;  // Set the watchdog flag
+  watchdogFlag = true; // Set the watchdog flag
 }
 
 // Interrupt handler for the data logging stop button
