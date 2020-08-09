@@ -14,16 +14,7 @@ void powerDown()
     pinMode(PIN_STOP_LOGGING, INPUT); // Remove the pull-up
   }
 
-  // ***Power down immediately***
-  // Do not close the SD file(s)
-  // Close file before going to sleep
-  //  if (online.dataLogging)
-  //  {
-  //    file.sync();
-  //  }
-
-  //Serial.flush(); // Don't waste time waiting for prints to finish
-
+  // Power down immediately
   qwiic.end();          // Power down I2C
   SPI.end();            // Power down SPI
   power_adc_disable();  // Power down ADC
@@ -107,7 +98,7 @@ void goToSleep()
   // Counter/Timer 6 will use the 32kHz clock
   // Calculate how many 32768Hz system ticks we need to sleep for:
   //sysTicksToSleep = msToSleep * 32768L / 1000
-  // We need to be careful with the multiply as we will overflow uint32_t if msToSleep is > 131072
+  // Be careful with the multiply and overflow of uint32_t if msToSleep is > 131072
   uint32_t sysTicksToSleep;
   if (msToSleep < 131000)
   {

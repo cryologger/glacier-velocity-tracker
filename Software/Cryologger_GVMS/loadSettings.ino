@@ -2,10 +2,10 @@
 void loadSettings()
 {
   // First load any settings from NVM
-  // After, we'll load settings from config file if available
-  // We'll then re-record settings so that the settings from the file over-rides internal NVM settings
+  // Next, load settings from settings.h configuration file if available
+  // Then override internal NVM settings with settings from settings.h 
 
-  // Check to see if EEPROM is blank
+  // Check if EEPROM is empty
   uint32_t testRead = 0;
   if (EEPROM.get(0, testRead) == 0xFFFFFFFF)
   {
@@ -13,8 +13,8 @@ void loadSettings()
     Serial.println(F("Default settings applied"));
   }
 
-  // Check that the current settings struct size matches what is stored in EEPROM
-  // Misalignment happens when we add a new feature or setting
+  // Check if current settings structure size matches what is stored in EEPROM
+  // Misalignment happens a new feature or setting is added
   int tempSize = 0;
   EEPROM.get(0, tempSize); // Load the sizeOfSettings
   if (tempSize != sizeof(settings))
@@ -23,8 +23,8 @@ void loadSettings()
     recordSettings(); // Record default settings to EEPROM and config file. At power on, settings are in default state
   }
 
-  // Check that the olaIdentifier is correct
-  // (It is possible for two different versions of the code to have the same sizeOfSettings - which causes problems!)
+  // Check if olaIdentifier is correct
+  // It is possible for two different versions of the code to have the same sizeOfSettings - which causes problems!
   int tempIdentifier = 0;
   EEPROM.get(sizeof(int), tempIdentifier); // Load the identifier from the EEPROM location after sizeOfSettings (int)
   if (tempIdentifier != OLA_IDENTIFIER)
@@ -42,7 +42,7 @@ void loadSettings()
   recordSettings();
 }
 
-// Record the current settings struct to EEPROM and then to config file
+// Record current settings structure to EEPROM and then to configuration file
 void recordSettings()
 {
   settings.sizeOfSettings = sizeof(settings);
@@ -50,7 +50,7 @@ void recordSettings()
   recordSettingsToFile();
 }
 
-// Export the current settings to a config file
+// Export the current settings to a configuration file
 void recordSettingsToFile()
 {
   if (online.microSd)
@@ -161,9 +161,9 @@ void recordSettingsToFile()
   }
 }
 
-// If a config file exists on the SD card, load them and overwrite the local settings
-// Heavily based on ReadCsvFile from SdFat library
-// Returns true if some settings were loaded from a file
+// If a configuration file exists on the SD card, load it and overwrite local settings
+// Based on ReadCsvFile from SdFat library
+// Returns true if settings were loaded from a file
 // Returns false if a file was not opened/loaded
 bool loadSettingsFromFile()
 {

@@ -137,7 +137,7 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(PIN_POWER_LOSS), powerDown, FALLING);
 
   analogReadResolution(14); // Default: 10-bit
-  
+
   Serial.begin(115200); // Start Serial at 115200 baud for initial debug messages
   Serial.flush(); // Wait for outgoing serial data to complete
   Serial.begin(settings.serialTerminalBaudRate); // Start Serial at specified baud rate
@@ -161,10 +161,10 @@ void setup()
   // Initialize microSD
   beginSd();
 
-  // Load settings
+  // Load settings from non-volatile memory (NVM) and/or settings.h file
   loadSettings();
 
-  // Initialize I2C
+  // Initialize I2C bus
   beginQwiic();
 
   // Disable IMU
@@ -173,10 +173,10 @@ void setup()
   // Initialize sensor(s)
   beginSensors();
 
-  // Initialize RTC
-  beginRtc();
+  // Configure RTC alarms
+  configureRtc();
 
-  // Sync RTC
+  // Synchronize RTC date and time with GNSS
   syncRtc();
 
   // Start data logging
@@ -230,7 +230,7 @@ void loop()
   if (alarmFlag)
   {
     openNewLogFile();           // Create new log file
-    //beginRtc();                 // Set RTC alarm
+    //configureRtc();                 // Set RTC alarm
     alarmFlag = false;          // Clear alarm flag
     rtcSyncRequiredFlag = true; // Set flag to indicate RTC sync is required
   }
@@ -325,9 +325,10 @@ void disableImu()
 }
 
 // Initialize RTC
-void beginRtc()
+void configureRtc()
 {
-  rtc.setAlarm(0, 0, 0, 0, 0, 0); // Set RTC alarm to trigger at day/hour/minute rollover (00:00:00)
+  rtc.setAlarm(0, 0, 0, 0, 0, 0); // Set RTC alarm to trigger on day/hour/minute rollover (00:00:00)
+  // RTC alarm modes:
   // 0: Alarm interrupt disabled
   // 1: Alarm match every year   (hundredths, seconds, minutes, hour, day, month)
   // 2: Alarm match every month  (hundredths, seconds, minutes, hours, day)
@@ -340,9 +341,10 @@ void beginRtc()
   rtc.attachInterrupt(); // Attach RTC alarm interrupt
 }
 
-// Sync RTC date and time with GNSS
+// Synchronize RTC date and time with GNSS
 void syncRtc()
 {
+  // Check if u-blox is available and logging
   if (qwiicOnline.uBlox)
   {
     uint32_t loopStartTime = millis();
@@ -392,14 +394,17 @@ void syncRtc()
 // Start data logging
 void beginDataLogging()
 {
-  if (online.microSd && settings.logData && qwiicOnline.uBlox)
+  // Check if conditions are met to begin data logging
+  if (online.microSd && settings.logData && qwiicOnline.uBlox && rtcSyncFlag)
   {
-    if (rtcSyncFlag)
-    {
-      createLogFile();
-    }
-    else
-    {
+    createLogFile();
+    /*
+      if (rtcSyncFlag)
+      {
+
+      }
+      else
+      {
       // If we don't have a file yet, create one. Otherwise, re-open the last used file
       if ((strlen(fileName) == 0) || (settings.openNewLogFile == true))
       {
@@ -414,7 +419,8 @@ void beginDataLogging()
       }
 
       updateDataFileCreate(); // Update the data file creation time stamp
-    }
+      }
+    */
     online.dataLogging = true;
     Serial.println(F("Data logging online"));
   }

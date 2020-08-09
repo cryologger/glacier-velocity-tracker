@@ -137,7 +137,7 @@ void menuMain()
   settings.printMajorDebugMessages = prevPrintMajorDebugMessages;
   settings.printMinorDebugMessages = prevPrintMinorDebugMessages;
 
-  recordSettings(); // Once all menus have exited, record the new settings to EEPROM and config file
+  recordSettings(); // Once all menus have exited, record the new settings to EEPROM and configuration file
 
   beginSensors(); // Once all menus have exited, start any sensors that are available, logging, but not yet online/begun.
 
