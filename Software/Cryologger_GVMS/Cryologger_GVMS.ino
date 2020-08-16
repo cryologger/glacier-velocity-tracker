@@ -1,14 +1,15 @@
 /*
   Title:    Cryologger - Glacier Velocity Measurement System (GVMS)
   Author:   Adam Garbo
-  Date:     August 7th, 2020
-  Version:  2.0
+  Date:     August 16th, 2020
+  Version:  0.1
 
   Based extensively on:
-    OpenLog Artemis GNSS Logging
+  - OpenLog Artemis GNSS Logging
     By: Paul Clark (PaulZC)
     Date: July 18th, 2020
     Version: V1.1
+    https://github.com/sparkfun/OpenLog_Artemis_GNSS_Logger
 
   Components:
   - SparkFun GPS-RTK2 Board ZED-F9P
@@ -16,7 +17,7 @@
   - SparkFun OpenLog Artemis
 
   Comments:
-  - Current under development
+  - This code is currently under development
 
   License:
   - This project is released under the MIT License (http://opensource.org/licenses/MIT)
@@ -24,15 +25,15 @@
 */
 
 // Define firmware version
-#define FIRMWARE_VERSION_MAJOR 2
-#define FIRMWARE_VERSION_MINOR 0
+#define FIRMWARE_VERSION_MAJOR 0
+#define FIRMWARE_VERSION_MINOR 1
 
 // Define OpenLog Artemis unique board identifier
 // Sum of:
-// Variant * 0x100 (OLA = 1; GNSS_LOGGER = 2; GEOPHONE_LOGGER = 3; CRYOLOGGER = 4)
+// Variant * 0x100  (OLA = 1; GNSS_LOGGER = 2; GEOPHONE_LOGGER = 3; CRYOLOGGER = 4)
 // Major firmware version * 0x10
 // Minor firmware version
-#define OLA_IDENTIFIER 0x411
+#define OLA_IDENTIFIER 0x111
 
 // Load default sensor settings
 #include "settings.h"
@@ -131,7 +132,7 @@ void setup()
 
   if (digitalRead(PIN_POWER_LOSS) == LOW)
   {
-    powerDown(); // Check PIN_POWER_LOSS just in case we missed the falling edge
+    powerDown(); // Check PIN_POWER_LOSS in case the falling edge was missed
     // TO DO: Change to goToSleep()
   }
   attachInterrupt(digitalPinToInterrupt(PIN_POWER_LOSS), powerDown, FALLING);
@@ -152,35 +153,15 @@ void setup()
     stopLoggingFlag = false; // Clear the flag
   }
 
-  // Turn on PWR LED
-  powerLedOn();
-
-  // Required if SD disabled
-  SPI.begin();
-
-  // Initialize microSD
-  beginSd();
-
-  // Load settings from non-volatile memory (NVM) and/or settings.h file
-  loadSettings();
-
-  // Initialize I2C bus
-  beginQwiic();
-
-  // Disable IMU
-  disableImu();
-
-  // Initialize sensor(s)
-  beginSensors();
-
-  // Configure RTC alarms
-  configureRtc();
-
-  // Synchronize RTC date and time with GNSS
-  syncRtc();
-
-  // Start data logging
-  beginDataLogging();
+  powerLedOn();       // Turn on PWR LED
+  SPI.begin();        // Required if SD disabled
+  beginSd();          // Initialize microSD
+  loadSettings();     // Load settings from non-volatile memory (NVM) and/or settings.h file
+  beginQwiic();       // Initialize I2C bus
+  disableImu();       // Disable IMU
+  beginSensors();     // Initialize sensor(s)
+  configureRtc();     // Configure RTC alarms
+  syncRtc();          // Synchronize RTC date and time with GNSS
 
   if (!settings.enableTerminalOutput && settings.logData)
   {
@@ -199,11 +180,14 @@ void setup()
   // Blink upon completion of setup
   blinkLed(20, 50);
 
-  // If entering sleep after first measurement, present user with configuration menu
-  if (settings.usBetweenReadings == settings.usLoggingDuration)
+  // If Serial Monitor is open, present configuration menu
+  if (Serial.available())
   {
     menuMain();
   }
+
+  // Once user configuration is complete, start data logging
+  beginDataLogging();
 }
 
 // Loop
@@ -226,11 +210,12 @@ void loop()
   {
     stopLogging();
   }
+
   // Check if RTC alarm ISR triggered
   if (alarmFlag)
   {
     openNewLogFile();           // Create new log file
-    //configureRtc();                 // Set RTC alarm
+    //configureRtc();             // Set RTC alarm
     alarmFlag = false;          // Clear alarm flag
     rtcSyncRequiredFlag = true; // Set flag to indicate RTC sync is required
   }
@@ -256,7 +241,10 @@ void beginQwiic()
   qwiicPowerOn();
   qwiic.begin();
   qwiic.setPullups(QWIIC_PULLUPS); // Set pull-ups here to make it clear which pull-ups are used
-  delay(250); // Allow extra time for the Qwiic sensors to power up
+  for (int i = 0; i < 250; i++) // Allow extra time for the Qwiic sensors to power up
+  {
+    delay(1);
+  }
 }
 
 // Initialize microSD
@@ -344,7 +332,7 @@ void configureRtc()
 // Synchronize RTC date and time with GNSS
 void syncRtc()
 {
-  // Check if u-blox is available and logging
+  // Check if u-blox is available
   if (qwiicOnline.uBlox)
   {
     uint32_t loopStartTime = millis();
