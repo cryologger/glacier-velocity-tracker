@@ -406,7 +406,7 @@ SD_WRITE:
       }
     }
 
-    // Force sync every 500 ms
+    // Force sync every 1000 ms
     if (millis() - lastDataLogSyncTime > 500)
     {
       lastDataLogSyncTime = millis();

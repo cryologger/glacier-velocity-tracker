@@ -58,19 +58,8 @@ bool createLogFile()
   // Get RTC's current date and time
   rtc.getTime();
 
-  // Create a new folder
-  sprintf(dirName, "20%02d%02d%02d", rtc.year, rtc.month, rtc.dayOfMonth);
-  if (sd.mkdir(dirName))
-  {
-    Serial.print(F("Created folder: ")); Serial.println(dirName);
-  }
-  else
-  {
-    Serial.println(F("Warning: Unable to create new folder"));
-  }
-
   // Create log file
-  sprintf(fileName, "20%02d%02d%02d/%02d%02d%02d.ubx",
+  sprintf(fileName, "20%02d%02d%02d_%02d%02d%02d.ubx",
           rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 

@@ -1,7 +1,7 @@
 /*
   Title:    Cryologger - Glacier Velocity Measurement System (GVMS)
   Author:   Adam Garbo
-  Date:     August 16th, 2020
+  Date:     August 21th, 2020
   Version:  0.1
 
   Based extensively on:
@@ -39,12 +39,20 @@
 #include "settings.h"
 
 // Define hardware version
-#define HARDWARE_VERSION_MAJOR 0
-#define HARDWARE_VERSION_MINOR 4
+#define HARDWARE_VERSION_MAJOR 1
+#define HARDWARE_VERSION_MINOR 0
 
 // Define pin functions
+#if(HARDWARE_VERSION_MAJOR == 0 && HARDWARE_VERSION_MINOR == 4)
 #define PIN_MICROSD_CHIP_SELECT 10
 #define PIN_IMU_POWER           22
+#elif(HARDWARE_VERSION_MAJOR == 1 && HARDWARE_VERSION_MINOR == 0)
+#define PIN_MICROSD_CHIP_SELECT 23
+#define PIN_IMU_POWER           27
+#define PIN_PWR_LED             29
+#define PIN_VREG_ENABLE         25
+#define PIN_VIN_MONITOR         34 // VIN/3 (1M/2M - will require a correction factor)
+#endif
 #define PIN_POWER_LOSS          3
 #define PIN_MICROSD_POWER       15
 #define PIN_QWIIC_POWER         18
@@ -186,6 +194,8 @@ void setup()
     menuMain();
   }
 
+  powerLedOff();  // Turn on PWR LED
+
   // Once user configuration is complete, start data logging
   beginDataLogging();
 }
@@ -215,7 +225,7 @@ void loop()
   if (alarmFlag)
   {
     openNewLogFile();           // Create new log file
-    //configureRtc();             // Set RTC alarm
+    configureRtc();             // Set RTC alarm
     alarmFlag = false;          // Clear alarm flag
     rtcSyncRequiredFlag = true; // Set flag to indicate RTC sync is required
   }
