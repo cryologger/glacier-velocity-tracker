@@ -25,15 +25,15 @@
 */
 
 // Define firmware version
-#define FIRMWARE_VERSION_MAJOR 0
-#define FIRMWARE_VERSION_MINOR 1
+#define FIRMWARE_VERSION_MAJOR 1
+#define FIRMWARE_VERSION_MINOR 2
 
 // Define OpenLog Artemis unique board identifier
 // Sum of:
 // Variant * 0x100  (OLA = 1; GNSS_LOGGER = 2; GEOPHONE_LOGGER = 3; CRYOLOGGER = 4)
 // Major firmware version * 0x10
 // Minor firmware version
-#define OLA_IDENTIFIER 0x111
+#define OLA_IDENTIFIER 0x212
 
 // Load default sensor settings
 #include "settings.h"
