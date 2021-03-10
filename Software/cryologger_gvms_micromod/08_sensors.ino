@@ -1,0 +1,3 @@
+void configureSensors() {}
+
+void readSensors() {}
