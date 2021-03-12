@@ -5,10 +5,45 @@ void configureSd()
   {
     online.microSd = true;
   }
-  else 
+  else
   {
     DEBUG_PRINTLN("Warning: microSD not detected! Please check wiring.");
+    digitalWrite(LED_BUILTIN, HIGH);
+    while (1);
   }
+}
+
+// Create log file
+void createDebugLogFile()
+{
+  // Open log file for writing
+  // O_CREAT - Create the file if it does not exist
+  // O_APPEND - Seek to the end of the file prior to each write
+  // O_WRITE - Open the file for writing
+  if (!file.open("debug.csv", O_CREAT | O_APPEND | O_WRITE))
+  {
+    DEBUG_PRINTLN("Failed to create log file");
+    return;
+  }
+
+  if (!file.isOpen())
+  {
+    DEBUG_PRINTLN("Warning: Unable to open file");
+  }
+
+  // Write header to file
+  file.println("datetime,epoch,quality,voltage");
+
+  // Update file create timestamp
+  updateFileCreate();
+
+  // Sync the log file
+  file.sync();
+
+  // Close log file
+  file.close();
+
+  DEBUG_PRINT("Logging to file: "); DEBUG_PRINTLN(fileName);
 }
 
 // Create log file
@@ -56,34 +91,23 @@ void createLogFile()
 }
 
 // Log data to microSD
-void logData()
+void logDebugData()
 {
   unsigned long loopStartTime = millis(); // Start loop timer
-
-  // Open log file and append data
-  if (file.open(fileName, O_APPEND | O_WRITE))
+ 
+  // Open log file for writing
+  // O_CREAT - Create the file if it does not exist
+  // O_APPEND - Seek to the end of the file prior to each write
+  // O_WRITE - Open the file for writing
+  if (file.open("diagnostics.csv", O_APPEND | O_WRITE))
   {
-    file.print(moMessage.unixtime);             file.print(",");
-    file.print(moMessage.temperature / 100.0);  file.print(",");
-    file.print(moMessage.humidity / 100.0);     file.print(",");
-    file.print(moMessage.pressure / 100.0);     file.print(",");
-    file.print(moMessage.latitude);             file.print(",");
-    file.print(moMessage.longitude);            file.print(",");
-    file.print(moMessage.satellites);           file.print(",");
-    file.print(moMessage.pdop);                 file.print(",");
-    file.print(moMessage.rtcDrift);             file.print(",");
-    file.print(moMessage.voltage);              file.print(",");
-    file.print(moMessage.transmitDuration);     file.print(",");
-    file.print(messageCounter);                 file.print(",");
-    file.print(timer.voltage);                  file.print(",");
-    file.print(timer.rtc);                      file.print(",");
-    file.print(timer.microSd);                  file.print(",");
-    file.print(timer.sensor);                   file.print(",");
-    file.print(timer.gnss);                     file.print(",");
-    file.print(timer.iridium);                  file.print(",");
-    file.print(online.microSd);                 file.print(",");
-    file.print(online.gnss);                    file.print(",");
-    file.println(online.iridium);
+    file.print(timer.voltage);    file.print(",");
+    file.print(timer.rtc);        file.print(",");
+    file.print(timer.microSd);    file.print(",");
+    file.print(timer.sensors);     file.print(",");
+    file.print(timer.logGnss);    file.print(",");
+    file.print(online.microSd);   file.print(",");
+    file.println(online.gnss);    file.print(",");
 
     updateFileAccess(); // Update file access and write timestamps
   }
@@ -109,7 +133,7 @@ void logData()
   {
     DEBUG_PRINTLN("Warning: File close error!");
   }
-  
+
   // Stop the loop timer
   timer.microSd = millis() - loopStartTime;
 
@@ -122,7 +146,7 @@ void updateFileCreate()
 {
   // Get the RTC's current date and time
   rtc.getTime();
-  
+
   // Update the file create timestamp
   if (!file.timestamp(T_CREATE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
   {
@@ -135,7 +159,7 @@ void updateFileAccess()
 {
   // Get the RTC's current date and time
   rtc.getTime();
-  
+
   // Update the file access and write timestamps
   if (!file.timestamp(T_ACCESS, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
   {

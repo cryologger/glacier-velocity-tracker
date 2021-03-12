@@ -17,7 +17,8 @@ void configureWdt() {
 }
 
 // Reset the Watchdog Timer
-void petDog() {
+void petDog() 
+{
   wdt.restart();
   //DEBUG_PRINT("Watchdog interrupt: "); DEBUG_PRINTLN(watchdogCounter);
   watchdogFlag = false; // Clear watchdog flag

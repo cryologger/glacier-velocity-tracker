@@ -12,7 +12,7 @@ void goToSleep()
 {
 
 #if DEBUG
-  Serial.flush();       // Wait for transmission of serial data to complete
+  //Serial.flush();       // Wait for transmission of serial data to complete
   Serial.end();         // Disable Serial
 #endif
   Wire.end();               // Disable I2C
@@ -49,7 +49,6 @@ void goToSleep()
 
   // Mark devices as offline
   online.gnss = false;
-  online.iridium = false;
   online.microSd = false;
 
   // Disable power to Flash, SRAM, and cache
@@ -94,16 +93,10 @@ void wakeUp()
   Serial.begin(115200); // Enable Serial
 #endif
 
-  // If alarm is triggered, enable power to system
+  // If alarm is triggered 
   if (alarmFlag)
   {
-    readRtc();            // Read RTC
-    qwiicPowerOn();       // Enable power to Qwiic connector
-    peripheralPowerOn();  // Enable power to peripherals
-    configureSd();        // Configure microSD
-    configureGnss();      // Configure u-blox receiver
-    //configureIridium();   // Configure Iridium 9603
-    configureSensors();   // Configure attached sensors
+    readRtc(); // Read RTC
   }
 }
 

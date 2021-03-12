@@ -1,14 +1,13 @@
 
 void configureGnss()
 {
-  //gnss.enableDebugging();                   // Uncomment to enable GNSS debug messages on Serial
-  //gnss.enableDebugging(Serial, true);  // Uncomment to enable only the important GNSS debug messages on Serial
-  gnss.disableUBX7Fcheck();                 // Disable the "7F" check in checkUbloxI2C as RAWX data can legitimately contain 0x7F
+  //gnss.enableDebugging();             // Uncomment to enable GNSS debug messages on Serial
+  //gnss.enableDebugging(Serial, true); // Uncomment to enable only the important GNSS debug messages on Serial
+  gnss.disableUBX7Fcheck();           // Disable the "7F" check in checkUbloxI2C as RAWX data can legitimately contain 0x7F
 
-  // RAWX messages can be over 2 KB in size, so we need to make sure we allocate enough RAM to hold all the data.
-  // The buffer needs to be big enough to hold the backlog of data
-  // getMaxFileBufferAvail will tell us the maximum number of bytes which the file buffer has contained.
-  gnss.setFileBufferSize(fileBufferSize); // setFileBufferSize must be called _before_ .begin
+  // Allocate sufficient RAM to store RAWX messages (>2 KB)
+  // getMaxFileBufferAvail indicates maximum number of bytes the file buffer has contained
+  gnss.setFileBufferSize(fileBufferSize); // setFileBufferSize must be called before gnss.begin()
 
   // Connect to the u-blox module using Wire port
   if (gnss.begin())
@@ -16,10 +15,8 @@ void configureGnss()
     gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
     gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to Flash and BBR
     gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
-    //gnss.setAutoRXMSFRBXcallback(&newSfrbx); // Enable automatic RXM SFRBX messages with callback to newSFRBX
     gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM SFRBX messages without callback (implicit update)
     gnss.logRXMSFRBX();                               // Enable RXM SFRBX data logging
-    //gnss.setAutoRXMRAWXcallback(&newRawx); // Enable automatic RXM RAWX messages with callback to newRAWX
     gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM RAWX messages without callback (implicit update)
     gnss.logRXMRAWX();                                // Enable RXM RAWX data logging
     gnss.setAutoPVTcallback(&syncRtc);                // Enable automatic NAV PVT messages with callback to syncRtc
@@ -32,24 +29,14 @@ void configureGnss()
   {
     DEBUG_PRINTLN("Warning: u-blox GNSS not detected at default I2C address. Please check wiring.");
     online.gnss = false;
+    digitalWrite(LED_BUILTIN, HIGH);
+    while (1);
   }
 
   // Uncomment to reset u-blox module to default factory settings with 1 Hz navigation rate
   //gnss.factoryDefault();
   //delay(5000);
 
-}
-
-// UBX-RXM-SFRBX callback
-void newSfrbx(UBX_RXM_SFRBX_data_t ubxDataStruct)
-{
-  sfrbxCounter++; // Increment counter
-}
-
-// UBX-RXM-RAWX callback
-void newRawx(UBX_RXM_RAWX_data_t ubxDataStruct)
-{
-  rawxCounter++; // Increment counter
 }
 
 // Read the GNSS receiver
@@ -93,8 +80,13 @@ void readGnss()
 // Callback function to process UBX-NAV-PVT data
 void syncRtc(UBX_NAV_PVT_data_t ubx)
 {
-  // Reset the Watchdog Timer
-  petDog();
+  // Reset the Watchdog Timer every second
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis > 1000)
+  {
+    previousMillis = currentMillis;
+    petDog();
+  }
 
   // Read battery voltage
   readBattery();
@@ -102,8 +94,8 @@ void syncRtc(UBX_NAV_PVT_data_t ubx)
   // Blink LED
   digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 
-  bool dateValidFlag = ubx.valid.bits.validDate;
-  bool timeValidFlag = ubx.valid.bits.validTime;
+  bool dateValidFlag = ubx.flags2.bits.confirmedDate;
+  bool timeValidFlag = ubx.flags2.bits.confirmedTime;
   byte fixType = ubx.fixType;
 
 #if DEBUG_GNSS
@@ -113,7 +105,7 @@ void syncRtc(UBX_NAV_PVT_data_t ubx)
           ubx.hour, ubx.min, ubx.sec, ubx.iTOW % 1000,
           ubx.lat, ubx.lon, ubx.numSV,
           ubx.pDOP, ubx.fixType,
-          ubx.valid.bits.validDate, ubx.valid.bits.validTime);
+          dateValidFlag, timeValidFlag);
   DEBUG_PRINTLN(gnssBuffer);
 #endif
 
@@ -133,14 +125,8 @@ void syncRtc(UBX_NAV_PVT_data_t ubx)
     DEBUG_PRINTLN("A GNSS fix was found!");
     gnssFixFlag = true; // Set fix flag
 
-    // Write data to union
-    moMessage.latitude = ubx.lat;
-    moMessage.longitude = ubx.lon;
-    moMessage.satellites = ubx.numSV;
-    moMessage.pdop = ubx.pDOP;
-
     // Attempt to sync RTC with GNSS
-    if (fixType >= 2 && timeValidFlag && dateValidFlag)
+    if (dateValidFlag && timeValidFlag)
     {
       // Convert GNSS date and time to Unix Epoch time
       tmElements_t tm;
@@ -157,9 +143,6 @@ void syncRtc(UBX_NAV_PVT_data_t ubx)
       int rtcDrift = rtc.getEpoch() - gnssEpoch;
 
       DEBUG_PRINT("RTC drift: "); DEBUG_PRINTLN(rtcDrift);
-
-      // Write data to union
-      moMessage.rtcDrift = rtcDrift;
 
       // Set RTC date and time
       rtc.setTime(ubx.hour, ubx.min, ubx.sec, ubx.iTOW % 1000,
@@ -180,22 +163,27 @@ void logGnss()
   // Start loop timer
   unsigned long loopStartTime = millis();
 
-  sfrbxCounter = 0; // Counter for number of received SFRBX message groups
-  rawxCounter = 0; // Counter for number of received RAWX message groups
-
+  // Open log file
   if (!file.open(fileName, O_APPEND | O_WRITE))
   {
     DEBUG_PRINTLN("Warning: Unable to open file");
   }
 
-  // Log data until logging alarm
+  // Flush data
+  gnss.flushRXMSFRBX();
+  gnss.flushRXMRAWX();
+
+  // Log data until logging alarm triggers
   while (!alarmFlag)
   {
-    gnss.checkUblox(); // Check for the arrival of new data and process it.
+    // Check for the arrival of new data and process it
+    gnss.checkUblox();
 
-    petDog(); // Reset watchdog
+    // Reset watchdog
+    petDog();
 
-    while (gnss.fileBufferAvailable() >= sdWriteSize) // Check if sdWriteSize waiting in the buffer
+    // Check if sdWriteSize bytes waiting in the buffer
+    while (gnss.fileBufferAvailable() >= sdWriteSize)
     {
       // Blink to indicate SD write
       digitalWrite(LED_BUILTIN, HIGH);
@@ -209,33 +197,38 @@ void logGnss()
       // Write exactly sdWriteSize bytes from myBuffer to the ubxDataFile on the SD card
       file.write(myBuffer, sdWriteSize);
 
+      // Update bytesWritten
+      bytesWritten += sdWriteSize;
+
       // Check for the arrival of new data and process it
       gnss.checkUblox();
-      //gnss.checkCallbacks(); // Check if any callbacks are waiting to be processed
 
       digitalWrite(LED_BUILTIN, LOW);
     }
 
-    // Print message count every second
+    // Print fileBufferSize every 5 seconds
     if (millis() > previousMillis + 1000)
     {
-      // Print number of messages received
-      //DEBUG_PRINT("SFRBX: "); DEBUG_PRINT(sfrbxCounter);
-      //DEBUG_PRINT(" RAWX: "); DEBUG_PRINT(rawxCounter);
+      // Print how many bytes have been written to SD card
+      DEBUG_PRINT("Bytes written to SD card: "); DEBUG_PRINTLN(bytesWritten);
 
-      uint16_t maxBufferBytes = gnss.getMaxFileBufferAvail(); // Get max file buffer size
+      // Get max file buffer size
+      uint16_t maxBufferBytes = gnss.getMaxFileBufferAvail();
 
-      //DEBUG_PRINT(" Max file buffer size: "); DEBUG_PRINTLN(maxBufferBytes);
+      DEBUG_PRINT("Max file buffer size: "); DEBUG_PRINTLN(maxBufferBytes);
 
       // Warning if fileBufferSize was more than 80% full
       if (maxBufferBytes > ((fileBufferSize / 5) * 4))
       {
-        DEBUG_PRINTLN("Warning: File buffer over 80% full. Data loss may have occurrred.");
+        DEBUG_PRINTLN("Warning: File buffer >80% full. Data loss may have occurrred.");
       }
+
+      // Update millis counter
       previousMillis = millis();
     }
-  }
-  DEBUG_PRINTLN("Exiting while (logFlag) loop");
+  } // Exit log function
+
+  // Stop logging
 
   // Check for bytes remaining in file buffer
   uint16_t remainingBytes = gnss.fileBufferAvailable();
@@ -252,11 +245,15 @@ void logGnss()
     gnss.extractFileBufferData((uint8_t *)&myBuffer, bytesToWrite); // Extract bytesToWrite bytes from the UBX file buffer and put them into myBuffer
 
     file.write(myBuffer, bytesToWrite); // Write bytesToWrite bytes from myBuffer to the ubxDataFile on the SD card
+
+    bytesWritten += bytesToWrite; // Update bytesWritten
     remainingBytes -= bytesToWrite; // Decrement remainingBytes
+
   }
 
-  // Toggle logging flag
-  loggingFlag = false;
+  // Print how many bytes have been written to SD card
+  DEBUG_PRINT("Total number of bytes written to SD card: ");
+  DEBUG_PRINTLN(bytesWritten);
 
   // Update the file access and write timestamps
   updateFileAccess();
@@ -266,6 +263,9 @@ void logGnss()
 
   // Close logfile
   file.close();
+
+  // Toggle logging flag
+  loggingFlag = false;
 
   // Stop the loop timer
   timer.logGnss = millis() - loopStartTime;
