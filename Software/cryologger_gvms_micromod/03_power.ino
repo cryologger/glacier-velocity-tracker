@@ -95,11 +95,6 @@ void wakeUp()
 #endif
   Serial1.begin(234000);
   
-  // If alarm is triggered
-  if (alarmFlag)
-  {
-    readRtc(); // Read RTC
-  }
 }
 
 // Enable power to Qwiic connector

@@ -8,8 +8,11 @@ void configureSd()
   else
   {
     DEBUG_PRINTLN("Warning: microSD not detected! Please check wiring.");
-    digitalWrite(LED_BUILTIN, HIGH);
-    while (1);
+    while (1)
+    {
+      blinkLed(2, 250);
+      blinkLed(1, 1000);
+    }
   }
 }
 
@@ -32,7 +35,7 @@ void createDebugLogFile()
   }
 
   // Write header to file
-  debugFile.println("unixtime,timer_voltage,timer_rtc,timer_sd,timer_sensors,timer_gnss,online_microsd,online_gnss,watchdog");
+  debugFile.println("datetime,unixtime,timer_voltage,timer_rtc,timer_sd,timer_sensors,timer_gnss,bytes_written,online_microsd,online_gnss,rtc_drift,watchdog,sample");
 
   // Update file create timestamp
   updateFileCreate(&debugFile);
@@ -95,22 +98,33 @@ void logDebugData()
 {
   unsigned long loopStartTime = millis(); // Start loop timer
 
+  counter++; // Increment
+
+  char dateTime[30];
+  sprintf(dateTime, "20%02d-%02d-%02d %02d:%02d:%02d",
+          rtc.year, rtc.month, rtc.dayOfMonth,
+          rtc.hour, rtc.minute, rtc.seconds);
+
   // Open log file for writing
   // O_CREAT - Create the file if it does not exist
   // O_APPEND - Seek to the end of the file prior to each write
   // O_WRITE - Open the file for writing
   if (debugFile.open(debugFileName, O_APPEND | O_WRITE))
   {
+    debugFile.print(dateTime);        debugFile.print(",");
     debugFile.print(unixtime);        debugFile.print(",");
     debugFile.print(timer.voltage);   debugFile.print(",");
     debugFile.print(timer.rtc);       debugFile.print(",");
     debugFile.print(timer.microSd);   debugFile.print(",");
     debugFile.print(timer.sensors);   debugFile.print(",");
     debugFile.print(timer.logGnss);   debugFile.print(",");
+    debugFile.print(bytesWritten);    debugFile.print(",");
     debugFile.print(online.microSd);  debugFile.print(",");
     debugFile.print(online.gnss);     debugFile.print(",");
-    debugFile.println(watchdogCounter);
-    
+    debugFile.print(rtcDrift);        debugFile.print(",");
+    debugFile.print(watchdogCounterMax);  debugFile.print(",");
+    debugFile.println(counter);
+
     updateFileAccess(&debugFile); // Update file access and write timestamps
   }
   else

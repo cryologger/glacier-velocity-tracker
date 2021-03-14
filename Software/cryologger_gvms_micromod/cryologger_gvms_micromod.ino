@@ -64,8 +64,8 @@
 APM3_RTC          rtc;
 APM3_WDT          wdt;
 SdFs              sd;             // File system object
-FsFile            logFile;        // Log file
-FsFile            debugFile;      // Log file
+FsFile            logFile;        // Data log file
+FsFile            debugFile;      // Diagnostics log file
 SFE_UBLOX_GNSS    gnss;           // I2C address: 0x42
 
 // ----------------------------------------------------------------------------
@@ -73,9 +73,9 @@ SFE_UBLOX_GNSS    gnss;           // I2C address: 0x42
 // ----------------------------------------------------------------------------
 byte          sleepAlarmMinutes     = 10;
 byte          sleepAlarmHours       = 0;
-byte          loggingAlarmHours     = 0;
-byte          loggingAlarmMinutes   = 10;
-unsigned int  gnssTimeout           = 300;   // Timeout for GNSS signal acquisition (s)
+byte          loggingAlarmHours     = 1;
+byte          loggingAlarmMinutes   = 0;
+unsigned int  gnssTimeout           = 5;   // Timeout for GNSS signal acquisition (minutes)
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -84,23 +84,23 @@ unsigned int  gnssTimeout           = 300;   // Timeout for GNSS signal acquisit
 const int     sdWriteSize         = 512;    // Write data to SD in blocks of 512 bytes
 const int     fileBufferSize      = 16384;  // Allocate 16 KB RAM for UBX message storage
 volatile bool alarmFlag           = false;   // Flag for alarm interrupt service routine
+volatile bool loggingFlag         = false;  // Flag to
 volatile bool watchdogFlag        = false;  // Flag for Watchdog Timer interrupt service routine
 volatile int  watchdogCounter     = 0;      // Counter for Watchdog Timer interrupts
-volatile int  watchdogCounterMax  = 0;
-volatile bool loggingFlag         = false;  // Flag to
+volatile int  watchdogCounterMax  = 0;      // Max number of Watchdog Timer interrupts seen
 bool          firstTimeFlag       = true;   // Flag to determine if the program is running for the first time
 bool          resetFlag           = 0;      // Flag to force system reset using Watchdog Timer
 bool          gnssFixFlag         = false;  // Flag to indicate if GNSS valid fix has been acquired
 bool          rtcSyncFlag         = false;  // Flag to indicate if the RTC was syned with the GNSS
-byte          gnssFixCounter      = 0;      // Counter for valid GNSS fixes
-byte          gnssFixCounterMax   = 60;     // Counter limit for threshold of valid GNSS fixes
 char          logFileName[30]     = "";     // Keep a record of this file name so that it can be re-opened upon wakeup from sleep
 char          debugFileName[30]   = "debug.csv";
+long          rtcDrift            = 0;
 unsigned int  sdPowerDelay        = 250;    // Delay before disabling power to microSD (milliseconds)
 unsigned int  qwiicPowerDelay     = 2500;   // Delay after enabling power to Qwiic connector (milliseconds)
+unsigned int  counter             = 0;
 unsigned long previousMillis      = 0;      // Global millis() timer
-unsigned long unixtime            = 0;
-unsigned long bytesWritten        = 0;      // Counter how many bytes have been written to SD card
+unsigned long unixtime            = 0;      // Unix epoch timestamp
+unsigned long bytesWritten        = 0;      // Counter for tracking bytes written to microSD card
 float         voltage             = 0.0;    // Battery voltage
 time_t        alarmTime           = 0;
 
@@ -151,20 +151,20 @@ void setup()
   blinkLed(2, 1000); // Non-blocking delay to allow user to open Serial Monitor
 #endif
 
-  Serial1.begin(234000);  // Initialize Serial1 at 230400 baud to communicate with u-blox
-  qwiicPowerOn();       // Enable power to Qwiic connector
+  //Serial1.begin(230400);  // Initialize Serial1 at 230400 baud for communication with u-blox
+  qwiicPowerOff();       // Enable power to Qwiic connector
   peripheralPowerOn();  // Enable power to peripherials
 
   DEBUG_PRINTLN();
   printLine();
   DEBUG_PRINTLN("Cryologger - Glacier Velocity Measurement System v2.0");
   printLine();
-  printDateTime();
+  printDateTime(); // Print current RTC time at boot
 
   // Configure devices
+  configureWdt();     // Configure and start Watchdog Timer (WDT)
   configureGnss();    // Configure GNSS receiver
   syncRtc();          // Acquire GNSS fix and synchronize RTC with GNSS
-  configureWdt();     // Configure and start Watchdog Timer (WDT)
   configureSd();      // Configure microSD
   createDebugLogFile();
   configureSensors(); // Configure attached sensors
@@ -186,6 +186,9 @@ void loop()
   // Check if alarm flag is set or if program is running for the first time
   if (alarmFlag)
   {
+    // Read RTC
+    readRtc();
+
     // Clear alarm flag
     alarmFlag = false;
 
@@ -202,11 +205,13 @@ void loop()
 
       peripheralPowerOn();  // Enable power to peripherals
       configureSd();        // Configure microSD
-      createLogFile();
+      createLogFile();      // Create new log file
 
       //qwiicPowerOn();       // Enable power to Qwiic connector
+      blinkLed(2, 1000);    // Delay to allow u-blox receiver to boot-up
       configureGnss();      // Configure u-blox receiver
-      logGnss();
+      syncRtc();            // Synchronize RTC
+      logGnss();            // Log UBX data
 
       printTimers();  // Print function execution timers
     }
@@ -263,15 +268,18 @@ extern "C" void am_watchdog_isr(void)
   else
   {
     wdt.stop();
-    digitalWrite(LED_BUILTIN, HIGH);
-    while (1);
+    while (1)
+    {
+      blinkLed(2, 250);
+      blinkLed(3, 1000);
+    }
   }
   watchdogFlag = true; // Set the watchdog flag
   watchdogCounter++; // Increment watchdog interrupt counter
 
-  if(watchdogCounter > watchdogCounterMax) 
+  if (watchdogCounter > watchdogCounterMax)
   {
     watchdogCounterMax = watchdogCounter;
   }
-  
+
 }

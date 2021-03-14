@@ -39,3 +39,23 @@ void printTimers()
   DEBUG_PRINT("logGnss: "); printTab(1);  DEBUG_PRINTLN(timer.logGnss);
   printLine();
 }
+
+
+void printGnssSettings()
+{
+  printLine();
+  DEBUG_PRINTLN("Settings");
+  printLine();
+  DEBUG_PRINT("UART1 BAUD: ");    printTab(1);  DEBUG_PRINTLN(gnss.getVal32(UBLOX_CFG_UART1_BAUDRATE));
+  DEBUG_PRINT("UART2 BAUD: ");    printTab(1);  DEBUG_PRINTLN(gnss.getVal32(UBLOX_CFG_UART2_BAUDRATE));
+  DEBUG_PRINT("UART1 UBX: ");     printTab(1);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_UART1INPROT_UBX));
+  DEBUG_PRINT("UART1 NMEA: ");    printTab(1);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_UART1INPROT_NMEA));
+  DEBUG_PRINT("UART1 RTCM3X: ");  printTab(1);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_UART1INPROT_RTCM3X));
+  DEBUG_PRINT("GPS: ");           printTab(2);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_SIGNAL_GPS_ENA));
+  DEBUG_PRINT("GLO: ");           printTab(2);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_SIGNAL_GLO_ENA));
+  DEBUG_PRINT("GAL: ");           printTab(2);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_SIGNAL_GAL_ENA));
+  DEBUG_PRINT("BDS: ");           printTab(2);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_SIGNAL_BDS_ENA));
+  DEBUG_PRINT("QZSS: ");          printTab(2);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_SIGNAL_QZSS_ENA));
+
+  printLine();
+}

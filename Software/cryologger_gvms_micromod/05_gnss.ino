@@ -1,44 +1,82 @@
 
 void configureGnss()
 {
-  //gnss.enableDebugging();             // Uncomment to enable GNSS debug messages on Serial
-  //gnss.enableDebugging(Serial, true); // Uncomment to enable only the important GNSS debug messages on Serial
-  //gnss.disableUBX7Fcheck();           // Disable the "7F" check in checkUbloxI2C as RAWX data can legitimately contain 0x7F
+  // Uncomment to enable GNSS debug messages on Serial
+  //gnss.enableDebugging();
 
   // Allocate sufficient RAM to store RAWX messages (>2 KB)
-  // getMaxFileBufferAvail indicates maximum number of bytes the file buffer has contained
   gnss.setFileBufferSize(fileBufferSize); // setFileBufferSize must be called before gnss.begin()
 
-  // Connect to the u-blox module using Wire port
+  // Initialize Serial at a baud rate of 230400
+  Serial1.begin(38400);
+
+  // Attempt to initlialze u-blox module using Serial port
   if (gnss.begin(Serial1))
   {
-    //gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
-    gnss.setUART1Output(COM_TYPE_UBX);                  // Set the UART1 port to output UBX only (disable NMEA)
-    gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to Flash and BBR
-    gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
-    gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM SFRBX messages without callback (implicit update)
-    gnss.logRXMSFRBX();                               // Enable RXM SFRBX data logging
-    gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM RAWX messages without callback (implicit update)
-    gnss.logRXMRAWX();                                // Enable RXM RAWX data logging
-    gnss.setAutoPVTcallback(&processNavPvt);          // Enable automatic NAV PVT messages with callback to syncRtc
-    gnss.logNAVPVT();                                 // Enable NAV PVT data logging
+    DEBUG_PRINTLN("u-blox GNSS initialized at 38400 bps.");
+    printGnssSettings();
 
-    configureSignals();
-
-    DEBUG_PRINTLN("u-blox GNSS initialized.");
-    online.gnss = true;
+    // Change baud rate to 230400 bps
+    bool response = true;
+    response &= gnss.setVal32(UBLOX_CFG_UART1_BAUDRATE, 230400);
+    if (response == false)
+    {
+      Serial.println("SetVal failed");
+    }
   }
   else
   {
-    DEBUG_PRINTLN("Warning: u-blox GNSS not detected at default I2C address. Please check wiring.");
+    DEBUG_PRINTLN("Warning: u-blox GNSS not detected at 38400 bps. Please check wiring and baud rate.");
+  }
+  // Attempt to initlialze u-blox module using Serial port at 230400 baud
+  Serial1.begin(230400);
+  if (gnss.begin(Serial1))
+  {
+    DEBUG_PRINTLN("u-blox GNSS initialized at 230400 bps.");
+  }
+  else
+  {
+    DEBUG_PRINTLN("Warning: u-blox GNSS not detected. Please check wiring.");
     online.gnss = false;
-    digitalWrite(LED_BUILTIN, HIGH);
-    while (1);
+
+    while (1)
+    {
+      blinkLed(2, 250);
+      blinkLed(2, 1000);
+    }
   }
 
-  // Uncomment to reset u-blox module to default factory settings with 1 Hz navigation rate
+  printGnssSettings();
+  // Uncomment to reset u-blox to default factory settings with 1 Hz navigation rate
   //gnss.factoryDefault();
   //delay(5000);
+
+  gnss.setUART1Output(COM_TYPE_UBX);                // Set the UART1 port to output UBX only (disable NMEA)
+  gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to Flash and BBR
+  gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
+  gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM SFRBX messages without callback (implicit update)
+  gnss.logRXMSFRBX();                               // Enable RXM SFRBX data logging
+  gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM RAWX messages without callback (implicit update)
+  gnss.logRXMRAWX();                                // Enable RXM RAWX data logging
+  gnss.setAutoPVTcallback(&processNavPvt);          // Enable automatic NAV PVT messages with callback to syncRtc
+  gnss.logNAVPVT();                                 // Enable NAV PVT data logging
+
+  // Configure satellite signals
+  bool setValueSuccess = true;
+  setValueSuccess &= gnss.setVal8(UBLOX_CFG_SIGNAL_GPS_ENA, 1);   // Enable GPS
+  setValueSuccess &= gnss.setVal8(UBLOX_CFG_SIGNAL_GLO_ENA, 1);   // Enable GLONASS
+  setValueSuccess &= gnss.setVal8(UBLOX_CFG_SIGNAL_GAL_ENA, 0);   // Enable Galileo
+  setValueSuccess &= gnss.setVal8(UBLOX_CFG_SIGNAL_BDS_ENA, 0);   // Disable BeiDou
+  setValueSuccess &= gnss.setVal8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0);  // Disable QZSS
+
+  if (setValueSuccess == false)
+  {
+    DEBUG_PRINTLN("Warning: Satellite signal values not successfully set");
+  }
+
+  DEBUG_PRINTLN("u-blox GNSS initialized.");
+  printGnssSettings();
+  online.gnss = true;
 
 }
 
@@ -79,6 +117,7 @@ void syncRtc()
 // Callback function to process UBX-NAV-PVT data
 void processNavPvt(UBX_NAV_PVT_data_t ubx)
 {
+  petDog();
   // Blink LED
   digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 
@@ -114,7 +153,7 @@ void processNavPvt(UBX_NAV_PVT_data_t ubx)
     rtc.getTime(); // Get the RTC's date and time
 
     // Calculate drift (to the second)
-    int rtcDrift = rtc.getEpoch() - gnssEpoch;
+    rtcDrift = rtc.getEpoch() - gnssEpoch;
 
     DEBUG_PRINT("RTC drift: "); DEBUG_PRINTLN(rtcDrift);
 
@@ -124,11 +163,9 @@ void processNavPvt(UBX_NAV_PVT_data_t ubx)
 
     rtcSyncFlag = true; // Set flag
     DEBUG_PRINT("RTC time synced to: "); printDateTime();
-    blinkLed(5, 500);
   }
 
 }
-
 
 void logGnss()
 {
@@ -254,7 +291,7 @@ void configureSignals()
   success &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 1); // Enable GLONASS
   success &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 0); // Enable Galileo
   success &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, 0); // Disable BeiDou
-  success &= gnss.sendCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0, 2100); // Disable QZSS
+  success &= gnss.sendCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0); // Disable QZSS
   if (success > 0)
   {
     Serial.println(F("configureSignals: sendCfgValset was successful when enabling constellations"));
