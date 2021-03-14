@@ -15,6 +15,7 @@ void goToSleep()
   //Serial.flush();       // Wait for transmission of serial data to complete
   Serial.end();         // Disable Serial
 #endif
+  Serial1.end();            // Disable Serial1
   Wire.end();               // Disable I2C
   SPI.end();                // Disable SPI
   //powerControlADC(false);   // Disable power to ADC (v2.x)
@@ -86,14 +87,15 @@ void wakeUp()
   //initializeADC();      // Enable power to ADC (v2.x)
 
   Wire.begin();         // Enable I2C
-  //Wire.setClock(400000); // Set I2C clock speed to 400 kHz
-  //Wire.setPullups(0);   // Disable Artemis internal I2C pull-ups to help reduce bus errors
-  SPI.begin();          // Enable SPI
+  //Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
+
+  SPI.begin();            // Enable SPI
 #if DEBUG
   Serial.begin(115200); // Enable Serial
 #endif
-
-  // If alarm is triggered 
+  Serial1.begin(234000);
+  
+  // If alarm is triggered
   if (alarmFlag)
   {
     readRtc(); // Read RTC
@@ -106,7 +108,7 @@ void qwiicPowerOn()
   digitalWrite(PIN_QWIIC_POWER, HIGH);
   // Non-blocking delay to allow Qwiic devices time to power up
   unsigned long currentMillis = millis();
-  while(millis() - currentMillis <= qwiicPowerDelay)
+  while (millis() - currentMillis <= qwiicPowerDelay)
   {
     previousMillis = currentMillis;
   }

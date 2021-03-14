@@ -52,6 +52,7 @@
 // ----------------------------------------------------------------------------
 // Pin definitions
 // ----------------------------------------------------------------------------
+
 #define PIN_VBAT          A0
 #define PIN_PWC_POWER     33 // G1
 #define PIN_QWIIC_POWER   34 // G2
@@ -63,16 +64,17 @@
 APM3_RTC          rtc;
 APM3_WDT          wdt;
 SdFs              sd;             // File system object
-FsFile            file;           // Log file
+FsFile            logFile;        // Log file
+FsFile            debugFile;      // Log file
 SFE_UBLOX_GNSS    gnss;           // I2C address: 0x42
 
 // ----------------------------------------------------------------------------
 // User defined global variable declarations
 // ----------------------------------------------------------------------------
-byte          sleepAlarmMinutes     = 60;
+byte          sleepAlarmMinutes     = 10;
 byte          sleepAlarmHours       = 0;
 byte          loggingAlarmHours     = 0;
-byte          loggingAlarmMinutes   = 60;
+byte          loggingAlarmMinutes   = 10;
 unsigned int  gnssTimeout           = 300;   // Timeout for GNSS signal acquisition (s)
 
 // ----------------------------------------------------------------------------
@@ -84,6 +86,7 @@ const int     fileBufferSize      = 16384;  // Allocate 16 KB RAM for UBX messag
 volatile bool alarmFlag           = false;   // Flag for alarm interrupt service routine
 volatile bool watchdogFlag        = false;  // Flag for Watchdog Timer interrupt service routine
 volatile int  watchdogCounter     = 0;      // Counter for Watchdog Timer interrupts
+volatile int  watchdogCounterMax  = 0;
 volatile bool loggingFlag         = false;  // Flag to
 bool          firstTimeFlag       = true;   // Flag to determine if the program is running for the first time
 bool          resetFlag           = 0;      // Flag to force system reset using Watchdog Timer
@@ -91,7 +94,8 @@ bool          gnssFixFlag         = false;  // Flag to indicate if GNSS valid fi
 bool          rtcSyncFlag         = false;  // Flag to indicate if the RTC was syned with the GNSS
 byte          gnssFixCounter      = 0;      // Counter for valid GNSS fixes
 byte          gnssFixCounterMax   = 60;     // Counter limit for threshold of valid GNSS fixes
-char          fileName[30]        = "";     // Keep a record of this file name so that it can be re-opened upon wakeup from sleep
+char          logFileName[30]     = "";     // Keep a record of this file name so that it can be re-opened upon wakeup from sleep
+char          debugFileName[30]   = "debug.csv";
 unsigned int  sdPowerDelay        = 250;    // Delay before disabling power to microSD (milliseconds)
 unsigned int  qwiicPowerDelay     = 2500;   // Delay after enabling power to Qwiic connector (milliseconds)
 unsigned long previousMillis      = 0;      // Global millis() timer
@@ -138,8 +142,7 @@ void setup()
   analogReadResolution(14);
 
   Wire.begin(); // Initialize I2C
-  Wire.setClock(100000); // Set I2C clock speed to 400 kHz
-  Wire.setPullups(0);   // Disable Artemis internal I2C pull-ups to reduce bus errors
+  //Wire.setClock(400000); // Set I2C clock speed to 400 kHz
   SPI.begin(); // Initialize SPI
 
 #if DEBUG
@@ -148,6 +151,7 @@ void setup()
   blinkLed(2, 1000); // Non-blocking delay to allow user to open Serial Monitor
 #endif
 
+  Serial1.begin(234000);  // Initialize Serial1 at 230400 baud to communicate with u-blox
   qwiicPowerOn();       // Enable power to Qwiic connector
   peripheralPowerOn();  // Enable power to peripherials
 
@@ -159,7 +163,7 @@ void setup()
 
   // Configure devices
   configureGnss();    // Configure GNSS receiver
-  readGnss();         // Acquire GNSS fix and synchronize RTC with GNSS
+  syncRtc();          // Acquire GNSS fix and synchronize RTC with GNSS
   configureWdt();     // Configure and start Watchdog Timer (WDT)
   configureSd();      // Configure microSD
   createDebugLogFile();
@@ -200,7 +204,7 @@ void loop()
       configureSd();        // Configure microSD
       createLogFile();
 
-      qwiicPowerOn();       // Enable power to Qwiic connector
+      //qwiicPowerOn();       // Enable power to Qwiic connector
       configureGnss();      // Configure u-blox receiver
       logGnss();
 
@@ -254,8 +258,6 @@ extern "C" void am_watchdog_isr(void)
   // Perform system reset after 10 watchdog interrupts (should not occur)
   if (watchdogCounter < 10 )
   {
-    //DEBUG_PRINTLN("CAP'N! WE'RE GOING DOWN! AHHH!!!!!!!");
-
     wdt.restart(); // "Pet" the dog
   }
   else
@@ -266,4 +268,10 @@ extern "C" void am_watchdog_isr(void)
   }
   watchdogFlag = true; // Set the watchdog flag
   watchdogCounter++; // Increment watchdog interrupt counter
+
+  if(watchdogCounter > watchdogCounterMax) 
+  {
+    watchdogCounterMax = watchdogCounter;
+  }
+  
 }

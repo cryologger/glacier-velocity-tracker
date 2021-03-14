@@ -3,24 +3,27 @@ void configureGnss()
 {
   //gnss.enableDebugging();             // Uncomment to enable GNSS debug messages on Serial
   //gnss.enableDebugging(Serial, true); // Uncomment to enable only the important GNSS debug messages on Serial
-  gnss.disableUBX7Fcheck();           // Disable the "7F" check in checkUbloxI2C as RAWX data can legitimately contain 0x7F
+  //gnss.disableUBX7Fcheck();           // Disable the "7F" check in checkUbloxI2C as RAWX data can legitimately contain 0x7F
 
   // Allocate sufficient RAM to store RAWX messages (>2 KB)
   // getMaxFileBufferAvail indicates maximum number of bytes the file buffer has contained
   gnss.setFileBufferSize(fileBufferSize); // setFileBufferSize must be called before gnss.begin()
 
   // Connect to the u-blox module using Wire port
-  if (gnss.begin())
+  if (gnss.begin(Serial1))
   {
-    gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
+    //gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
+    gnss.setUART1Output(COM_TYPE_UBX);                  // Set the UART1 port to output UBX only (disable NMEA)
     gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to Flash and BBR
     gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
     gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM SFRBX messages without callback (implicit update)
     gnss.logRXMSFRBX();                               // Enable RXM SFRBX data logging
     gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM RAWX messages without callback (implicit update)
     gnss.logRXMRAWX();                                // Enable RXM RAWX data logging
-    gnss.setAutoPVTcallback(&syncRtc);                // Enable automatic NAV PVT messages with callback to syncRtc
+    gnss.setAutoPVTcallback(&processNavPvt);          // Enable automatic NAV PVT messages with callback to syncRtc
     gnss.logNAVPVT();                                 // Enable NAV PVT data logging
+
+    configureSignals();
 
     DEBUG_PRINTLN("u-blox GNSS initialized.");
     online.gnss = true;
@@ -40,14 +43,12 @@ void configureGnss()
 }
 
 // Read the GNSS receiver
-void readGnss()
+void syncRtc()
 {
   // Start loop timer
   unsigned long loopStartTime = millis();
 
   rtcSyncFlag = false; // Clear flag
-  gnssFixFlag = false; // Clear flag
-  gnssFixCounter = 0; // Reset counter
 
   // Check if GNSS initialized successfully
   if (online.gnss)
@@ -55,14 +56,15 @@ void readGnss()
     DEBUG_PRINTLN("Acquiring GNSS fix...");
 
     // Attempt to acquire a valid GNSS position fix
-    while (!gnssFixFlag && millis() - loopStartTime < gnssTimeout * 1000UL)
+    while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 1000UL)
     {
       gnss.checkUblox(); // Check for arrival of new data and process it
       gnss.checkCallbacks(); // Check if callbacks are waiting to be processed
+
     }
-    if (!gnssFixFlag)
+    if (!rtcSyncFlag)
     {
-      DEBUG_PRINTLN("Warning: Unable to acquire GNSS fix!");
+      DEBUG_PRINTLN("Warning: Unable to sync RTC!");
     }
   }
   else
@@ -70,27 +72,13 @@ void readGnss()
     DEBUG_PRINTLN("Warning: u-blox GNSS offline!");
   }
 
-  // Turn off LED
-  digitalWrite(LED_BUILTIN, LOW);
-
   // Stop the loop timer
   timer.gnss = millis() - loopStartTime;
 }
 
 // Callback function to process UBX-NAV-PVT data
-void syncRtc(UBX_NAV_PVT_data_t ubx)
+void processNavPvt(UBX_NAV_PVT_data_t ubx)
 {
-  // Reset the Watchdog Timer every second
-  unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis > 1000)
-  {
-    previousMillis = currentMillis;
-    petDog();
-  }
-
-  // Read battery voltage
-  readBattery();
-
   // Blink LED
   digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 
@@ -99,72 +87,59 @@ void syncRtc(UBX_NAV_PVT_data_t ubx)
   byte fixType = ubx.fixType;
 
 #if DEBUG_GNSS
-  char gnssBuffer[100];
-  sprintf(gnssBuffer, "%04u-%02d-%02d %02d:%02d:%02d.%03d,%ld,%ld,%d,%d,%d,%d,%d",
-          ubx.year, ubx.month, ubx.day,
-          ubx.hour, ubx.min, ubx.sec, ubx.iTOW % 1000,
-          ubx.lat, ubx.lon, ubx.numSV,
-          ubx.pDOP, ubx.fixType,
-          dateValidFlag, timeValidFlag);
-  DEBUG_PRINTLN(gnssBuffer);
+  Serial.printf("%04u-%02d-%02d %02d:%02d:%02d.%03d,%ld,%ld,%d,%d,%d,%d,%d\n",
+                ubx.year, ubx.month, ubx.day,
+                ubx.hour, ubx.min, ubx.sec, ubx.iTOW % 1000,
+                ubx.lat, ubx.lon, ubx.numSV,
+                ubx.pDOP, ubx.fixType,
+                dateValidFlag, timeValidFlag);
 #endif
 
-  // Check if GNSS fix is valid
-  if (fixType == 3)
-  {
-    gnssFixCounter += 2; // Increment counter
-  }
-  else if (fixType == 2)
-  {
-    gnssFixCounter += 1; // Increment counter
-  }
 
-  // Check if GNSS fix threshold has been reached
-  if (gnssFixCounter >= gnssFixCounterMax)
+  // Attempt to sync RTC with GNSS
+  if (fixType >= 2 && dateValidFlag && timeValidFlag)
   {
     DEBUG_PRINTLN("A GNSS fix was found!");
     gnssFixFlag = true; // Set fix flag
 
-    // Attempt to sync RTC with GNSS
-    if (dateValidFlag && timeValidFlag)
-    {
-      // Convert GNSS date and time to Unix Epoch time
-      tmElements_t tm;
-      tm.Year = ubx.year - 1970;
-      tm.Month = ubx.month;
-      tm.Day = ubx.day;
-      tm.Hour = ubx.hour;
-      tm.Minute = ubx.min;
-      tm.Second = ubx.sec;
-      time_t gnssEpoch = makeTime(tm);
-      rtc.getTime(); // Get the RTC's date and time
+    // Convert GNSS date and time to Unix Epoch time
+    tmElements_t tm;
+    tm.Year = ubx.year - 1970;
+    tm.Month = ubx.month;
+    tm.Day = ubx.day;
+    tm.Hour = ubx.hour;
+    tm.Minute = ubx.min;
+    tm.Second = ubx.sec;
+    time_t gnssEpoch = makeTime(tm);
+    rtc.getTime(); // Get the RTC's date and time
 
-      // Calculate drift (to the second)
-      int rtcDrift = rtc.getEpoch() - gnssEpoch;
+    // Calculate drift (to the second)
+    int rtcDrift = rtc.getEpoch() - gnssEpoch;
 
-      DEBUG_PRINT("RTC drift: "); DEBUG_PRINTLN(rtcDrift);
+    DEBUG_PRINT("RTC drift: "); DEBUG_PRINTLN(rtcDrift);
 
-      // Set RTC date and time
-      rtc.setTime(ubx.hour, ubx.min, ubx.sec, ubx.iTOW % 1000,
-                  ubx.day, ubx.month, ubx.year - 2000);
+    // Set RTC date and time
+    rtc.setTime(ubx.hour, ubx.min, ubx.sec, ubx.iTOW % 1000,
+                ubx.day, ubx.month, ubx.year - 2000);
 
-      rtcSyncFlag = true; // Set flag
-      DEBUG_PRINT("RTC time synced to: "); printDateTime();
-    }
-    else
-    {
-      DEBUG_PRINTLN("Warning: RTC sync not performed due to invalid GNSS fix!");
-    }
+    rtcSyncFlag = true; // Set flag
+    DEBUG_PRINT("RTC time synced to: "); printDateTime();
+    blinkLed(5, 500);
   }
+
 }
+
 
 void logGnss()
 {
   // Start loop timer
   unsigned long loopStartTime = millis();
 
+  // Reset bytesWritten counter
+  bytesWritten = 0;
+
   // Open log file
-  if (!file.open(fileName, O_APPEND | O_WRITE))
+  if (!logFile.open(logFileName, O_APPEND | O_WRITE))
   {
     DEBUG_PRINTLN("Warning: Unable to open file");
   }
@@ -195,7 +170,7 @@ void logGnss()
       gnss.extractFileBufferData((uint8_t *)&myBuffer, sdWriteSize);
 
       // Write exactly sdWriteSize bytes from myBuffer to the ubxDataFile on the SD card
-      file.write(myBuffer, sdWriteSize);
+      logFile.write(myBuffer, sdWriteSize);
 
       // Update bytesWritten
       bytesWritten += sdWriteSize;
@@ -210,12 +185,12 @@ void logGnss()
     if (millis() > previousMillis + 1000)
     {
       // Print how many bytes have been written to SD card
-      DEBUG_PRINT("Bytes written to SD card: "); DEBUG_PRINTLN(bytesWritten);
+      DEBUG_PRINT("Bytes written: "); DEBUG_PRINT(bytesWritten);
 
       // Get max file buffer size
       uint16_t maxBufferBytes = gnss.getMaxFileBufferAvail();
 
-      DEBUG_PRINT("Max file buffer size: "); DEBUG_PRINTLN(maxBufferBytes);
+      DEBUG_PRINT(" Max file buffer: "); DEBUG_PRINTLN(maxBufferBytes);
 
       // Warning if fileBufferSize was more than 80% full
       if (maxBufferBytes > ((fileBufferSize / 5) * 4))
@@ -244,7 +219,7 @@ void logGnss()
     }
     gnss.extractFileBufferData((uint8_t *)&myBuffer, bytesToWrite); // Extract bytesToWrite bytes from the UBX file buffer and put them into myBuffer
 
-    file.write(myBuffer, bytesToWrite); // Write bytesToWrite bytes from myBuffer to the ubxDataFile on the SD card
+    logFile.write(myBuffer, bytesToWrite); // Write bytesToWrite bytes from myBuffer to the ubxDataFile on the SD card
 
     bytesWritten += bytesToWrite; // Update bytesWritten
     remainingBytes -= bytesToWrite; // Decrement remainingBytes
@@ -256,18 +231,37 @@ void logGnss()
   DEBUG_PRINTLN(bytesWritten);
 
   // Update the file access and write timestamps
-  updateFileAccess();
+  updateFileAccess(&logFile);
 
   // Sync file
-  file.sync();
+  logFile.sync();
 
   // Close logfile
-  file.close();
+  logFile.close();
 
   // Toggle logging flag
   loggingFlag = false;
 
   // Stop the loop timer
   timer.logGnss = millis() - loopStartTime;
+}
+
+void configureSignals()
+{
+  // Enable the selected constellations
+  uint8_t success = true;
+  success &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, 1); // Enable GPS
+  success &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 1); // Enable GLONASS
+  success &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 0); // Enable Galileo
+  success &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, 0); // Disable BeiDou
+  success &= gnss.sendCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0, 2100); // Disable QZSS
+  if (success > 0)
+  {
+    Serial.println(F("configureSignals: sendCfgValset was successful when enabling constellations"));
+  }
+  else
+  {
+    Serial.println(F("configureSignals: sendCfgValset failed when enabling constellations"));
+  }
 
 }

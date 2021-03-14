@@ -20,46 +20,46 @@ void createDebugLogFile()
   // O_CREAT - Create the file if it does not exist
   // O_APPEND - Seek to the end of the file prior to each write
   // O_WRITE - Open the file for writing
-  if (!file.open("debug.csv", O_CREAT | O_APPEND | O_WRITE))
+  if (!debugFile.open(debugFileName, O_CREAT | O_APPEND | O_WRITE))
   {
     DEBUG_PRINTLN("Failed to create log file");
     return;
   }
 
-  if (!file.isOpen())
+  if (!debugFile.isOpen())
   {
     DEBUG_PRINTLN("Warning: Unable to open file");
   }
 
   // Write header to file
-  file.println("datetime,epoch,quality,voltage");
+  debugFile.println("unixtime,timer_voltage,timer_rtc,timer_sd,timer_sensors,timer_gnss,online_microsd,online_gnss,watchdog");
 
   // Update file create timestamp
-  updateFileCreate();
+  updateFileCreate(&debugFile);
 
   // Sync the log file
-  file.sync();
+  debugFile.sync();
 
   // Close log file
-  file.close();
+  debugFile.close();
 
-  DEBUG_PRINT("Logging to file: "); DEBUG_PRINTLN(fileName);
+  DEBUG_PRINT("Logging diagnostics to file: "); DEBUG_PRINTLN(debugFileName);
 }
 
 // Create log file
 void createLogFile()
 {
   // Check if file is open and close it
-  if (file.isOpen())
+  if (logFile.isOpen())
   {
-    file.close();
+    logFile.close();
   }
 
   // Get the RTC's current date and time
   rtc.getTime();
 
   // Create timestamped log file name
-  sprintf(fileName, "20%02d%02d%02d_%02d%02d%02d.ubx",
+  sprintf(logFileName, "20%02d%02d%02d_%02d%02d%02d.ubx",
           rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 
@@ -67,49 +67,51 @@ void createLogFile()
   // O_CREAT - Create the file if it does not exist
   // O_APPEND - Seek to the end of the file prior to each write
   // O_WRITE - Open the file for writing
-  if (!file.open(fileName, O_CREAT | O_APPEND | O_WRITE))
+  if (!logFile.open(logFileName, O_CREAT | O_APPEND | O_WRITE))
   {
     DEBUG_PRINTLN("Failed to create log file");
     return;
   }
 
-  if (!file.isOpen())
+  if (!logFile.isOpen())
   {
     DEBUG_PRINTLN("Warning: Unable to open file");
   }
 
   // Update file create timestamp
-  updateFileCreate();
+  updateFileCreate(&logFile);
 
   // Sync the log file
-  file.sync();
+  logFile.sync();
 
   // Close log file
-  file.close();
+  logFile.close();
 
-  DEBUG_PRINT("Logging to file: "); DEBUG_PRINTLN(fileName);
+  DEBUG_PRINT("Logging to file: "); DEBUG_PRINTLN(logFileName);
 }
 
 // Log data to microSD
 void logDebugData()
 {
   unsigned long loopStartTime = millis(); // Start loop timer
- 
+
   // Open log file for writing
   // O_CREAT - Create the file if it does not exist
   // O_APPEND - Seek to the end of the file prior to each write
   // O_WRITE - Open the file for writing
-  if (file.open("diagnostics.csv", O_APPEND | O_WRITE))
+  if (debugFile.open(debugFileName, O_APPEND | O_WRITE))
   {
-    file.print(timer.voltage);    file.print(",");
-    file.print(timer.rtc);        file.print(",");
-    file.print(timer.microSd);    file.print(",");
-    file.print(timer.sensors);     file.print(",");
-    file.print(timer.logGnss);    file.print(",");
-    file.print(online.microSd);   file.print(",");
-    file.println(online.gnss);    file.print(",");
-
-    updateFileAccess(); // Update file access and write timestamps
+    debugFile.print(unixtime);        debugFile.print(",");
+    debugFile.print(timer.voltage);   debugFile.print(",");
+    debugFile.print(timer.rtc);       debugFile.print(",");
+    debugFile.print(timer.microSd);   debugFile.print(",");
+    debugFile.print(timer.sensors);   debugFile.print(",");
+    debugFile.print(timer.logGnss);   debugFile.print(",");
+    debugFile.print(online.microSd);  debugFile.print(",");
+    debugFile.print(online.gnss);     debugFile.print(",");
+    debugFile.println(watchdogCounter);
+    
+    updateFileAccess(&debugFile); // Update file access and write timestamps
   }
   else
   {
@@ -117,19 +119,19 @@ void logDebugData()
   }
 
   // Sync log file
-  if (!file.sync())
+  if (!debugFile.sync())
   {
     DEBUG_PRINTLN("Warning: File sync error!");
   }
 
   // Check for write error
-  if (file.getWriteError())
+  if (debugFile.getWriteError())
   {
     DEBUG_PRINTLN("Warning: File write error!");
   }
 
   // Close log file
-  if (!file.close())
+  if (!debugFile.close())
   {
     DEBUG_PRINTLN("Warning: File close error!");
   }
@@ -142,31 +144,22 @@ void logDebugData()
 }
 
 // Update the file create timestamp
-void updateFileCreate()
+void updateFileCreate(FsFile *dataFile)
 {
   // Get the RTC's current date and time
   rtc.getTime();
 
   // Update the file create timestamp
-  if (!file.timestamp(T_CREATE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
-  {
-    DEBUG_PRINTLN("Warning: Unable to write file create timestamp");
-  }
+  dataFile->timestamp(T_CREATE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds);
 }
 
 // Update the file access and write timestamps
-void updateFileAccess()
+void updateFileAccess(FsFile *dataFile)
 {
   // Get the RTC's current date and time
   rtc.getTime();
 
   // Update the file access and write timestamps
-  if (!file.timestamp(T_ACCESS, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
-  {
-    DEBUG_PRINTLN("Warning: Unable to write file access timestamp");
-  }
-  if (!file.timestamp(T_WRITE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
-  {
-    DEBUG_PRINTLN("Warning: Unable to write file write timestamp");
-  }
+  dataFile->timestamp(T_ACCESS, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds);
+  dataFile->timestamp(T_WRITE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds);
 }
