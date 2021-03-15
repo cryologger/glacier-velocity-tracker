@@ -1,4 +1,4 @@
-
+// Configure u-blox module
 void configureGnss()
 {
   // Uncomment to enable GNSS debug messages on Serial
@@ -7,38 +7,63 @@ void configureGnss()
   // Allocate sufficient RAM to store RAWX messages (>2 KB)
   gnss.setFileBufferSize(fileBufferSize); // setFileBufferSize must be called before gnss.begin()
 
-  // Initialize Serial at a baud rate of 230400
-  Serial1.begin(38400);
+  // Open Serial1 port and set data rate to 460800 baud
+  Serial1.begin(460800);
 
-  // Attempt to initlialze u-blox module using Serial port
+  // Attempt to initialize u-blox module
   if (gnss.begin(Serial1))
   {
-    DEBUG_PRINTLN("u-blox GNSS initialized at 38400 bps.");
-    printGnssSettings();
+    DEBUG_PRINTLN("Success: u-blox initialized at 460800 bps.");
+    online.gnss = true;
+  }
+  else
+  {
+    DEBUG_PRINTLN("Warning: u-blox not detected at 460800 bps. Attempting 38400 bps...");
 
-    // Change baud rate to 230400 bps
-    bool response = true;
-    response &= gnss.setVal32(UBLOX_CFG_UART1_BAUDRATE, 230400);
-    if (response == false)
+    // Change Serial1 data rate to 38400 baud (u-blox default)
+    Serial1.begin(38400);
+
+    // Attempt to initlialze u-blox module
+    if (gnss.begin(Serial1))
     {
-      Serial.println("SetVal failed");
+      DEBUG_PRINTLN("Success: u-blox initialized at 38400 bps.");
+
+      // Change UART1 baud rate to 460800 bps
+      bool response = true;
+      response &= gnss.setVal32(UBLOX_CFG_UART1_BAUDRATE, 460800);
+      if (response)
+      {
+        DEBUG_PRINTLN("Sucess: UART1 baud rate set to 460800 bps.");
+
+        // Open Serial1 port and set data rate to 460800 baud
+        Serial1.begin(460800);
+
+        // Attempt to initialize u-blox module
+        if (gnss.begin(Serial1))
+        {
+          DEBUG_PRINTLN("Success: u-blox initialized at 460800 bps.");
+          online.gnss = true;
+        }
+        else
+        {
+          DEBUG_PRINTLN("Warning: u-blox not detected at 460800 bps. Please check wiring or baud rate.");
+          online.gnss = false;
+        }
+      }
+      else
+      {
+        DEBUG_PRINTLN("Warning: UART1 baud rate not set to 460800 bps.");
+      }
+    }
+    else
+    {
+      DEBUG_PRINTLN("Warning: u-blox not detected at 38400 bps. Please check wiring or baud rate.");
+      online.gnss = false;
     }
   }
-  else
-  {
-    DEBUG_PRINTLN("Warning: u-blox GNSS not detected at 38400 bps. Please check wiring and baud rate.");
-  }
-  // Attempt to initlialze u-blox module using Serial port at 230400 baud
-  Serial1.begin(230400);
-  if (gnss.begin(Serial1))
-  {
-    DEBUG_PRINTLN("u-blox GNSS initialized at 230400 bps.");
-  }
-  else
-  {
-    DEBUG_PRINTLN("Warning: u-blox GNSS not detected. Please check wiring.");
-    online.gnss = false;
 
+  if (!online.gnss)
+  {
     while (1)
     {
       blinkLed(2, 250);
@@ -46,20 +71,23 @@ void configureGnss()
     }
   }
 
+  // Print current GNSS settings
   printGnssSettings();
+
   // Uncomment to reset u-blox to default factory settings with 1 Hz navigation rate
   //gnss.factoryDefault();
   //delay(5000);
 
+  // Configure u-blox module
   gnss.setUART1Output(COM_TYPE_UBX);                // Set the UART1 port to output UBX only (disable NMEA)
   gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to Flash and BBR
   gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
-  gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM SFRBX messages without callback (implicit update)
-  gnss.logRXMSFRBX();                               // Enable RXM SFRBX data logging
-  gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM RAWX messages without callback (implicit update)
-  gnss.logRXMRAWX();                                // Enable RXM RAWX data logging
   gnss.setAutoPVTcallback(&processNavPvt);          // Enable automatic NAV PVT messages with callback to syncRtc
+  gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM RAWX messages without callback (implicit update)
+  gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM SFRBX messages without callback (implicit update)
   gnss.logNAVPVT();                                 // Enable NAV PVT data logging
+  gnss.logRXMRAWX();                                // Enable RXM RAWX data logging
+  gnss.logRXMSFRBX();                               // Enable RXM SFRBX data logging
 
   // Configure satellite signals
   bool setValueSuccess = true;
@@ -69,15 +97,10 @@ void configureGnss()
   setValueSuccess &= gnss.setVal8(UBLOX_CFG_SIGNAL_BDS_ENA, 0);   // Disable BeiDou
   setValueSuccess &= gnss.setVal8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0);  // Disable QZSS
 
-  if (setValueSuccess == false)
+  if (!setValueSuccess)
   {
     DEBUG_PRINTLN("Warning: Satellite signal values not successfully set");
   }
-
-  DEBUG_PRINTLN("u-blox GNSS initialized.");
-  printGnssSettings();
-  online.gnss = true;
-
 }
 
 // Read the GNSS receiver
