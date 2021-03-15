@@ -26,42 +26,36 @@ void configureGnss()
     // Attempt to initlialze u-blox module
     if (gnss.begin(Serial1))
     {
-      DEBUG_PRINTLN("Success: u-blox initialized at 230400 bps.");
+      DEBUG_PRINTLN("Success: u-blox initialized at 38400 bps.");
 
       // Change UART1 baud rate to 460800 bps
       bool response = true;
       response &= gnss.setVal32(UBLOX_CFG_UART1_BAUDRATE, 460800);
-      if (response == true)
+
+      DEBUG_PRINTLN("Sucess: UART1 baud rate set to 460800 bps.");
+
+      // Open Serial1 port and set data rate to 460800 baud
+      Serial1.begin(460800);
+
+      // Attempt to initialize u-blox module
+      if (gnss.begin(Serial1))
       {
-        DEBUG_PRINTLN("Sucess: UART1 baud rate set to 460800 bps.");
-
-        // Open Serial1 port and set data rate to 460800 baud
-        Serial1.begin(460800);
-
-        // Attempt to initialize u-blox module
-        if (gnss.begin(Serial1))
-        {
-          DEBUG_PRINTLN("Success: u-blox initialized at 460800 bps.");
-          online.gnss = true;
-        }
-        else
-        {
-          DEBUG_PRINTLN("Warning: u-blox not detected at 460800 bps. Please check wiring or baud rate.");
-          online.gnss = false;
-        }
+        DEBUG_PRINTLN("Success: u-blox initialized at 460800 bps.");
+        online.gnss = true;
       }
       else
       {
-        DEBUG_PRINTLN("Warning: UART1 baud rate not set to 460800 bps.");
+        DEBUG_PRINTLN("Warning: u-blox not detected at 460800 bps. Please check wiring or baud rate.");
+        online.gnss = false;
       }
     }
+
     else
     {
       DEBUG_PRINTLN("Warning: u-blox not detected at 38400 bps. Please check wiring or baud rate.");
       online.gnss = false;
     }
   }
-
   if (!online.gnss)
   {
     while (1)
@@ -303,24 +297,4 @@ void logGnss()
 
   // Stop the loop timer
   timer.logGnss = millis() - loopStartTime;
-}
-
-void configureSignals()
-{
-  // Enable the selected constellations
-  uint8_t success = true;
-  success &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, 1); // Enable GPS
-  success &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 1); // Enable GLONASS
-  success &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 0); // Enable Galileo
-  success &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, 0); // Disable BeiDou
-  success &= gnss.sendCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0); // Disable QZSS
-  if (success > 0)
-  {
-    Serial.println(F("configureSignals: sendCfgValset was successful when enabling constellations"));
-  }
-  else
-  {
-    Serial.println(F("configureSignals: sendCfgValset failed when enabling constellations"));
-  }
-
 }

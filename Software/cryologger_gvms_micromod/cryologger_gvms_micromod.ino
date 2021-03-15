@@ -71,10 +71,10 @@ SFE_UBLOX_GNSS    gnss;           // I2C address: 0x42
 // ----------------------------------------------------------------------------
 // User defined global variable declarations
 // ----------------------------------------------------------------------------
-byte          sleepAlarmMinutes     = 1;
+byte          sleepAlarmMinutes     = 0;
 byte          sleepAlarmHours       = 1;
-byte          loggingAlarmHours     = 1;
 byte          loggingAlarmMinutes   = 0;
+byte          loggingAlarmHours     = 1;
 unsigned int  gnssTimeout           = 3;   // Timeout for GNSS signal acquisition (minutes)
 
 // ----------------------------------------------------------------------------
