@@ -26,12 +26,12 @@ void configureGnss()
     // Attempt to initlialze u-blox module
     if (gnss.begin(Serial1))
     {
-      DEBUG_PRINTLN("Success: u-blox initialized at 38400 bps.");
+      DEBUG_PRINTLN("Success: u-blox initialized at 230400 bps.");
 
       // Change UART1 baud rate to 460800 bps
       bool response = true;
       response &= gnss.setVal32(UBLOX_CFG_UART1_BAUDRATE, 460800);
-      if (response)
+      if (response == true)
       {
         DEBUG_PRINTLN("Sucess: UART1 baud rate set to 460800 bps.");
 
@@ -71,9 +71,6 @@ void configureGnss()
     }
   }
 
-  // Print current GNSS settings
-  printGnssSettings();
-
   // Uncomment to reset u-blox to default factory settings with 1 Hz navigation rate
   //gnss.factoryDefault();
   //delay(5000);
@@ -96,11 +93,13 @@ void configureGnss()
   setValueSuccess &= gnss.setVal8(UBLOX_CFG_SIGNAL_GAL_ENA, 0);   // Enable Galileo
   setValueSuccess &= gnss.setVal8(UBLOX_CFG_SIGNAL_BDS_ENA, 0);   // Disable BeiDou
   setValueSuccess &= gnss.setVal8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0);  // Disable QZSS
-
   if (!setValueSuccess)
   {
     DEBUG_PRINTLN("Warning: Satellite signal values not successfully set");
   }
+
+  // Print GNSS configuration settings
+  printGnssSettings();
 }
 
 // Read the GNSS receiver
@@ -117,7 +116,7 @@ void syncRtc()
     DEBUG_PRINTLN("Acquiring GNSS fix...");
 
     // Attempt to acquire a valid GNSS position fix
-    while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 1000UL)
+    while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 60UL * 1000UL)
     {
       gnss.checkUblox(); // Check for arrival of new data and process it
       gnss.checkCallbacks(); // Check if callbacks are waiting to be processed
@@ -255,7 +254,7 @@ void logGnss()
       // Warning if fileBufferSize was more than 80% full
       if (maxBufferBytes > ((fileBufferSize / 5) * 4))
       {
-        DEBUG_PRINTLN("Warning: File buffer >80% full. Data loss may have occurrred.");
+        //DEBUG_PRINTLN("Warning: File buffer >80% full. Data loss may have occurrred.");
       }
 
       // Update millis counter

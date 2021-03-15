@@ -23,7 +23,7 @@ void configureRtc() {
   // Set the initial RTC rolling alarm
   //rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
-  rtc.setAlarm(0, 5, 0, 0, 0, 0); // Hour rollover
+  rtc.setAlarm(0, 0, 0, 0, 0, 0); // Hour rollover
 
 
   // Set the RTC alarm mode
@@ -66,7 +66,7 @@ void setSleepAlarm()
   rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
   // Set the RTC alarm mode
-  rtc.setAlarmMode(5); // Alarm match on hundredths, seconds, minutes, hours
+  rtc.setAlarmMode(4); // Alarm match on hundredths, seconds, minutes, hours
 
   // Print the next RTC alarm date and time
   DEBUG_PRINT("Datetime: "); printDateTime();
@@ -82,7 +82,7 @@ void setLoggingAlarm()
   rtc.setAlarm((rtc.hour + loggingAlarmHours) % 24, (rtc.minute + loggingAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
   // Set the RTC alarm mode
-  rtc.setAlarmMode(5); // Alarm match on hundredths, seconds,  minutes, hours
+  rtc.setAlarmMode(4); // Alarm match on hundredths, seconds,  minutes, hours
 
   // Print the next RTC alarm date and time
   DEBUG_PRINT("Datetime: "); printDateTime();

@@ -71,11 +71,11 @@ SFE_UBLOX_GNSS    gnss;           // I2C address: 0x42
 // ----------------------------------------------------------------------------
 // User defined global variable declarations
 // ----------------------------------------------------------------------------
-byte          sleepAlarmMinutes     = 10;
-byte          sleepAlarmHours       = 0;
+byte          sleepAlarmMinutes     = 1;
+byte          sleepAlarmHours       = 1;
 byte          loggingAlarmHours     = 1;
 byte          loggingAlarmMinutes   = 0;
-unsigned int  gnssTimeout           = 5;   // Timeout for GNSS signal acquisition (minutes)
+unsigned int  gnssTimeout           = 3;   // Timeout for GNSS signal acquisition (minutes)
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -210,7 +210,7 @@ void loop()
       //qwiicPowerOn();       // Enable power to Qwiic connector
       blinkLed(2, 1000);    // Delay to allow u-blox receiver to boot-up
       configureGnss();      // Configure u-blox receiver
-      syncRtc();            // Synchronize RTC
+      //syncRtc();            // Synchronize RTC
       logGnss();            // Log UBX data
 
       printTimers();  // Print function execution timers
