@@ -13,7 +13,7 @@ void configureGnss()
   // Attempt to initialize u-blox module
   if (gnss.begin(Serial1))
   {
-    DEBUG_PRINTLN("Success: u-blox initialized at 460800 bps.");
+    DEBUG_PRINTLN("Info: u-blox initialized at 460800 bps.");
     online.gnss = true;
   }
   else
@@ -26,7 +26,7 @@ void configureGnss()
     // Attempt to initlialze u-blox module
     if (gnss.begin(Serial1))
     {
-      DEBUG_PRINTLN("Success: u-blox initialized at 38400 bps.");
+      DEBUG_PRINTLN("Info: u-blox initialized at 38400 bps.");
 
       // Change UART1 baud rate to 460800 bps
       bool response = true;
@@ -40,7 +40,7 @@ void configureGnss()
       // Attempt to initialize u-blox module
       if (gnss.begin(Serial1))
       {
-        DEBUG_PRINTLN("Success: u-blox initialized at 460800 bps.");
+        DEBUG_PRINTLN("Info: u-blox initialized at 460800 bps.");
         online.gnss = true;
       }
       else
@@ -49,13 +49,15 @@ void configureGnss()
         online.gnss = false;
       }
     }
-
     else
     {
       DEBUG_PRINTLN("Warning: u-blox not detected at 38400 bps. Please check wiring or baud rate.");
       online.gnss = false;
     }
   }
+
+  // If u-blox is offline, there is a communication issue
+  // TO DO: Figure out what to do
   if (!online.gnss)
   {
     while (1)
@@ -72,26 +74,29 @@ void configureGnss()
   // Configure u-blox module
   gnss.setUART1Output(COM_TYPE_UBX);                // Set the UART1 port to output UBX only (disable NMEA)
   gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to Flash and BBR
-  gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
+  gnss.setNavigationFrequency(10);                   // Produce one navigation solution per second
   gnss.setAutoPVTcallback(&processNavPvt);          // Enable automatic NAV PVT messages with callback to syncRtc
-  gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM RAWX messages without callback (implicit update)
-  gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM SFRBX messages without callback (implicit update)
-  gnss.logNAVPVT();                                 // Enable NAV PVT data logging
-  gnss.logRXMRAWX();                                // Enable RXM RAWX data logging
-  gnss.logRXMSFRBX();                               // Enable RXM SFRBX data logging
+  gnss.setAutoRXMRAWX(true);                        // Enable automatic RXM RAWX reports at the navigation frequency
+  gnss.setAutoRXMSFRBX(true);                       // Enable automatic RXM SFRBX reports at the navigation frequency
+
 
   // Configure satellite signals
   bool setValueSuccess = true;
-  setValueSuccess &= gnss.setVal8(UBLOX_CFG_SIGNAL_GPS_ENA, 1);   // Enable GPS
-  setValueSuccess &= gnss.setVal8(UBLOX_CFG_SIGNAL_GLO_ENA, 1);   // Enable GLONASS
-  setValueSuccess &= gnss.setVal8(UBLOX_CFG_SIGNAL_GAL_ENA, 0);   // Enable Galileo
-  setValueSuccess &= gnss.setVal8(UBLOX_CFG_SIGNAL_BDS_ENA, 0);   // Disable BeiDou
-  setValueSuccess &= gnss.setVal8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0);  // Disable QZSS
+  setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, 1);   // Enable GPS
+  setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GLO_ENA, 1);   // Enable GLONASS
+  setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 0);   // Enable Galileo
+  setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, 0);   // Disable BeiDou
+  setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0, 2100);  // Disable QZSS
   if (!setValueSuccess)
   {
-    DEBUG_PRINTLN("Warning: Satellite signal values not successfully set");
+    DEBUG_PRINTLN("Warning: Satellite signals not successfully set");
+  }
+  else
+  {
+    DEBUG_PRINTLN("Info: Satellite signals successfully set");
   }
 
+  delay(2000);
   // Print GNSS configuration settings
   printGnssSettings();
 }
@@ -107,7 +112,7 @@ void syncRtc()
   // Check if GNSS initialized successfully
   if (online.gnss)
   {
-    DEBUG_PRINTLN("Acquiring GNSS fix...");
+    DEBUG_PRINTLN("Info: Acquiring GNSS fix...");
 
     // Attempt to acquire a valid GNSS position fix
     while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 60UL * 1000UL)
@@ -188,6 +193,9 @@ void logGnss()
   // Start loop timer
   unsigned long loopStartTime = millis();
 
+  gnss.logRXMRAWX();  // Enable RXM RAWX data logging
+  gnss.logRXMSFRBX(); // Enable RXM SFRBX data logging
+
   // Reset bytesWritten counter
   bytesWritten = 0;
 
@@ -196,10 +204,6 @@ void logGnss()
   {
     DEBUG_PRINTLN("Warning: Unable to open file");
   }
-
-  // Flush data
-  gnss.flushRXMSFRBX();
-  gnss.flushRXMRAWX();
 
   // Log data until logging alarm triggers
   while (!alarmFlag)
@@ -241,7 +245,7 @@ void logGnss()
       DEBUG_PRINT("Bytes written: "); DEBUG_PRINT(bytesWritten);
 
       // Get max file buffer size
-      uint16_t maxBufferBytes = gnss.getMaxFileBufferAvail();
+      maxBufferBytes = gnss.getMaxFileBufferAvail();
 
       DEBUG_PRINT(" Max file buffer: "); DEBUG_PRINTLN(maxBufferBytes);
 

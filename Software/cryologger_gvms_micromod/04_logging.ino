@@ -35,7 +35,7 @@ void createDebugLogFile()
   }
 
   // Write header to file
-  debugFile.println("datetime,unixtime,timer_voltage,timer_rtc,timer_sd,timer_sensors,timer_gnss,bytes_written,online_microsd,online_gnss,rtc_drift,watchdog,sample");
+  debugFile.println("datetime,unixtime,timer_voltage,timer_rtc,timer_sd,timer_sensors,timer_gnss,bytes_written,max_buffer,online_microsd,online_gnss,rtc_drift,watchdog,sample");
 
   // Update file create timestamp
   updateFileCreate(&debugFile);
@@ -119,6 +119,7 @@ void logDebugData()
     debugFile.print(timer.sensors);   debugFile.print(",");
     debugFile.print(timer.logGnss);   debugFile.print(",");
     debugFile.print(bytesWritten);    debugFile.print(",");
+    debugFile.print(maxBufferBytes);  debugFile.print(",");
     debugFile.print(online.microSd);  debugFile.print(",");
     debugFile.print(online.gnss);     debugFile.print(",");
     debugFile.print(rtcDrift);        debugFile.print(",");

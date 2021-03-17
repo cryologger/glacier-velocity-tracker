@@ -71,11 +71,11 @@ SFE_UBLOX_GNSS    gnss;           // I2C address: 0x42
 // ----------------------------------------------------------------------------
 // User defined global variable declarations
 // ----------------------------------------------------------------------------
-byte          sleepAlarmMinutes     = 0;
-byte          sleepAlarmHours       = 1;
+byte          sleepAlarmMinutes     = 5;
+byte          sleepAlarmHours       = 0;
 byte          loggingAlarmMinutes   = 0;
 byte          loggingAlarmHours     = 1;
-unsigned int  gnssTimeout           = 3;   // Timeout for GNSS signal acquisition (minutes)
+unsigned int  gnssTimeout           = 5;   // Timeout for GNSS signal acquisition (minutes)
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -98,6 +98,7 @@ long          rtcDrift            = 0;
 unsigned int  sdPowerDelay        = 250;    // Delay before disabling power to microSD (milliseconds)
 unsigned int  qwiicPowerDelay     = 2500;   // Delay after enabling power to Qwiic connector (milliseconds)
 unsigned int  counter             = 0;
+unsigned int  maxBufferBytes      = 0;
 unsigned long previousMillis      = 0;      // Global millis() timer
 unsigned long unixtime            = 0;      // Unix epoch timestamp
 unsigned long bytesWritten        = 0;      // Counter for tracking bytes written to microSD card
@@ -159,7 +160,7 @@ void setup()
   printLine();
   DEBUG_PRINTLN("Cryologger - Glacier Velocity Measurement System v2.0");
   printLine();
-  printDateTime(); // Print current RTC time at boot
+  DEBUG_PRINT("Info: "); printDateTime(); // Print current RTC time at boot
 
   // Configure devices
   configureWdt();     // Configure and start Watchdog Timer (WDT)
