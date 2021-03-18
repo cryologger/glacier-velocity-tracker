@@ -60,8 +60,10 @@ void configureGnss()
   // TO DO: Figure out what to do
   if (!online.gnss)
   {
+    DEBUG_PRINTLN("Warning: Non-recoverable error due to u-blox initialization.");
     while (1)
     {
+      wdt.stop();
       blinkLed(2, 250);
       blinkLed(2, 1000);
     }
@@ -71,14 +73,14 @@ void configureGnss()
   //gnss.factoryDefault();
   //delay(5000);
 
+
   // Configure u-blox module
   gnss.setUART1Output(COM_TYPE_UBX);                // Set the UART1 port to output UBX only (disable NMEA)
   gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to Flash and BBR
-  gnss.setNavigationFrequency(10);                   // Produce one navigation solution per second
+  gnss.setNavigationFrequency(10);                  // Produce one navigation solution per second
   gnss.setAutoPVTcallback(&processNavPvt);          // Enable automatic NAV PVT messages with callback to syncRtc
   gnss.setAutoRXMRAWX(true);                        // Enable automatic RXM RAWX reports at the navigation frequency
   gnss.setAutoRXMSFRBX(true);                       // Enable automatic RXM SFRBX reports at the navigation frequency
-
 
   // Configure satellite signals
   bool setValueSuccess = true;
@@ -89,14 +91,16 @@ void configureGnss()
   setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0, 2100);  // Disable QZSS
   if (!setValueSuccess)
   {
-    DEBUG_PRINTLN("Warning: Satellite signals not successfully set");
+    DEBUG_PRINTLN("Warning: Satellite signals not configured!");
   }
   else
   {
-    DEBUG_PRINTLN("Info: Satellite signals successfully set");
+    DEBUG_PRINTLN("Info: Satellite signals configured.");
+    //gnssConfigFlag = true;
   }
 
-  delay(2000);
+  //delay(2000);
+
   // Print GNSS configuration settings
   printGnssSettings();
 }
@@ -155,11 +159,10 @@ void processNavPvt(UBX_NAV_PVT_data_t ubx)
                 dateValidFlag, timeValidFlag);
 #endif
 
-
   // Attempt to sync RTC with GNSS
   if (fixType >= 2 && dateValidFlag && timeValidFlag)
   {
-    DEBUG_PRINTLN("A GNSS fix was found!");
+    DEBUG_PRINTLN("Info: GNSS fix found.");
     gnssFixFlag = true; // Set fix flag
 
     // Convert GNSS date and time to Unix Epoch time
@@ -176,16 +179,15 @@ void processNavPvt(UBX_NAV_PVT_data_t ubx)
     // Calculate drift (to the second)
     rtcDrift = rtc.getEpoch() - gnssEpoch;
 
-    DEBUG_PRINT("RTC drift: "); DEBUG_PRINTLN(rtcDrift);
+    DEBUG_PRINT("Info: RTC drift of "); DEBUG_PRINT(rtcDrift); DEBUG_PRINTLN(" seconds.");
 
     // Set RTC date and time
     rtc.setTime(ubx.hour, ubx.min, ubx.sec, ubx.iTOW % 1000,
                 ubx.day, ubx.month, ubx.year - 2000);
 
     rtcSyncFlag = true; // Set flag
-    DEBUG_PRINT("RTC time synced to: "); printDateTime();
+    DEBUG_PRINT("Info: RTC time synced to "); printDateTime();
   }
-
 }
 
 void logGnss()
@@ -202,7 +204,12 @@ void logGnss()
   // Open log file
   if (!logFile.open(logFileName, O_APPEND | O_WRITE))
   {
-    DEBUG_PRINTLN("Warning: Unable to open file");
+    DEBUG_PRINT("Warning: "); DEBUG_PRINT(logFileName); DEBUG_PRINTLN(" failed to open!");
+    return;
+  }
+  else
+  {
+    DEBUG_PRINT("Info: "); DEBUG_PRINT(logFileName); DEBUG_PRINTLN(" opened.");
   }
 
   // Log data until logging alarm triggers
@@ -239,28 +246,36 @@ void logGnss()
     }
 
     // Print fileBufferSize every 5 seconds
-    if (millis() > previousMillis + 1000)
+    if (millis() > previousMillis + 5000UL)
     {
+      // Sync log file
+      if (!logFile.sync())
+      {
+        DEBUG_PRINT("Warning: "); DEBUG_PRINT(logFileName); DEBUG_PRINT(" sync error!");
+      }
+      else
+      {
+        //DEBUG_PRINT("Info: "); DEBUG_PRINT(logFileName); DEBUG_PRINTLN(" synced.");
+      }
+
       // Print how many bytes have been written to SD card
-      DEBUG_PRINT("Bytes written: "); DEBUG_PRINT(bytesWritten);
+      DEBUG_PRINT("Info: "); DEBUG_PRINT(bytesWritten); DEBUG_PRINT(" bytes written. ");
 
       // Get max file buffer size
       maxBufferBytes = gnss.getMaxFileBufferAvail();
 
-      DEBUG_PRINT(" Max file buffer: "); DEBUG_PRINTLN(maxBufferBytes);
+      DEBUG_PRINT(" Max buffer is "); DEBUG_PRINT(maxBufferBytes); DEBUG_PRINTLN(" bytes.");
 
       // Warning if fileBufferSize was more than 80% full
       if (maxBufferBytes > ((fileBufferSize / 5) * 4))
       {
-        //DEBUG_PRINTLN("Warning: File buffer >80% full. Data loss may have occurrred.");
+        DEBUG_PRINTLN("Warning: File buffer >80% full. Data loss may have occurrred.");
       }
 
       // Update millis counter
       previousMillis = millis();
     }
-  } // Exit log function
-
-  // Stop logging
+  }
 
   // Check for bytes remaining in file buffer
   uint16_t remainingBytes = gnss.fileBufferAvailable();
@@ -280,21 +295,42 @@ void logGnss()
 
     bytesWritten += bytesToWrite; // Update bytesWritten
     remainingBytes -= bytesToWrite; // Decrement remainingBytes
-
   }
 
   // Print how many bytes have been written to SD card
-  DEBUG_PRINT("Total number of bytes written to SD card: ");
-  DEBUG_PRINTLN(bytesWritten);
+  DEBUG_PRINT("Info: "); DEBUG_PRINT(bytesWritten); DEBUG_PRINTLN(" bytes written to SD.");
 
   // Update the file access and write timestamps
   updateFileAccess(&logFile);
 
   // Sync file
-  logFile.sync();
+  if (!logFile.sync())
+  {
+    DEBUG_PRINT("Warning: "); DEBUG_PRINT(logFileName); DEBUG_PRINTLN(" sync error!");
+  }
+  else
+  {
+    DEBUG_PRINT("Info: "); DEBUG_PRINT(logFileName); DEBUG_PRINTLN(" synced.");
+  }
+
+  // Check for write error
+  if (logFile.getWriteError())
+  {
+    DEBUG_PRINT("Warning: "); DEBUG_PRINT(debugFileName); DEBUG_PRINTLN(" write error!");
+  }
 
   // Close logfile
-  logFile.close();
+  if (!logFile.close())
+  {
+    DEBUG_PRINT("Warning: "); DEBUG_PRINT(logFileName); DEBUG_PRINTLN(" failed to close!");
+  }
+  else
+  {
+    DEBUG_PRINT("Info: "); DEBUG_PRINT(logFileName); DEBUG_PRINTLN(" closed.");
+  }
+
+  // Close Serial1 port
+  Serial1.end();
 
   // Toggle logging flag
   loggingFlag = false;

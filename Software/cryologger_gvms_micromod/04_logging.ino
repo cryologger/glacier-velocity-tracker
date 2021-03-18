@@ -3,13 +3,16 @@ void configureSd()
 {
   if (sd.begin(SdSpiConfig(PIN_SD_CS, DEDICATED_SPI)))
   {
+    DEBUG_PRINTLN("Info: microSD initalized.");
     online.microSd = true;
   }
   else
   {
     DEBUG_PRINTLN("Warning: microSD not detected! Please check wiring.");
+    DEBUG_PRINTLN("Warning: Non-recoverable error due to microSD initialization.");
     while (1)
     {
+      wdt.stop();
       blinkLed(2, 250);
       blinkLed(1, 1000);
     }
@@ -25,13 +28,12 @@ void createDebugLogFile()
   // O_WRITE - Open the file for writing
   if (!debugFile.open(debugFileName, O_CREAT | O_APPEND | O_WRITE))
   {
-    DEBUG_PRINTLN("Failed to create log file");
+    DEBUG_PRINT("Warning: Failed to create "); DEBUG_PRINTLN(debugFileName);
     return;
   }
-
-  if (!debugFile.isOpen())
+  else
   {
-    DEBUG_PRINTLN("Warning: Unable to open file");
+    DEBUG_PRINT("Info: "); DEBUG_PRINT(debugFileName); DEBUG_PRINTLN(" created.");
   }
 
   // Write header to file
@@ -41,12 +43,26 @@ void createDebugLogFile()
   updateFileCreate(&debugFile);
 
   // Sync the log file
-  debugFile.sync();
+  if (!debugFile.sync())
+  {
+    DEBUG_PRINT("Warning: "); DEBUG_PRINT(debugFileName); DEBUG_PRINTLN(" sync error.");
+  }
+  else
+  {
+    DEBUG_PRINT("Info: "); DEBUG_PRINT(debugFileName); DEBUG_PRINTLN(" synced.");
+  }
 
   // Close log file
-  debugFile.close();
+  if (!debugFile.close())
+  {
+    DEBUG_PRINT("Warning: "); DEBUG_PRINT(debugFileName); DEBUG_PRINTLN(" failed to close.");
+  }
+  else
+  {
+    DEBUG_PRINT("Info: "); DEBUG_PRINT(debugFileName); DEBUG_PRINTLN(" closed.");
+  }
 
-  DEBUG_PRINT("Logging diagnostics to file: "); DEBUG_PRINTLN(debugFileName);
+  DEBUG_PRINT("Info: Debug logging to "); DEBUG_PRINTLN(debugFileName);
 }
 
 // Create log file
@@ -72,25 +88,38 @@ void createLogFile()
   // O_WRITE - Open the file for writing
   if (!logFile.open(logFileName, O_CREAT | O_APPEND | O_WRITE))
   {
-    DEBUG_PRINTLN("Failed to create log file");
+    DEBUG_PRINT("Warning: Failed to create "); DEBUG_PRINTLN(logFileName);
     return;
   }
-
-  if (!logFile.isOpen())
+  else
   {
-    DEBUG_PRINTLN("Warning: Unable to open file");
+    DEBUG_PRINT("Info: "); DEBUG_PRINT(logFileName); DEBUG_PRINTLN(" created.");
   }
 
   // Update file create timestamp
   updateFileCreate(&logFile);
 
   // Sync the log file
-  logFile.sync();
+  if (!logFile.sync())
+  {
+    DEBUG_PRINT("Warning: "); DEBUG_PRINT(logFileName); DEBUG_PRINTLN(" sync error.");
+  }
+  else
+  {
+    DEBUG_PRINT("Info: "); DEBUG_PRINT(logFileName); DEBUG_PRINTLN(" synced.");
+  }
 
   // Close log file
-  logFile.close();
+  if (!logFile.close())
+  {
+    DEBUG_PRINT("Warning: "); DEBUG_PRINT(logFileName); DEBUG_PRINTLN(" failed to close.");
+  }
+  else
+  {
+    DEBUG_PRINT("Info: "); DEBUG_PRINT(logFileName); DEBUG_PRINTLN(" closed.");
+  }
 
-  DEBUG_PRINT("Logging to file: "); DEBUG_PRINTLN(logFileName);
+  DEBUG_PRINT("Info: Logging data to "); DEBUG_PRINTLN(logFileName);
 }
 
 // Log data to microSD
@@ -98,7 +127,7 @@ void logDebugData()
 {
   unsigned long loopStartTime = millis(); // Start loop timer
 
-  counter++; // Increment
+  debugCounter++; // Increment debug counter
 
   char dateTime[30];
   sprintf(dateTime, "20%02d-%02d-%02d %02d:%02d:%02d",
@@ -109,46 +138,58 @@ void logDebugData()
   // O_CREAT - Create the file if it does not exist
   // O_APPEND - Seek to the end of the file prior to each write
   // O_WRITE - Open the file for writing
-  if (debugFile.open(debugFileName, O_APPEND | O_WRITE))
+  if (!debugFile.open(debugFileName, O_APPEND | O_WRITE))
   {
-    debugFile.print(dateTime);        debugFile.print(",");
-    debugFile.print(unixtime);        debugFile.print(",");
-    debugFile.print(timer.voltage);   debugFile.print(",");
-    debugFile.print(timer.rtc);       debugFile.print(",");
-    debugFile.print(timer.microSd);   debugFile.print(",");
-    debugFile.print(timer.sensors);   debugFile.print(",");
-    debugFile.print(timer.logGnss);   debugFile.print(",");
-    debugFile.print(bytesWritten);    debugFile.print(",");
-    debugFile.print(maxBufferBytes);  debugFile.print(",");
-    debugFile.print(online.microSd);  debugFile.print(",");
-    debugFile.print(online.gnss);     debugFile.print(",");
-    debugFile.print(rtcDrift);        debugFile.print(",");
-    debugFile.print(watchdogCounterMax);  debugFile.print(",");
-    debugFile.println(counter);
-
-    updateFileAccess(&debugFile); // Update file access and write timestamps
+    DEBUG_PRINT("Warning: "); DEBUG_PRINT(debugFileName); DEBUG_PRINTLN(" failed to open.");
   }
   else
   {
-    DEBUG_PRINTLN("Warning: Unable to open file!");
+    DEBUG_PRINT("Info: "); DEBUG_PRINT(debugFileName); DEBUG_PRINTLN(" opened.");
   }
+
+  // Log debugging information
+  debugFile.print(dateTime);            debugFile.print(",");
+  debugFile.print(unixtime);            debugFile.print(",");
+  debugFile.print(timer.voltage);       debugFile.print(",");
+  debugFile.print(timer.rtc);           debugFile.print(",");
+  debugFile.print(timer.microSd);       debugFile.print(",");
+  debugFile.print(timer.sensors);       debugFile.print(",");
+  debugFile.print(timer.logGnss);       debugFile.print(",");
+  debugFile.print(bytesWritten);        debugFile.print(",");
+  debugFile.print(maxBufferBytes);      debugFile.print(",");
+  debugFile.print(online.microSd);      debugFile.print(",");
+  debugFile.print(online.gnss);         debugFile.print(",");
+  debugFile.print(rtcDrift);            debugFile.print(",");
+  debugFile.print(watchdogCounterMax);  debugFile.print(",");
+  debugFile.println(debugCounter);
+
+  // Update file access and write timestamps
+  updateFileAccess(&debugFile);
 
   // Sync log file
   if (!debugFile.sync())
   {
-    DEBUG_PRINTLN("Warning: File sync error!");
+    DEBUG_PRINT("Warning: "); DEBUG_PRINT(debugFileName); DEBUG_PRINTLN(" sync error!");
+  }
+  else
+  {
+    DEBUG_PRINT("Info: "); DEBUG_PRINT(debugFileName); DEBUG_PRINTLN(" synced.");
   }
 
   // Check for write error
   if (debugFile.getWriteError())
   {
-    DEBUG_PRINTLN("Warning: File write error!");
+    DEBUG_PRINT("Warning: "); DEBUG_PRINT(debugFileName); DEBUG_PRINTLN(" write error!");
   }
 
   // Close log file
   if (!debugFile.close())
   {
-    DEBUG_PRINTLN("Warning: File close error!");
+    DEBUG_PRINT("Warning: "); DEBUG_PRINT(debugFileName); DEBUG_PRINTLN(" failed to close!");
+  }
+  else
+  {
+    DEBUG_PRINT("Info: "); DEBUG_PRINT(debugFileName); DEBUG_PRINTLN(" closed.");
   }
 
   // Stop the loop timer

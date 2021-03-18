@@ -15,7 +15,6 @@ void goToSleep()
   //Serial.flush();       // Wait for transmission of serial data to complete
   Serial.end();         // Disable Serial
 #endif
-  Serial1.end();            // Disable Serial1
   Wire.end();               // Disable I2C
   SPI.end();                // Disable SPI
   //powerControlADC(false);   // Disable power to ADC (v2.x)
@@ -86,21 +85,23 @@ void wakeUp()
   ap3_adc_setup();
   //initializeADC();      // Enable power to ADC (v2.x)
 
-  Wire.begin();         // Enable I2C
-  //Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
-
-  SPI.begin();            // Enable SPI
+  // Restart I2C, SPI and serial only if alarm triggers
+  if (alarmFlag)
+  {
+    Wire.begin();         // Enable I2C
+    //Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
+    SPI.begin();            // Enable SPI
 #if DEBUG
-  Serial.begin(115200); // Enable Serial
+    Serial.begin(115200); // Enable Serial
 #endif
-  Serial1.begin(234000);
-  
+  }
 }
 
 // Enable power to Qwiic connector
 void qwiicPowerOn()
 {
   digitalWrite(PIN_QWIIC_POWER, HIGH);
+
   // Non-blocking delay to allow Qwiic devices time to power up
   unsigned long currentMillis = millis();
   while (millis() - currentMillis <= qwiicPowerDelay)

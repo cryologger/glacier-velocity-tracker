@@ -20,11 +20,13 @@ void configureRtc() {
   // Clear the RTC alarm interrupt
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
 
+  // Get time before starting rolling alarm
+  //rtc.getTime();
+  
   // Set the initial RTC rolling alarm
   //rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
   rtc.setAlarm(0, 0, 0, 0, 0, 0); // Hour rollover
-
 
   // Set the RTC alarm mode
   rtc.setAlarmMode(5); // Alarm match on hundredths, seconds
@@ -49,7 +51,7 @@ void readRtc()
   // Get RTC's UNIX Epoch time
   unixtime = rtc.getEpoch();
 
-  //DEBUG_PRINT("Unix Epoch time: "); DEBUG_PRINTLN(unixtime);
+  //DEBUG_PRINT("Info: Unix epoch time is "); DEBUG_PRINTLN(unixtime);
 
   // Stop the loop timer
   timer.rtc = micros() - loopStartTime;
@@ -66,11 +68,11 @@ void setSleepAlarm()
   rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
   // Set the RTC alarm mode
-  rtc.setAlarmMode(4); // Alarm match on hundredths, seconds, minutes, hours
+  rtc.setAlarmMode(sleepAlarmMode); // Alarm match on hundredths, seconds, minutes, hours
 
   // Print the next RTC alarm date and time
-  DEBUG_PRINT("Datetime: "); printDateTime();
-  DEBUG_PRINT("Sleep until: "); printAlarm();
+  DEBUG_PRINT("Info: Current time is "); printDateTime();
+  DEBUG_PRINT("Info: Sleeping until "); printAlarm();
 }
 
 void setLoggingAlarm()
@@ -82,11 +84,11 @@ void setLoggingAlarm()
   rtc.setAlarm((rtc.hour + loggingAlarmHours) % 24, (rtc.minute + loggingAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
   // Set the RTC alarm mode
-  rtc.setAlarmMode(4); // Alarm match on hundredths, seconds,  minutes, hours
+  rtc.setAlarmMode(loggingAlarmMode); // Alarm match on hundredths, seconds,  minutes, hours
 
   // Print the next RTC alarm date and time
-  DEBUG_PRINT("Datetime: "); printDateTime();
-  DEBUG_PRINT("Log until: "); printAlarm();
+  DEBUG_PRINT("Info: Current time is "); printDateTime();
+  DEBUG_PRINT("Info: Logging until "); printAlarm();
 }
 
 // Print the RTC's current date and time

@@ -71,11 +71,13 @@ SFE_UBLOX_GNSS    gnss;           // I2C address: 0x42
 // ----------------------------------------------------------------------------
 // User defined global variable declarations
 // ----------------------------------------------------------------------------
-byte          sleepAlarmMinutes     = 5;
-byte          sleepAlarmHours       = 0;
-byte          loggingAlarmMinutes   = 0;
-byte          loggingAlarmHours     = 1;
-unsigned int  gnssTimeout           = 5;   // Timeout for GNSS signal acquisition (minutes)
+byte          sleepAlarmMinutes     = 30;  // Rolling alarm every X minutes
+byte          sleepAlarmHours       = 0;  // Rolling alarm every X hours
+byte          loggingAlarmMinutes   = 30;  // Rolling alarm every X minutes
+byte          loggingAlarmHours     = 0;  // Rolling alarm every X hours
+byte          sleepAlarmMode        = 5;  // Alarm match on hundredths, seconds, minutes
+byte          loggingAlarmMode      = 5;  // Alarm match on hundredths, seconds, minutes
+unsigned int  gnssTimeout           = 5;  // Timeout for GNSS signal acquisition (minutes)
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -83,7 +85,7 @@ unsigned int  gnssTimeout           = 5;   // Timeout for GNSS signal acquisitio
 
 const int     sdWriteSize         = 512;    // Write data to SD in blocks of 512 bytes
 const int     fileBufferSize      = 16384;  // Allocate 16 KB RAM for UBX message storage
-volatile bool alarmFlag           = false;   // Flag for alarm interrupt service routine
+volatile bool alarmFlag           = false;  // Flag for alarm interrupt service routine
 volatile bool loggingFlag         = false;  // Flag to
 volatile bool watchdogFlag        = false;  // Flag for Watchdog Timer interrupt service routine
 volatile int  watchdogCounter     = 0;      // Counter for Watchdog Timer interrupts
@@ -97,7 +99,7 @@ char          debugFileName[30]   = "debug.csv";
 long          rtcDrift            = 0;
 unsigned int  sdPowerDelay        = 250;    // Delay before disabling power to microSD (milliseconds)
 unsigned int  qwiicPowerDelay     = 2500;   // Delay after enabling power to Qwiic connector (milliseconds)
-unsigned int  counter             = 0;
+unsigned int  debugCounter        = 0;
 unsigned int  maxBufferBytes      = 0;
 unsigned long previousMillis      = 0;      // Global millis() timer
 unsigned long unixtime            = 0;      // Unix epoch timestamp
@@ -163,17 +165,16 @@ void setup()
   DEBUG_PRINT("Info: "); printDateTime(); // Print current RTC time at boot
 
   // Configure devices
-  configureWdt();     // Configure and start Watchdog Timer (WDT)
-  configureGnss();    // Configure GNSS receiver
-  syncRtc();          // Acquire GNSS fix and synchronize RTC with GNSS
-  configureSd();      // Configure microSD
-  createDebugLogFile();
-  configureSensors(); // Configure attached sensors
-  //createLogFile();    // Create initial log file
-  configureRtc();     // Configure initial real-time clock (RTC) alarm
+  configureWdt();       // Configure and start Watchdog Timer (WDT)
+  configureGnss();      // Configure GNSS receiver
+  syncRtc();            // Acquire GNSS fix and synchronize RTC with GNSS
+  configureSd();        // Configure microSD
+  createDebugLogFile(); // Create debug log file
+  configureSensors();   // Configure attached sensors
+  configureRtc();       // Configure initial real-time clock (RTC) alarm
 
-  DEBUG_PRINT("Datetime: "); printDateTime();
-  DEBUG_PRINT("Initial alarm: "); printAlarm();
+  DEBUG_PRINT("Info: Datetime is "); printDateTime();
+  DEBUG_PRINT("Info: Initial alarm set for "); printAlarm();
 
   // Blink LED to indicate completion of setup
   blinkLed(10, 100);
@@ -193,11 +194,11 @@ void loop()
     // Clear alarm flag
     alarmFlag = false;
 
-    DEBUG_PRINT("Alarm trigger: "); printDateTime();
+    DEBUG_PRINT("Info: Alarm trigger "); printDateTime();
 
     // Toggle logging flag
     loggingFlag = !loggingFlag;
-    DEBUG_PRINT("loggingFlag: "); DEBUG_PRINTLN(loggingFlag);
+    DEBUG_PRINT("Info: loggingFlag = "); DEBUG_PRINTLN(loggingFlag);
 
     // Perform measurements
     if (loggingFlag)
@@ -216,6 +217,9 @@ void loop()
 
       printTimers();  // Print function execution timers
     }
+
+    // Delay to allow previous log file to close
+    blinkLed(2, 1000);
 
     // Log system diagnostic information
     logDebugData();

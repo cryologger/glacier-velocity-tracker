@@ -32,10 +32,10 @@ void printTimers()
   DEBUG_PRINTLN("Function Execution Timers (ms)");
   printLine();
   DEBUG_PRINT("voltage: "); printTab(1);  DEBUG_PRINTLN(timer.voltage);
-  DEBUG_PRINT("rtc: ");     printTab(1);  DEBUG_PRINTLN(timer.rtc);
+  DEBUG_PRINT("rtc: ");     printTab(2);  DEBUG_PRINTLN(timer.rtc);
   DEBUG_PRINT("microsd: "); printTab(1);  DEBUG_PRINTLN(timer.microSd);
   DEBUG_PRINT("sensors: "); printTab(1);  DEBUG_PRINTLN(timer.sensors);
-  DEBUG_PRINT("gnss: ");    printTab(1);  DEBUG_PRINTLN(timer.gnss);
+  DEBUG_PRINT("gnss: ");    printTab(2);  DEBUG_PRINTLN(timer.gnss);
   DEBUG_PRINT("logGnss: "); printTab(1);  DEBUG_PRINTLN(timer.logGnss);
   printLine();
 }
