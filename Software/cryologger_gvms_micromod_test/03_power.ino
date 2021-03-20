@@ -81,7 +81,6 @@ void qwiicPowerOn()
 void qwiicPowerOff()
 {
   digitalWrite(PIN_QWIIC_POWER, LOW);
-
 }
 
 // Enable power to microSD and peripherals

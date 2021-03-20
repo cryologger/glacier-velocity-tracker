@@ -1,6 +1,6 @@
-// Configure the real-time clock
-void configureRtc() {
-
+// Configure the real-time clock (RTC)
+void configureRtc()
+{
   // Alarm modes:
   // 0: Alarm interrupt disabled
   // 1: Alarm match hundredths, seconds, minutes, hour, day, month  (every year)
@@ -19,16 +19,17 @@ void configureRtc() {
 
   // Get time before starting rolling alarm
   //rtc.getTime();
-  
-  // Set the initial RTC rolling alarm
+
+  // Set initial rolling alarm
   //rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
-  rtc.setAlarm(0, 0, 0, 0, 0, 0); // Alarm match on minute, hour rollover
+  // Set initial rollover alarm
+  rtc.setAlarm(0, 0, 0, 0, 0, 0);
 
-  // Set the RTC alarm mode
+  // Set the alarm mode
   rtc.setAlarmMode(5); // Alarm match on hundredths, seconds
 
-  // Attach RTC alarm interrupt
+  // Attach alarm interrupt
   rtc.attachInterrupt();
 
   // Clear the RTC alarm interrupt
@@ -57,8 +58,8 @@ void setSleepAlarm()
   rtc.setAlarmMode(5); // Alarm match on hundredths, seconds, minutes, hours
 
   // Print the next RTC alarm date and time
-  Serial.println("Info: Current time is "); printDateTime();
-  Serial.println("Info: Sleeping until "); printAlarm();
+  Serial.print("Info: Current time is "); printDateTime();
+  Serial.print("Info: Sleeping until "); printAlarm();
 }
 
 void setLoggingAlarm()
@@ -73,10 +74,9 @@ void setLoggingAlarm()
   rtc.setAlarmMode(loggingAlarmMode); // Alarm match on hundredths, seconds,  minutes, hours
 
   // Print the next RTC alarm date and time
-  Serial.println("Info: Current time is "); printDateTime();
-  Serial.println("Info: Logging until "); printAlarm();
+  Serial.print("Info: Current time is "); printDateTime();
+  Serial.print("Info: Logging until "); printAlarm();
 }
-
 
 // Print the RTC's date and time
 void printDateTime()
