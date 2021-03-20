@@ -25,7 +25,7 @@ void configureGnss()
     DEBUG_PRINTLN("Warning: u-blox module not detected at 230400 bps. Attempting 38400 bps...");
 
     // Change Serial1 data rate to 38400 baud (u-blox default)
-    Serial1.begin(460800);
+    Serial1.begin(38400);
 
     // Initlialze u-blox module
     if (gnss.begin(Serial1))
@@ -65,9 +65,9 @@ void configureGnss()
   {
     DEBUG_PRINTLN("Warning: Non-recoverable error due to u-blox module initialization failure.");
     peripheralPowerOff(); // Disable power to microSD and u-blox
+    wdt.stop(); // Stop watchdog timer
     while (1)
     {
-      wdt.stop(); // Stop watchdog timer
       blinkLed(2, 250);
       blinkLed(2, 1000);
     }
