@@ -26,10 +26,10 @@ void configureRtc() {
   // Set the initial RTC rolling alarm
   //rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
-  rtc.setAlarm(0, 0, 0, 0, 0, 0); // Hour rollover
+  rtc.setAlarm(0, 30, 0, 0, 0, 0); // Hour rollover
 
   // Set the RTC alarm mode
-  rtc.setAlarmMode(5); // Alarm match on hundredths, seconds
+  rtc.setAlarmMode(initialAlarmMode); // Alarm match on hundredths, seconds
 
   // Attach RTC alarm interrupt
   rtc.attachInterrupt();
@@ -37,6 +37,8 @@ void configureRtc() {
   // Clear the RTC alarm interrupt
   //rtc.clearInterrupt();
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
+
+  DEBUG_PRINTLN("Info: RTC configured.");
 }
 
 // Read the real-time clock

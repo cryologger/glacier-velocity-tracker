@@ -10,15 +10,12 @@ void readBattery()
 // Enter deep sleep
 void goToSleep()
 {
-
 #if DEBUG
-  //Serial.flush();       // Wait for transmission of serial data to complete
   Serial.end();         // Disable Serial
 #endif
-  Wire.end();               // Disable I2C
-  SPI.end();                // Disable SPI
-  //powerControlADC(false);   // Disable power to ADC (v2.x)
-  power_adc_disable();
+  Wire.end();           // Disable I2C
+  SPI.end();            // Disable SPI
+  power_adc_disable();  // Disable power to ADC
 
   digitalWrite(LED_BUILTIN, LOW); // Turn off LED
 
@@ -44,18 +41,22 @@ void goToSleep()
     }
   }
 
-  qwiicPowerOff();      // Disable power to Qwiic connector
-  peripheralPowerOff(); // Disable power to peripherals
+  // Disable power to Qwiic connector
+  qwiicPowerOff();
+
+  // Disable power to peripherals
+  peripheralPowerOff();
 
   // Mark devices as offline
   online.gnss = false;
   online.microSd = false;
+  online.dataLogging = false;
+  online.debugLogging = false;
 
-  // Disable power to Flash, SRAM, and cache
+  // Disable power to flash, SRAM, and cache
   am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_CACHE); // Turn off CACHE
   am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_FLASH_512K); // Turn off everything but lower 512k
   am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_SRAM_64K_DTCM); // Turn off everything but lower 64k
-  //am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_ALL); // Turn off all memory (doesn't recover)
 
   // Keep the 32kHz clock running for RTC
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
@@ -75,26 +76,20 @@ void goToSleep()
 // Wake from deep sleep
 void wakeUp()
 {
-  // Enable power to SRAM, turn on entire Flash
+  // Enable power to SRAM, turn on entire flash
   am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_MAX);
 
   // Return to using the main clock
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
   am_hal_stimer_config(AM_HAL_STIMER_HFRC_3MHZ);
 
-  ap3_adc_setup();
-  //initializeADC();      // Enable power to ADC (v2.x)
-
-  // Restart I2C, SPI and serial only if alarm triggers
-  if (alarmFlag)
-  {
-    Wire.begin();         // Enable I2C
-    //Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
-    SPI.begin();            // Enable SPI
+  ap3_adc_setup();      // Enable power to ADC (v2.x)
+  Wire.begin();         // Enable I2C
+  SPI.begin();          // Enable SPI
 #if DEBUG
-    Serial.begin(115200); // Enable Serial
+  Serial.begin(115200); // Enable Serial
 #endif
-  }
+
 }
 
 // Enable power to Qwiic connector
@@ -104,9 +99,9 @@ void qwiicPowerOn()
 
   // Non-blocking delay to allow Qwiic devices time to power up
   unsigned long currentMillis = millis();
-  while (millis() - currentMillis <= qwiicPowerDelay)
+  while (millis() - currentMillis < qwiicPowerDelay)
   {
-    previousMillis = currentMillis;
+    petDog(); // Restart watchdog timer
   }
 }
 
@@ -119,12 +114,25 @@ void qwiicPowerOff()
 // Enable power to microSD and peripherals
 void peripheralPowerOn()
 {
+  // Non-blocking delay
+  // norwegiancreations.com/2018/10/arduino-tutorial-avoiding-the-overflow-issue-when-using-millis-and-micros/
+  unsigned long currentMillis = millis();
+  while (millis() - currentMillis < sdPowerDelay)
+  {
+    petDog();
+  }
   digitalWrite(PIN_PWC_POWER, HIGH);
 }
 
 // Disable power to microSD and peripherals
 void peripheralPowerOff()
 {
+  // Non-blocking delay to allow microSD time to complete writing
+  unsigned long currentMillis = millis();
+  while (millis() - currentMillis < sdPowerDelay)
+  {
+    petDog();
+  }
   digitalWrite(PIN_PWC_POWER, LOW);
 }
 
