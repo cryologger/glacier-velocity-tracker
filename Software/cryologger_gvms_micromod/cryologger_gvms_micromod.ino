@@ -1,6 +1,6 @@
 /*
     Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0 Prototype
-    Date:     March 10, 2021
+    Date:     March 20, 2021
     Author:   Adam Garbo
 
     Components:
@@ -22,7 +22,7 @@
 
     Results:
     - Debug file write fails
-    - First data loggign file did not complete writing
+    - First data logging file did not complete writing
     - First data log file did not have timestamps updated
     - Data logging failed after 3 files
     - Watchdog failure
