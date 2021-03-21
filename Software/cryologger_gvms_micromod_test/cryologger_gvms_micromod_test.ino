@@ -7,10 +7,9 @@
     - SparkFun Artemis Processor
     - SparkFun MicroMod Data Logging Carrier Board
     - SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic)
-    
+
     Comments:
     - Minimal debugging code for testing purposes
-
 */
 
 // ----------------------------------------------------------------------------
@@ -22,6 +21,7 @@
 #include <SdFat.h>                                // https://github.com/greiman/SdFat
 #include <SPI.h>
 #include <WDT.h>
+#include <Wire.h>
 
 // -----------------------------------------------------------------------------
 // Debugging
@@ -86,33 +86,35 @@ void setup()
   pinMode(PIN_PWC_POWER, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
-  qwiicPowerOff(); // Disable power to Qwiic connector
-  peripheralPowerOn(); // Enable power to peripherials
+  qwiicPowerOn();       // Enable power to Qwiic connector
+  peripheralPowerOn();  // Enable power to peripherials
 
-  SPI.begin(); // Initialize SPI
+  Wire.begin();         // Initalize I2C
+  Wire.setPullups(0);   // Disable Artemis internal I2C pull-ups to reduce bus errors
+  SPI.begin();          // Initialize SPI
 
   Serial.begin(115200); // Open Serial port
-  //while (!Serial); // Wait for user to open Serial Monitor
-  delay(2000); // Delay to allow user to open Serial Monitor
+  //while (!Serial);      // Wait for user to open Serial Monitor
+  delay(2000);          // Delay to allow user to open Serial Monitor
 
   Serial.println("Cryologger - Glacier Velocity Measurement System");
 
-  printDateTime();      // Print RTC's date and time
+  printDateTime();      // Print RTC's current date and time
 
   // Configure devices
   configureWdt();       // Configure and start Watchdog Timer (WDT)
-  configureGnss();      // Configure GNSS receiver
-  syncRtc();            // Acquire GNSS fix and synchronize RTC with GNSS
+  configureGnss();      // Configure u-blox GNSS
+  syncRtc();            // Acquire GNSS fix and sync RTC with GNSS
   configureSd();        // Configure microSD
   configureRtc();       // Configure real-time clock (RTC) alarm
 
   Serial.print("Info: Datetime is "); printDateTime();
-  Serial.print("Info: Initial RTC alarm set for "); printAlarm();
+  Serial.print("Info: Initial alarm set for "); printAlarm();
 
   // Blink LED to indicate completion of setup
-  blinkLed(5, 100);
-  blinkLed(2, 1000);
-  blinkLed(5, 100);
+  blinkLed(3, 1000);
+  blinkLed(3, 100);
+  blinkLed(3, 1000);
 }
 
 // ----------------------------------------------------------------------------
@@ -140,9 +142,8 @@ void loop()
       setLoggingAlarm();    // Set logging duration
       peripheralPowerOn();  // Enable power to peripherals
       configureSd();        // Configure microSD
-      delay(2000);
-      configureGnss();      // Configure u-blox receiver
-      delay(2000);
+      qwiicPowerOn();       // Enable power to Qwiic connector
+      configureGnss();      // Configure u-blox GNSS
       logGnss();            // Log data
     }
 
@@ -196,6 +197,7 @@ extern "C" void am_watchdog_isr(void)
   {
     wdt.stop(); // Stop the watchdog timer
     peripheralPowerOff(); // Disable power to peripherals
+    qwiicPowerOff(); // Disable power to Qwiic connector
     while (1)
     {
       blinkLed(2, 250);

@@ -6,6 +6,7 @@ void configureSd()
   {
     Serial.println("Warning: microSD initialization failed.");
     peripheralPowerOff(); // Disable power to peripherals
+    qwiicPowerOff(); // Disable power to Qwiic connector
     wdt.stop(); // Stop watchdog timer
     while (1)
     {

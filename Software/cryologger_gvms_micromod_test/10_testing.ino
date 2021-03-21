@@ -13,6 +13,7 @@
   - End: 2021-03-20 18:30
   - Sleep: 5 minutes
   - Logging: 30 minutes
+  - Frequency: 10 Hz
   - Antenna: Tallysman HC872 antenna
   - SanDisk 64 GB
 
@@ -31,7 +32,8 @@
   - End: 2021-03-21 1:45
   - Sleep: 5 minutes
   - Logging: 30 minutes
-  - Antenna: Tallysman TC3872 antenna
+  - Frequency: 10 Hz
+  - Antenna: Tallysman TW3872 antenna
   - SD card: SanDisk 64 GB
 
   Comments:
@@ -52,6 +54,7 @@
   - End: 2021-03-21 1:45
   - Sleep: 5 minutes
   - Logging: 30 minutes
+  - Frequency: 10 Hz
   - Tallysman HC872 antenna
   - SanDisk 64 GB
 
@@ -73,6 +76,7 @@
   - End: 2021-03-21
   - Sleep: 5 minutes
   - Logging: 30 minutes
+  - Frequency: 10 Hz
   - Tallysman HC872 antenna
   - SanDisk 64 GB
 
@@ -89,7 +93,5 @@
   Files:
   - 20210321_030000.ubx
   - ...
-  - 20210321_111000.ubx (0 byte)
-
-
+  - 20210321_111000.ubx (0 bytes)
 */

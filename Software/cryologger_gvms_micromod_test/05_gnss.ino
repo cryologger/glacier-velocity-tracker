@@ -4,62 +4,79 @@ void configureGnss()
   // Allocate sufficient RAM to store RAWX messages (>2 KB)
   gnss.setFileBufferSize(fileBufferSize); // Must be called before gnss.begin()
 
-  Serial.println("Info: Opening Serial1 port at 230400 baud");
-
-  // Open Serial1 port and set data rate to 230400 baud
-  Serial1.begin(230400);
-
   // Initialize u-blox GNSS
-  if (gnss.begin(Serial1))
+  if (!gnss.begin(Wire))
   {
-    Serial.println("Info: u-blox initialized at 230400 baud.");
+    Serial.println("Warning: u-blox failed to initialize!");
+    peripheralPowerOff(); // Disable power to peripherals
+    qwiicPowerOff(); // Disable power to Qwiic connector
+    wdt.stop(); // Stop watchdog timer
+    while (1)
+    {
+      blinkLed(2, 250);
+      blinkLed(2, 1000);
+    }
   }
-  else
-  {
-    Serial.println("Info: u-blox failed to initialize at 230400 bad. Attempting 38400 baud.");
-    /*
-        // Open Serial1 port and set data rate to 38400 baud
-        Serial1.begin(38400);
 
-        // Initialize u-blox GNSS
-        if (gnss.begin(Serial1))
-        {
-          Serial.println("Info: u-blox initialized at 38400 baud.");
+  /*
+    Serial.println("Info: Opening Serial1 port at 230400 baud");
 
-          // Set baud rate of u-blox UART1 port
-          gnss.setSerialRate(230400);
-          Serial.println("Info: u-blox UART1 set to 230400 baud.");
-          delay(100);
+    // Open Serial1 port and set data rate to 230400 baud
+    //Serial1.begin(230400);
 
-          // Open Serial1 port and set data rate to 230400 baud
-          Serial1.begin(230400);
+    // Initialize u-blox GNSS
+    if (gnss.begin(Serial1))
+    {
+      Serial.println("Info: u-blox initialized at 230400 baud.");
+    }
+    else
+    {
+      Serial.println("Info: u-blox failed to initialize at 230400 bad. Attempting 38400 baud.");
+
+          // Open Serial1 port and set data rate to 38400 baud
+          Serial1.begin(38400);
 
           // Initialize u-blox GNSS
           if (gnss.begin(Serial1))
           {
-            Serial.println("Info: u-blox initialized at 230400 baud.");
+            Serial.println("Info: u-blox initialized at 38400 baud.");
+
+            // Set baud rate of u-blox UART1 port
+            gnss.setSerialRate(230400);
+            Serial.println("Info: u-blox UART1 set to 230400 baud.");
+            delay(100);
+
+            // Open Serial1 port and set data rate to 230400 baud
+            Serial1.begin(230400);
+
+            // Initialize u-blox GNSS
+            if (gnss.begin(Serial1))
+            {
+              Serial.println("Info: u-blox initialized at 230400 baud.");
+            }
+            else
+            {
+              Serial.println("Warning: u-blox GNSS not detected! Please check wiring or baud rate.");
+              peripheralPowerOff(); // Disable power to microSD and u-blox
+              wdt.stop(); // Stop watchdog timer
+              while (1)
+              {
+                blinkLed(2, 250);
+                blinkLed(2, 1000);
+              }
+            }
           }
           else
           {
-            Serial.println("Warning: u-blox GNSS not detected! Please check wiring or baud rate.");
-            //peripheralPowerOff(); // Disable power to microSD and u-blox
-            //wdt.stop(); // Stop watchdog timer
-            //while (1)
-            //{
-            //  blinkLed(2, 250);
-            //  blinkLed(2, 1000);
-            //}
+            Serial.println("Warning: u-blox GNSS not detected at baud rates 38400 or 230400.");
           }
-        }
-        else
-        {
-          Serial.println("Warning: u-blox GNSS not detected at baud rates 38400 or 230400.");
-        }
-    */
-  }
+    }
+  */
+
 
   // Configure u-blox GNSS
-  gnss.setUART1Output(COM_TYPE_UBX);                // Set the UART1 port to output UBX only (disable NMEA)
+  //gnss.setUART1Output(COM_TYPE_UBX);                // Set the UART1 port to output UBX only (disable NMEA)
+  gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
   gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
   gnss.setNavigationFrequency(10);                  // Produce one navigation solution per second
   gnss.setAutoPVTcallback(&processNavPvt);          // Enable automatic NAV PVT messages with callback to processNavPvt()
@@ -68,19 +85,21 @@ void configureGnss()
 
   if (!gnssConfigFlag)
   {
-    // Configure communciation interfaces
-    bool setValueSuccess = true;
-    setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 0);        // Disable I2C
-    setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);        // Disable SPI
-    setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);      // Disable UART2
-    setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_USB_ENABLED, 0, 2000); // Disable USB
-    if (!setValueSuccess)
-    {
+    /*
+      // Configure communciation interfaces
+      bool setValueSuccess = true;
+      //setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);        // Disable I2C
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);        // Disable SPI
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 0);      // Disable UART1
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);      // Disable UART2
+      setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_USB_ENABLED, 0, 2000); // Disable USB
+      if (!setValueSuccess)
+      {
       Serial.println("Warning: Communication interfaces not configured!");
-    }
-
+      }
+    */
     // Configure satellite signals
-    setValueSuccess = true;
+    bool setValueSuccess = true;
     setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, 1);         // Enable GPS
     setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GLO_ENA, 1);         // Enable GLONASS
     setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 0);         // Disable Galileo
@@ -210,8 +229,8 @@ void logGnss()
     while (gnss.fileBufferAvailable() >= sdWriteSize)
     {
       // Reset watchdog timer
-      petDog(); 
-      
+      petDog();
+
       // Turn on LED during SD writes
       digitalWrite(LED_BUILTIN, HIGH);
 
@@ -262,7 +281,7 @@ void logGnss()
   {
     // Reset watchdog timer
     petDog();
-    
+
     // Turn on LED during SD writes
     digitalWrite(LED_BUILTIN, HIGH);
 
@@ -308,7 +327,7 @@ void logGnss()
   }
 
   // Close Serial1 port
-  Serial1.end();
+  //Serial1.end();
 
   // Toggle logging flag
   loggingFlag = false;

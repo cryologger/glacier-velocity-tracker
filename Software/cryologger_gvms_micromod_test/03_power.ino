@@ -4,6 +4,7 @@ void goToSleep()
 #if DEBUG
   Serial.end(); // Close Serial port
 #endif
+  Wire.end(); // Disable I2C
   SPI.end(); // Disable SPI
   power_adc_disable(); // Disable ADC
   digitalWrite(LED_BUILTIN, LOW); // Turn off LED
@@ -30,8 +31,11 @@ void goToSleep()
     }
   }
 
-  qwiicPowerOff();      // Disable power to Qwiic connector
-  peripheralPowerOff(); // Disable power to peripherals
+  // Disable power to Qwiic connector
+  qwiicPowerOff();
+
+  // Disable power to peripherals
+  peripheralPowerOff();
 
   // Disable power to Flash, SRAM, and cache
   am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_CACHE); // Turn off CACHE
@@ -65,6 +69,8 @@ void wakeUp()
 
   ap3_adc_setup();
 
+  Wire.begin(); // Enable I2C
+  Wire.setPullups(0); // Disable Artemis internal I2C pull-ups to reduce bus errors
   SPI.begin(); // Enable SPI
 #if DEBUG
   Serial.begin(115200); // Open Serial port
@@ -75,6 +81,7 @@ void wakeUp()
 void qwiicPowerOn()
 {
   digitalWrite(PIN_QWIIC_POWER, HIGH);
+  delay(2500);
 }
 
 // Disable power to Qwiic connector
