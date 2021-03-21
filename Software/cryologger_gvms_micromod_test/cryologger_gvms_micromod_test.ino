@@ -13,12 +13,52 @@
     - Minimal code example to test system
 
 
-    Test:
-    - 2021-03-20 13:00 EST 
+    Test #1:
+    - Start: Approx. 2021-03-20 13:00 EST
+    - End: 2021-03-20 14:30 EST
     - Sleep 5 minutes
     - Logging 30 minutes
     - Tallysman HC872 antenna
     - SanDisk 64 GB
+
+    Results:
+    - u-blox failed to initialze after two cycles
+    - Code wasn't yet set to ignore serial init failure
+    - Produced two outputs:
+      20210320_170000.ubx
+      20210320_173500.ubx
+
+    Test #2:
+    - Start: Approx 2021-03-20 13:10 EST
+    - End: 2021-03-20 
+    - Sleep 5 minutes
+    - Logging 30 minutes
+    - Tallysman TC3872 antenna
+    - SanDisk 64 GB
+    - Fixed serial code to ignore init failure
+
+    Results:
+    - Watchdog timer triggered
+    - Failed after creating 2 log files
+      20210320_180000.ubx
+      20210320_183500.ubx
+    - Watchdog timer triggered
+    
+    Test #3:
+    - Start: Approx. 2021-03-20 14:40 EST
+    - End: 2021-03-20 
+    - Sleep 5 minutes
+    - Logging 30 minutes
+    - Tallysman HC872 antenna
+    - SanDisk 64 GB
+    - Fixed serial code to ignore init failure
+    - Added more watchdog resets
+    - First log file should be 20210320_1700
+
+    Results:
+    - Watchdog timer triggered
+    - Failed after a single file
+      20210320_190000.ubx
 */
 
 // ----------------------------------------------------------------------------
@@ -108,7 +148,7 @@ void setup()
   printDateTime();      // Print RTC's date and time
 
   // Configure devices
-  configureWdt();       // Configure and start Watchdog Timer (WDT)
+  //TestconfigureWdt();       // Configure and start Watchdog Timer (WDT)
   configureGnss();      // Configure GNSS receiver
   syncRtc();            // Acquire GNSS fix and synchronize RTC with GNSS
   configureSd();        // Configure microSD

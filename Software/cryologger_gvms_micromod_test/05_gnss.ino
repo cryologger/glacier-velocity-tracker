@@ -17,44 +17,45 @@ void configureGnss()
   else
   {
     Serial.println("Info: u-blox failed to initialize at 230400 bad. Attempting 38400 baud.");
+    /*
+        // Open Serial1 port and set data rate to 38400 baud
+        Serial1.begin(38400);
 
-    // Open Serial1 port and set data rate to 38400 baud
-    Serial1.begin(38400);
+        // Initialize u-blox GNSS
+        if (gnss.begin(Serial1))
+        {
+          Serial.println("Info: u-blox initialized at 38400 baud.");
 
-    // Initialize u-blox GNSS
-    if (gnss.begin(Serial1))
-    {
-      Serial.println("Info: u-blox initialized at 38400 baud.");
+          // Set baud rate of u-blox UART1 port
+          gnss.setSerialRate(230400);
+          Serial.println("Info: u-blox UART1 set to 230400 baud.");
+          delay(100);
 
-      // Set baud rate of u-blox UART1 port
-      gnss.setSerialRate(230400);
-      Serial.println("Info: u-blox UART1 set to 230400 baud.");
-      delay(100);
+          // Open Serial1 port and set data rate to 230400 baud
+          Serial1.begin(230400);
 
-      // Open Serial1 port and set data rate to 230400 baud
-      Serial1.begin(230400);
-
-      // Initialize u-blox GNSS
-      if (gnss.begin(Serial1))
-      {
-        Serial.println("Info: u-blox initialized at 230400 baud.");
-      }
-      else
-      {
-        Serial.println("Warning: u-blox GNSS not detected! Please check wiring or baud rate.");
-        //peripheralPowerOff(); // Disable power to microSD and u-blox
-        //wdt.stop(); // Stop watchdog timer
-        //while (1)
-        //{
-        //  blinkLed(2, 250);
-        //  blinkLed(2, 1000);
-        //}
-      }
-    }
-    else
-    {
-      Serial.println("Warning: u-blox GNSS not detected at baud rates 38400 or 230400.");
-    }
+          // Initialize u-blox GNSS
+          if (gnss.begin(Serial1))
+          {
+            Serial.println("Info: u-blox initialized at 230400 baud.");
+          }
+          else
+          {
+            Serial.println("Warning: u-blox GNSS not detected! Please check wiring or baud rate.");
+            //peripheralPowerOff(); // Disable power to microSD and u-blox
+            //wdt.stop(); // Stop watchdog timer
+            //while (1)
+            //{
+            //  blinkLed(2, 250);
+            //  blinkLed(2, 1000);
+            //}
+          }
+        }
+        else
+        {
+          Serial.println("Warning: u-blox GNSS not detected at baud rates 38400 or 230400.");
+        }
+    */
   }
 
   // Configure u-blox GNSS
@@ -64,7 +65,6 @@ void configureGnss()
   gnss.setAutoPVTcallback(&processNavPvt);          // Enable automatic NAV PVT messages with callback to processNavPvt()
   gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM SFRBX messages
   gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM RAWX messages
-
 
   if (!gnssConfigFlag)
   {
@@ -209,6 +209,9 @@ void logGnss()
     // Check if sdWriteSize bytes are waiting in the buffer
     while (gnss.fileBufferAvailable() >= sdWriteSize)
     {
+      // Reset watchdog timer
+      petDog(); 
+      
       // Turn on LED during SD writes
       digitalWrite(LED_BUILTIN, HIGH);
 
@@ -257,6 +260,9 @@ void logGnss()
 
   while (remainingBytes > 0)
   {
+    // Reset watchdog timer
+    petDog();
+    
     // Turn on LED during SD writes
     digitalWrite(LED_BUILTIN, HIGH);
 
