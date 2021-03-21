@@ -24,7 +24,7 @@ void configureRtc()
   //rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
   // Set initial rollover alarm
-  rtc.setAlarm(0, 30, 0, 0, 0, 0);
+  rtc.setAlarm(0, 0, 0, 0, 0, 0);
 
   // Set the alarm mode
   rtc.setAlarmMode(5); // Alarm match on hundredths, seconds

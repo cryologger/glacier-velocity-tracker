@@ -6,7 +6,8 @@ void goToSleep()
 #endif
   Wire.end(); // Disable I2C
   SPI.end(); // Disable SPI
-  power_adc_disable(); // Disable ADC
+  power_adc_disable(); // Disable ADC (v1.x)
+  //powerControlADC(false); // Disable ADC (v2.x)
   digitalWrite(LED_BUILTIN, LOW); // Turn off LED
 
   // Force peripherals off
@@ -20,12 +21,10 @@ void goToSleep()
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART0);
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART1);
 
-  // Disable all pads except G1, G2 and LED
+  // Disable all pads except G1 (33), G2 (34) and LED_BUILTIN (19)
   for (int x = 0; x < 50; x++)
   {
-    if ((x != ap3_gpio_pin2pad(PIN_PWC_POWER)) &&
-        (x != ap3_gpio_pin2pad(PIN_QWIIC_POWER)) &&
-        (x != ap3_gpio_pin2pad(LED_BUILTIN)))
+    if ((x != 33) && (x != 34) && (x != 19))
     {
       am_hal_gpio_pinconfig(x, g_AM_HAL_GPIO_DISABLE);
     }
@@ -40,7 +39,7 @@ void goToSleep()
   // Disable power to Flash, SRAM, and cache
   am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_CACHE); // Turn off CACHE
   am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_FLASH_512K); // Turn off everything but lower 512k
-  am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_SRAM_64K_DTCM); // Turn off everything but lower 64k
+  //am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_SRAM_64K_DTCM); // Turn off everything but lower 64k
 
   // Keep the 32kHz clock running for RTC
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
@@ -67,11 +66,15 @@ void wakeUp()
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
   am_hal_stimer_config(AM_HAL_STIMER_HFRC_3MHZ);
 
-  ap3_adc_setup();
+  // Renable UART0
+  am_hal_gpio_pinconfig(48, g_AM_BSP_GPIO_COM_UART_TX);
+  am_hal_gpio_pinconfig(49, g_AM_BSP_GPIO_COM_UART_RX);
+  am_hal_pwrctrl_periph_enable(AM_HAL_PWRCTRL_PERIPH_UART0);
 
-  Wire.begin(); // Enable I2C
-  Wire.setPullups(0); // Disable Artemis internal I2C pull-ups to reduce bus errors
-  SPI.begin(); // Enable SPI
+  ap3_adc_setup();  // Enable ADC (v1.x)
+  initializeADC();  // Enable ADC (v2.x)
+  Wire.begin();     // Enable I2C
+  SPI.begin();      // Enable SPI
 #if DEBUG
   Serial.begin(115200); // Open Serial port
 #endif

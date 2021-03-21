@@ -89,9 +89,86 @@
   - Created 15 files but still failed
   - Watchdog timer did not trigger
   - Will attempt I2C now
-  
+
   Files:
   - 20210321_030000.ubx
   - ...
   - 20210321_111000.ubx (0 bytes)
+
+
+  -------------------------------------------------------------------------------
+   March 21, 2021
+  -------------------------------------------------------------------------------
+
+  Test #1:
+
+  - Location: Outside
+  - Start: 2021-03-21 15:53:14
+  - End: 2021-03-21 16:40
+  - Sleep: 5 minutes
+  - Logging: 30 minutes
+  - Frequency: 10 Hz
+  - Tallysman HC872 antenna
+  - SanDisk 64 GB
+  - Protocol: I2C
+  - u-blox RTK-SMA
+
+  Comments:
+  - First log file is 20210321_160000.ubx
+  - Manually observed serial stream for first 30 minutes
+  - Highest buffer observed was 2560 bytes
+  - File size of first file: 16839912 bytes
+  - Accidentally reset system from movement/static
+  
+  Results:
+  -  
+
+  Files: 
+  - 20210321_160000_HC872.ubx
+
+Test #2:
+
+  - Location: Outside
+  - Start: 2021-03-21 16:40
+  - End: 2021-03-21 
+  - Sleep: 5 minutes
+  - Logging: 30 minutes
+  - Frequency: 10 Hz
+  - Tallysman HC872 antenna
+  - SanDisk 64 GB
+  - Protocol: I2C
+  - u-blox RTK-SMA
+
+  Comments:
+  - Accidentally reset system from movement/static
+  
+  Results:
+  -  
+
+  Files: 
+  - 
+
+  Test 3:
+  
+  - Location: Outside
+  - Start: 2021-03-21 16:49
+  - End: 2021-03-21 
+  - Sleep: 5 minutes
+  - Logging: 30 minutes
+  - Frequency: 10 Hz
+  - Tallysman TW3872 antenna
+  - SanDisk 64 GB
+  - Protocol: I2C
+  - u-blox GPS-RTK2 u.Fl
+
+  Comments:
+  - 
+  
+  Results:
+  -  
+
+  Files: 
+  - 
+
+
 */

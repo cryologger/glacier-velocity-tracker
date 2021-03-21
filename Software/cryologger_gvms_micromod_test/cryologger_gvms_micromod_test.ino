@@ -32,16 +32,13 @@
 // ----------------------------------------------------------------------------
 // Pin definitions
 // ----------------------------------------------------------------------------
-
-#define PIN_PWC_POWER     G1
-#define PIN_QWIIC_POWER   G2
-#define PIN_SD_CS         CS
+#define PIN_PWC_POWER     33  // G1
+#define PIN_QWIIC_POWER   34  // G2 
+#define PIN_SD_CS         41  // CS (v1.x) SPI_CS (v2.x)
 
 // ----------------------------------------------------------------------------
 // Object instantiations
 // ----------------------------------------------------------------------------
-APM3_RTC          rtc;
-APM3_WDT          wdt;
 SdFs              sd;
 FsFile            file;
 FsFile            debugFile;
@@ -77,6 +74,32 @@ unsigned long previousMillis      = 0;            // Global millis() timer
 unsigned long bytesWritten        = 0;            // Counter for tracking bytes written to microSD
 
 // ----------------------------------------------------------------------------
+// Unions/structures
+// ----------------------------------------------------------------------------
+
+// Union to store device online/offline states
+struct struct_online
+{
+  bool gnss         = false;
+  bool microSd      = false;
+  bool sensors      = false;
+  bool logging      = false;
+  bool debugging    = false;
+} online;
+
+// Union to store loop timers
+struct struct_timer
+{
+  unsigned long wdt;
+  unsigned long rtc;
+  unsigned long voltage;
+  unsigned long sd;
+  unsigned long sensors;
+  unsigned long gnss;
+  unsigned long logGnss;
+} timer;
+
+// ----------------------------------------------------------------------------
 // Setup
 // ----------------------------------------------------------------------------
 void setup()
@@ -90,7 +113,7 @@ void setup()
   peripheralPowerOn();  // Enable power to peripherials
 
   Wire.begin();         // Initalize I2C
-  Wire.setPullups(0);   // Disable Artemis internal I2C pull-ups to reduce bus errors
+  //Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
   SPI.begin();          // Initialize SPI
 
   Serial.begin(115200); // Open Serial port
