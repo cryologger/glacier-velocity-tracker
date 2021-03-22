@@ -2,14 +2,19 @@
 
 ![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/master/Archive/v1.0/Images/DSC_1890.JPG)
 
+** Project status: Under active development as of March 22, 2021.**
+
 ## Introduction
 A low-cost, open-source glacier velocity measurement system based on the u-blox ZED-F9P intended for use with Precise Point Positioning (PPP) techniques.
 
-## Objective
+## Objectives
 * Inexpensive
 * Power efficiency
+* Reliable
+* Robust
 
 ## Design
+
 
 #### Materials 
 
@@ -25,11 +30,9 @@ A low-cost, open-source glacier velocity measurement system based on the u-blox 
 | Battery |  | ~$100.00 |
 
 ## Measurements
-The firmware runs on the SparkFun OpenLog Artemis and is dedicated to logging UBX messages from the u-blox ZED-F9P.
+The code will be powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board and is dedicated to logging UBX messages from the u-blox ZED-F9P.
 
-Messages are streamed directly to a microSD card in UBX format without being processed. 
-
-Log files can then be analysed afterwards using u-blox's u-center or RTKLIB and converted to RINEX in preparation for submission to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
+Messages are streamed directly to a microSD card in UBX format without being processed. Log files can then be analysed afterwards using u-blox's u-center or RTKLIB and converted to RINEX in preparation for submission to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
 
 ## Repository Contents
 * **/Software** - Contains the Arduino code and firmware binaries
