@@ -117,11 +117,10 @@
   - First log file is 20210321_160000.ubx
   - Manually observed serial stream for first 30 minutes
   - Highest buffer observed was 2560 bytes
-  - File size of first file: 16839912 bytes
-  - Accidentally reset system from movement/static
+  - File size of first file: 16839912 bytes 
   
   Results:
-  -  
+  -  Accidentally reset system from movement/static
 
   Files: 
   - 20210321_160000_HC872.ubx
@@ -130,7 +129,7 @@ Test #2:
 
   - Location: Outside
   - Start: 2021-03-21 16:40
-  - End: 2021-03-21 
+  - End: 2021-03-21 18:15
   - Sleep: 5 minutes
   - Logging: 30 minutes
   - Frequency: 10 Hz
@@ -141,18 +140,21 @@ Test #2:
 
   Comments:
   - Accidentally reset system from movement/static
+  - First file should be 20210321_170000.ubx
   
   Results:
-  -  
-
+  -  All files were created
+  
   Files: 
-  - 
+  - 20210321_170000_HC872.ubx
+  - ...
+  - 20210321_192000_HC872.ubx
 
   Test 3:
   
   - Location: Outside
   - Start: 2021-03-21 16:49
-  - End: 2021-03-21 
+  - End: 2021-03-21 18:15
   - Sleep: 5 minutes
   - Logging: 30 minutes
   - Frequency: 10 Hz
@@ -162,13 +164,63 @@ Test #2:
   - u-blox GPS-RTK2 u.Fl
 
   Comments:
+  - First file should be 20210321_170000.ubx
+  
+  Results:
+  - All files were created 
+  - Promising results
+  - Moving to 2 hour duration
+
+  Files: 
+  - 20210321_170000_TW3872.ubx
+  - ...
+  - 20210321_192000_TW3872.ubx
+
+
+  Test 4:
+  
+  - Location: Outside
+  - Start: 2021-03-22 2:20
+  - End: 2021-03-22 
+  - Sleep: 1 hour
+  - Logging: 1 hour
+  - Frequency: 1 Hz
+  - Tallysman TW3872 antenna
+  - SanDisk 64 GB
+  - Protocol: I2C
+  - u-blox GPS-RTK2 u.Fl
+
+  Comments:
   - 
   
   Results:
-  -  
+  - 
 
   Files: 
   - 
+
+  Test 5:
+  
+  - Location: Outside
+  - Start: 2021-03-22 2:20
+  - End: 2021-03-21 
+  - Sleep: 1 hour
+  - Logging: 1 hour
+  - Frequency: 1 Hz
+  - ANN-MB antenna
+  - SanDisk 64 GB
+  - Protocol: I2C
+  - u-blox GPS-RTK-SMA
+
+  Comments:
+  - 
+  
+  Results:
+  - 
+
+  Files: 
+  - 
+
 
 
 */

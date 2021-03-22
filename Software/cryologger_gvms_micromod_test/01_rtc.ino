@@ -58,7 +58,7 @@ void setSleepAlarm()
   rtc.setAlarmMode(5); // Alarm match on hundredths, seconds, minutes, hours
 
   // Print the next RTC alarm date and time
-  Serial.print("Info: Current time is "); printDateTime();
+  Serial.print("Info: Current time "); printDateTime();
   Serial.print("Info: Sleeping until "); printAlarm();
 }
 
@@ -74,7 +74,7 @@ void setLoggingAlarm()
   rtc.setAlarmMode(loggingAlarmMode); // Alarm match on hundredths, seconds,  minutes, hours
 
   // Print the next RTC alarm date and time
-  Serial.print("Info: Current time is "); printDateTime();
+  Serial.print("Info: Current time "); printDateTime();
   Serial.print("Info: Logging until "); printAlarm();
 }
 

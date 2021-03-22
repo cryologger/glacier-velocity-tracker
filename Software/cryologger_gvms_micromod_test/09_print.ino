@@ -14,6 +14,8 @@ void printTab(byte _times)
     Serial.print("\t");
   }
 }
+
+// Print values of u-blox registers
 void printGnssSettings()
 {
   printLine();
@@ -21,14 +23,14 @@ void printGnssSettings()
   printLine();
   Serial.print("UBLOX_CFG_RATE_MEAS: ");            printTab(2);  Serial.println(gnss.getVal16(UBLOX_CFG_RATE_MEAS));
   Serial.print("UBLOX_CFG_RATE_NAV: ");             printTab(2);  Serial.println(gnss.getVal16(UBLOX_CFG_RATE_NAV));
-  Serial.print("UBLOX_CFG_UART1_BAUDRATE: ");       printTab(1);  Serial.println(gnss.getVal32(UBLOX_CFG_UART1_BAUDRATE));
-  Serial.print("UBLOX_CFG_UART2_BAUDRATE: ");       printTab(1);  Serial.println(gnss.getVal32(UBLOX_CFG_UART2_BAUDRATE));
+  //Serial.print("UBLOX_CFG_UART1_BAUDRATE: ");       printTab(1);  Serial.println(gnss.getVal32(UBLOX_CFG_UART1_BAUDRATE));
+  //Serial.print("UBLOX_CFG_UART2_BAUDRATE: ");       printTab(1);  Serial.println(gnss.getVal32(UBLOX_CFG_UART2_BAUDRATE));
   Serial.print("UBLOX_CFG_I2COUTPROT_UBX: ");       printTab(1);  Serial.println(gnss.getVal8(UBLOX_CFG_I2COUTPROT_UBX));
   Serial.print("UBLOX_CFG_I2COUTPROT_NMEA: ");      printTab(1);  Serial.println(gnss.getVal8(UBLOX_CFG_I2COUTPROT_NMEA));
   Serial.print("UBLOX_CFG_I2COUTPROT_RTCM3X: ");    printTab(1);  Serial.println(gnss.getVal8(UBLOX_CFG_I2COUTPROT_RTCM3X));
-  Serial.print("UBLOX_CFG_UART1OUTPROT_UBX: ");     printTab(1);  Serial.println(gnss.getVal8(UBLOX_CFG_UART1OUTPROT_UBX));
-  Serial.print("UBLOX_CFG_UART1OUTPROT_NMEA: ");    printTab(1);  Serial.println(gnss.getVal8(UBLOX_CFG_UART1OUTPROT_NMEA));
-  Serial.print("UBLOX_CFG_UART1OUTPROT_RTCM3X: ");  printTab(1);  Serial.println(gnss.getVal8(UBLOX_CFG_UART1OUTPROT_RTCM3X));
+  //Serial.print("UBLOX_CFG_UART1OUTPROT_UBX: ");     printTab(1);  Serial.println(gnss.getVal8(UBLOX_CFG_UART1OUTPROT_UBX));
+  //Serial.print("UBLOX_CFG_UART1OUTPROT_NMEA: ");    printTab(1);  Serial.println(gnss.getVal8(UBLOX_CFG_UART1OUTPROT_NMEA));
+  //Serial.print("UBLOX_CFG_UART1OUTPROT_RTCM3X: ");  printTab(1);  Serial.println(gnss.getVal8(UBLOX_CFG_UART1OUTPROT_RTCM3X));
   Serial.print("UBLOX_CFG_SIGNAL_GPS_ENA: ");       printTab(1);  Serial.println(gnss.getVal8(UBLOX_CFG_SIGNAL_GPS_ENA));
   Serial.print("UBLOX_CFG_SIGNAL_GLO_ENA: ");       printTab(1);  Serial.println(gnss.getVal8(UBLOX_CFG_SIGNAL_GLO_ENA));
   Serial.print("UBLOX_CFG_SIGNAL_GAL_ENA: ");       printTab(1);  Serial.println(gnss.getVal8(UBLOX_CFG_SIGNAL_GAL_ENA));

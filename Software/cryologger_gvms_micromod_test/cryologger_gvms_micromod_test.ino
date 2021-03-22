@@ -39,20 +39,22 @@
 // ----------------------------------------------------------------------------
 // Object instantiations
 // ----------------------------------------------------------------------------
+APM3_RTC          rtc;
+APM3_WDT          wdt;
 SdFs              sd;
-FsFile            file;
+FsFile            logFile;
 FsFile            debugFile;
 SFE_UBLOX_GNSS    gnss;
 
 // ----------------------------------------------------------------------------
 // User defined global variable declarations
 // ----------------------------------------------------------------------------
-byte          sleepAlarmMinutes     = 5;  // Rolling minutes alarm
-byte          sleepAlarmHours       = 0;  // Rolling hours alarm
-byte          loggingAlarmMinutes   = 30; // Rolling minutes alarm
-byte          loggingAlarmHours     = 0;  // Rolling minhoursutes alarm
-byte          sleepAlarmMode        = 5;  // Alarm match on hundredths, seconds, minutes
-byte          loggingAlarmMode      = 5;  // Alarm match on hundredths, seconds, minutes
+byte          sleepAlarmMinutes     = 0;  // Rolling minutes alarm
+byte          sleepAlarmHours       = 1;  // Rolling hours alarm
+byte          loggingAlarmMinutes   = 0; // Rolling minutes alarm
+byte          loggingAlarmHours     = 1;  // Rolling minhoursutes alarm
+byte          sleepAlarmMode        = 4;  // Alarm match on hundredths, seconds, minutes
+byte          loggingAlarmMode      = 4;  // Alarm match on hundredths, seconds, minutes
 unsigned int  gnssTimeout           = 5;  // Timeout for GNSS signal acquisition (minutes)
 
 // ----------------------------------------------------------------------------
@@ -62,13 +64,15 @@ const int     sdWriteSize         = 512;          // Write data to SD in blocks 
 const int     fileBufferSize      = 16384;        // Allocate 16 KB RAM for UBX message storage
 volatile bool alarmFlag           = false;        // Flag for alarm interrupt service routine
 volatile bool loggingFlag         = false;        // Flag to determine if data logging should start/stop
-volatile bool watchdogFlag        = false;        // Flag for watchdog timer interrupt service routine
-volatile int  watchdogCounter     = 0;            // Counter for watchdog timer interrupts
+volatile bool wdtFlag             = false;        // Flag for watchdog timer interrupt service routine
+volatile int  wdtCounter          = 0;            // Counter for watchdog timer interrupts
+volatile int  wdtCounterMax       = 0;            // Counter for max watchdog timer interrupts
 bool          gnssConfigFlag      = false;        // Flag to track configuration of u-blox GNSS
 bool          resetFlag           = false;        // Flag to force system reset using watchdog timer
 bool          rtcSyncFlag         = false;        // Flag to indicate if the RTC was synced with the GNSS
-char          fileName[30]        = "";           // Log file name
+char          logFileName[30]     = "";           // Log file name
 char          debugFileName[10]   = "debug.csv";  // Debugging log file name
+unsigned int  debugCounter        = 0;            // Counter to track number of recorded debug messages
 unsigned int  maxBufferBytes      = 0;            // Maximum value of file buffer
 unsigned long previousMillis      = 0;            // Global millis() timer
 unsigned long bytesWritten        = 0;            // Counter for tracking bytes written to microSD
@@ -77,14 +81,14 @@ unsigned long bytesWritten        = 0;            // Counter for tracking bytes 
 // Unions/structures
 // ----------------------------------------------------------------------------
 
-// Union to store device online/offline states
+// Union to store online/offline states
 struct struct_online
 {
-  bool gnss         = false;
-  bool microSd      = false;
-  bool sensors      = false;
-  bool logging      = false;
-  bool debugging    = false;
+  bool microSd  = false;
+  bool gnss     = false;
+  bool sensors  = false;
+  bool logGnss  = false;
+  bool logDebug = false;
 } online;
 
 // Union to store loop timers
@@ -92,10 +96,11 @@ struct struct_timer
 {
   unsigned long wdt;
   unsigned long rtc;
-  unsigned long voltage;
-  unsigned long sd;
+  unsigned long microSd;
+  unsigned long battery;
   unsigned long sensors;
   unsigned long gnss;
+  unsigned long logDebug;
   unsigned long logGnss;
 } timer;
 
@@ -113,7 +118,7 @@ void setup()
   peripheralPowerOn();  // Enable power to peripherials
 
   Wire.begin();         // Initalize I2C
-  //Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
+  Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
   SPI.begin();          // Initialize SPI
 
   Serial.begin(115200); // Open Serial port
@@ -129,10 +134,11 @@ void setup()
   configureGnss();      // Configure u-blox GNSS
   syncRtc();            // Acquire GNSS fix and sync RTC with GNSS
   configureSd();        // Configure microSD
+  createDebugFile();    // Create debug log file
   configureRtc();       // Configure real-time clock (RTC) alarm
 
-  Serial.print("Info: Datetime is "); printDateTime();
-  Serial.print("Info: Initial alarm set for "); printAlarm();
+  Serial.print("Info: Datetime "); printDateTime();
+  Serial.print("Info: Initial alarm "); printAlarm();
 
   // Blink LED to indicate completion of setup
   blinkLed(3, 1000);
@@ -170,6 +176,9 @@ void loop()
       logGnss();            // Log data
     }
 
+    // Log system debug information
+    logDebug();
+
     // Clear logging alarm flag
     alarmFlag = false;
 
@@ -178,7 +187,7 @@ void loop()
   }
 
   // Check for watchdog interrupt
-  if (watchdogFlag)
+  if (wdtFlag)
   {
     petDog(); // Restart watchdog timer
   }
@@ -212,7 +221,7 @@ extern "C" void am_watchdog_isr(void)
   wdt.clear();
 
   // Perform system reset after 10 watchdog interrupts (should not occur)
-  if (watchdogCounter < 10)
+  if (wdtCounter < 10)
   {
     wdt.restart(); // Restart the watchdog timer
   }
@@ -227,6 +236,11 @@ extern "C" void am_watchdog_isr(void)
       blinkLed(3, 1000);
     }
   }
-  watchdogFlag = true; // Set the watchdog flag
-  watchdogCounter++; // Increment watchdog interrupt counter
+  wdtFlag = true; // Set the watchdog flag
+  wdtCounter++; // Increment watchdog interrupt counter
+
+  if (wdtCounter > wdtCounterMax)
+  {
+    wdtCounterMax = wdtCounter;
+  }
 }

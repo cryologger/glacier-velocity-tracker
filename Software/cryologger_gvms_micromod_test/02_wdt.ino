@@ -1,5 +1,5 @@
 // Configure the Watchdog Timer
-void configureWdt() 
+void configureWdt()
 {
   /*
     Simplified WDT Clock Divider Selections
@@ -18,10 +18,10 @@ void configureWdt()
 }
 
 // Reset the watchdog timer
-void petDog() 
+void petDog()
 {
   wdt.restart(); // Restart the watchdog timer
-  //DEBUG_PRINT("Watchdog interrupt: "); DEBUG_PRINTLN(watchdogCounter);
-  watchdogFlag = false; // Clear watchdog flag
-  watchdogCounter = 0; // Reset watchdog interrupt counter
+  //DEBUG_PRINT("Watchdog interrupt: "); DEBUG_PRINTLN(wdtCounter);
+  wdtFlag = false; // Clear watchdog flag
+  wdtCounter = 0; // Reset watchdog interrupt counter
 }
