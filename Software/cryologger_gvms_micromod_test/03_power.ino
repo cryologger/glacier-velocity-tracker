@@ -6,8 +6,12 @@ void goToSleep()
 #endif
   Wire.end(); // Disable I2C
   SPI.end(); // Disable SPI
-  power_adc_disable(); // Disable ADC (v1.x)
-  //powerControlADC(false); // Disable ADC (v2.x)
+
+#if(CORE_VERSION == 1)
+  power_adc_disable(); // Disable ADC
+#elif(CORE_VERSION == 2)
+  powerControlADC(false); // Disable ADC
+#endif
   digitalWrite(LED_BUILTIN, LOW); // Turn off LED
 
   // Force peripherals off
@@ -72,13 +76,18 @@ void wakeUp()
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
   am_hal_stimer_config(AM_HAL_STIMER_HFRC_3MHZ);
 
-  // Renable UART0 (v2.x)
-  //am_hal_gpio_pinconfig(48, g_AM_BSP_GPIO_COM_UART_TX);
-  //am_hal_gpio_pinconfig(49, g_AM_BSP_GPIO_COM_UART_RX);
-  //am_hal_pwrctrl_periph_enable(AM_HAL_PWRCTRL_PERIPH_UART0);
+#if(CORE_VERSION == 1)
+  // Renable UART0
+  am_hal_gpio_pinconfig(48, g_AM_BSP_GPIO_COM_UART_TX);
+  am_hal_gpio_pinconfig(49, g_AM_BSP_GPIO_COM_UART_RX);
+  am_hal_pwrctrl_periph_enable(AM_HAL_PWRCTRL_PERIPH_UART0);
+#endif
 
-  ap3_adc_setup();  // Enable ADC (v1.x)
-  //initializeADC();  // Enable ADC (v2.x)
+#if(CORE_VERSION == 1)
+  ap3_adc_setup();  // Enable ADC
+#elif(CORE_VERSION == 2)
+  initializeADC();  // Enable ADC
+#endif
   Wire.begin();     // Enable I2C
   Wire.setClock(400000); // Set I2C clock speed to 400 kHz
   SPI.begin();      // Enable SPI

@@ -9,7 +9,7 @@ void configureGnss()
   {
     Serial.println("Warning: u-blox failed to initialize!");
     online.gnss = false;
-    
+
     peripheralPowerOff(); // Disable power to peripherals
     qwiicPowerOff(); // Disable power to Qwiic connector
     wdt.stop(); // Stop watchdog timer
@@ -59,7 +59,7 @@ void configureGnss()
       Serial.println("Warning: Satellite signals not configured!");
     }
     gnssConfigFlag = true; // Set flag
-    
+
     // Print current GNSS settings
     printGnssSettings();
   }
@@ -152,6 +152,7 @@ void logGnss()
   else
   {
     Serial.print("Info: Created log file "); Serial.println(logFileName);
+    online.logGnss = true;
   }
 
   // Update file create timestamp
