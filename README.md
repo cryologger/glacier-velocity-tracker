@@ -1,7 +1,6 @@
 # Cryologger - Glacier Velocity Measurement System
 
-<img src="https://cdn.sparkfun.com//assets/parts/1/5/3/5/2/16481-SparkFun_GPS-RTK-SMA_Breakout_-_ZED-F9P__Qwiic_-01a.jpg" height="360">
-
+![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/master/Archive/v1.0/Images/DSC_1890.JPG)
 
 ## Introduction
 A low-cost, open-source glacier velocity measurement system based on the u-blox ZED-F9P intended for use with Precise Point Positioning (PPP) techniques.
@@ -12,10 +11,17 @@ A low-cost, open-source glacier velocity measurement system based on the u-blox 
 
 ## Design
 
-### Components:
-* SparkFun GPS-RTK-SMA ZED-F9P 
-* SparkFun OpenLog Artemis
-* u-blox ANN-MB antenna
+#### Materials 
+
+| Component | Product | Cost (USD) |
+| --- | --- | :---: | 
+| Processor | SparkFun MicroMod Artemis Processor | $14.95 |
+| Carrier Board | SparkFun MicroMod Data Logging Carrier Board | $19.95 |
+| GNSS | SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic) | $219.95 |
+| GNSS antenna | GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106 | $124.95 |
+| Voltage Regulator | SparkFun Buck-Boost Converter | $9.95 |
+| Enclosure |  | ~$50.00 |
+| Battery | Tadiran | ~$100.00 |
 
 ## Measurements
 The firmware runs on the SparkFun OpenLog Artemis and is dedicated to logging UBX messages from the u-blox ZED-F9P.
