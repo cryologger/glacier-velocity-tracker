@@ -21,7 +21,8 @@ A low-cost, open-source glacier velocity measurement system based on the u-blox 
 | GNSS antenna | GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106 | $124.95 |
 | Voltage Regulator | SparkFun Buck-Boost Converter | $9.95 |
 | Enclosure |  | ~$50.00 |
-| Battery | Tadiran | ~$100.00 |
+| Solar Panel |  | ~$100.00 |
+| Battery |  | ~$100.00 |
 
 ## Measurements
 The firmware runs on the SparkFun OpenLog Artemis and is dedicated to logging UBX messages from the u-blox ZED-F9P.
