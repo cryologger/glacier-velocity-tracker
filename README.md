@@ -2,7 +2,7 @@
 
 ![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/master/Archive/v1.0/Images/DSC_1890.JPG)
 
-** Project status: Under active development as of March 22, 2021.**
+**Project status: Under active development as of March 22, 2021.**
 
 ## Introduction
 A low-cost, open-source glacier velocity measurement system based on the u-blox ZED-F9P intended for use with Precise Point Positioning (PPP) techniques.
