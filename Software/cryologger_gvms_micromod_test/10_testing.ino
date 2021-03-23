@@ -180,8 +180,8 @@ Test #2:
   Test 4:
   
   - Location: Outside
-  - Start: 2021-03-22 2:20
-  - End: 2021-03-22 
+  - Start: 2021-03-22 2:00
+  - End: 2021-03-22 11:00
   - Sleep: 1 hour
   - Logging: 1 hour
   - Frequency: 1 Hz
@@ -194,16 +194,19 @@ Test #2:
   - 
   
   Results:
-  - 
+  - Tests fully successful
+  - No issues with debug logging
 
   Files: 
-  - 
+  - 20210322_020000_TW.ubx
+  - ...
+  - 20210322_100000_TW.ubx
 
   Test 5:
   
   - Location: Outside
-  - Start: 2021-03-22 2:20
-  - End: 2021-03-21 
+  - Start: 2021-03-22 2:00
+  - End: 2021-03-21 11:00
   - Sleep: 1 hour
   - Logging: 1 hour
   - Frequency: 1 Hz
@@ -216,11 +219,62 @@ Test #2:
   - 
   
   Results:
+  - Tests fully successful
+  - No issues with debug logging
+
+  Files: 
+  - 20210322_020000_ANN.ubx
+  - ...
+  - 20210322_100000_ANN.ubx
+
+
+  -------------------------------------------------------------------------------
+   March 22, 2021
+  -------------------------------------------------------------------------------
+
+  Test 1:
+  
+  - Location: Outside
+  - Start: 2021-03-23 0:45
+  - End: 2021-03-23 
+  - Sleep: 1 hour
+  - Logging: 2 hour
+  - Frequency: 1 Hz
+  - Tallysman TW3872 antenna
+  - SanDisk 64 GB
+  - Protocol: I2C
+  - u-blox GPS-RTK2 u.Fl
+
+  Comments:
+  - First logfile should be at 01:00
+  
+  Results:
   - 
 
   Files: 
   - 
 
+  Test 2:
+  
+  - Location: Outside
+  - Start: 2021-03-23 0:45
+  - End: 2021-03-23 
+  - Sleep: 1 hour
+  - Logging: 2 hour
+  - Frequency: 1 Hz
+  - ANN-MB antenna
+  - SanDisk 64 GB
+  - Protocol: I2C
+  - u-blox GPS-RTK-SMA
+
+  Comments:
+  - First logfile should be at 01:00
+  
+  Results:
+  - 
+
+  Files: 
+  - 
 
 
 */
