@@ -27,7 +27,7 @@ void configureRtc()
   rtc.setAlarm(0, 0, 0, 0, 0, 0);
 
   // Set the alarm mode
-  rtc.setAlarmMode(5); // Alarm match on hundredths, seconds
+  rtc.setAlarmMode(initialAlarmMode);
 
   // Attach alarm interrupt
   rtc.attachInterrupt();

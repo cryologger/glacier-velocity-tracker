@@ -27,7 +27,7 @@ void configureGnss()
   // Configure u-blox GNSS
   gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
   gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
-  gnss.setNavigationFrequency(1);                  // Produce one navigation solution per second
+  gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
   gnss.setAutoPVTcallback(&processNavPvt);          // Enable automatic NAV PVT messages with callback to processNavPvt()
   gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM SFRBX messages
   gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM RAWX messages
@@ -39,9 +39,9 @@ void configureGnss()
       bool setValueSuccess = true;
       //setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);        // Disable I2C
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);        // Disable SPI
-      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 0);      // Disable UART1
-      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);      // Disable UART2
-      setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_USB_ENABLED, 0, 2000); // Disable USB
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 1);      // Disable UART1
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 1);      // Disable UART2
+      setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_USB_ENABLED, 1); // Disable USB
       if (!setValueSuccess)
       {
         Serial.println("Warning: Communication interfaces not configured!");
@@ -49,11 +49,12 @@ void configureGnss()
     */
     // Configure satellite signals
     bool setValueSuccess = true;
-    setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, 1);         // Enable GPS
-    setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GLO_ENA, 1);         // Enable GLONASS
-    setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 0);         // Disable Galileo
-    setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, 0);         // Disable BeiDou
-    setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0, 2000); // Disable QZSS
+    setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, 1);   // Enable GPS
+    setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GLO_ENA, 1);   // Enable GLONASS
+    setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 0);   // Disable Galileo
+    setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, 0);   // Disable BeiDou
+    setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0); // Disable QZSS
+    delay(4000);
     if (!setValueSuccess)
     {
       Serial.println("Warning: Satellite signals not configured!");
@@ -205,8 +206,15 @@ void logGnss()
     }
 
     // Print bytes written every second
-    if (millis() > (previousMillis + 1000))
+    if (millis() > (previousMillis + 5000))
     {
+
+      // Sync the log file
+      if (!logFile.sync())
+      {
+        Serial.println("Warning: Failed to sync log file!");
+      }
+
       // Print number of bytes written to SD card
       Serial.print(bytesWritten); Serial.print(" bytes written. ");
 

@@ -15,7 +15,6 @@
 // ----------------------------------------------------------------------------
 // Libraries
 // ----------------------------------------------------------------------------
-
 #include <RTC.h>
 #include <SparkFun_u-blox_GNSS_Arduino_Library.h> // https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library
 #include <SdFat.h>                                // https://github.com/greiman/SdFat
@@ -24,14 +23,9 @@
 #include <Wire.h>
 
 // -----------------------------------------------------------------------------
-// Apollo3 Core Version
-// -----------------------------------------------------------------------------
-#define CORE_VERSION 2
-
-// -----------------------------------------------------------------------------
 // Debugging
 // -----------------------------------------------------------------------------
-#define DEBUG       true   // Output debug messages to Serial Monitor
+#define DEBUG       true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS  false  // Output GNSS information to Serial Monitor
 
 // ----------------------------------------------------------------------------
@@ -39,15 +33,13 @@
 // ----------------------------------------------------------------------------
 #define PIN_PWC_POWER     33  // G1
 #define PIN_QWIIC_POWER   34  // G2 
-#define PIN_SD_CS         41  // CS (v1.x) SPI_CS (v2.x)
+#define PIN_SD_CS         41  // CS
 
 // ----------------------------------------------------------------------------
 // Object instantiations
 // ----------------------------------------------------------------------------
-#if(CORE_VERSION == 1)
 APM3_RTC          rtc;
 APM3_WDT          wdt;
-#endif
 SdFs              sd;
 FsFile            logFile;
 FsFile            debugFile;
@@ -56,12 +48,14 @@ SFE_UBLOX_GNSS    gnss;
 // ----------------------------------------------------------------------------
 // User defined global variable declarations
 // ----------------------------------------------------------------------------
-byte          sleepAlarmMinutes     = 0;  // Rolling minutes alarm
+byte          sleepAlarmMinutes     = 0; // Rolling minutes alarm
 byte          sleepAlarmHours       = 1;  // Rolling hours alarm
-byte          loggingAlarmMinutes   = 0; // Rolling minutes alarm
-byte          loggingAlarmHours     = 1;  // Rolling minhoursutes alarm
-byte          sleepAlarmMode        = 4;  // Alarm match on hundredths, seconds, minutes
-byte          loggingAlarmMode      = 4;  // Alarm match on hundredths, seconds, minutes
+byte          loggingAlarmMinutes   = 0;  // Rolling minutes alarm
+byte          loggingAlarmHours     = 2;  // Rolling hours alarm
+byte          sleepAlarmMode        = 4;  // Sleep alarm mode
+byte          loggingAlarmMode      = 4;  // Logging alarm mode
+byte          initialAlarmMode      = 5;  // Initial alarm mode
+bool          sleepMode             = 1;  // Flag to indicate whether to sleep between new log files
 unsigned int  gnssTimeout           = 5;  // Timeout for GNSS signal acquisition (minutes)
 
 // ----------------------------------------------------------------------------

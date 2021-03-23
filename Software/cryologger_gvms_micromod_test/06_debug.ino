@@ -58,7 +58,7 @@ void logDebug()
   }
   else
   {
-    Serial.print("Info: Opened debug file "); Serial.println(debugFileName);
+    Serial.print("Info: Opened "); Serial.println(debugFileName);
     online.logDebug = true; // Set flag
   }
 
