@@ -237,7 +237,7 @@ Test #2:
   
   - Location: Outside
   - Start: 2021-03-23 0:45
-  - End: 2021-03-23 
+  - End: 2021-03-23 10:00
   - Sleep: 1 hour
   - Logging: 2 hour
   - Frequency: 1 Hz
@@ -263,7 +263,7 @@ Test #2:
   
   - Location: Outside
   - Start: 2021-03-23 0:45
-  - End: 2021-03-23 
+  - End: 2021-03-23 10:00
   - Sleep: 1 hour
   - Logging: 2 hour
   - Frequency: 1 Hz
@@ -285,8 +285,52 @@ Test #2:
   - 20210323_100000_ANN.ubx
 
   -------------------------------------------------------------------------------
-   March 22, 2021 
+   March 24, 2021 
   -------------------------------------------------------------------------------
+  
+  Test 1:
+  
+  - Location: Outside
+  - Start: 2021-03-24 13:35
+  - End: 2021-03-23 
+  - Sleep: Continuous
+  - Logging: 1 hour
+  - Frequency: 1 Hz
+  - SparkFun TOP106
+  - SanDisk 64 GB
+  - Protocol: I2C
+  - u-blox GPS-RTK-SMA
+
+  Comments:
+  - First logfile should be at 14:00
+  
+  Results:
+  - 
+
+  Files: 
+  - 
+
+  Test 2:
+  
+  - Location: Outside
+  - Start: 2021-03-23 13:35
+  - End: 2021-03-23 
+  - Sleep: Continuous
+  - Logging: 1 hour
+  - Frequency: 1 Hz
+  - Tallysman TW3872
+  - SanDisk 64 GB
+  - Protocol: I2C
+  - u-blox GPS-RTK2 u.Fl
+
+  Comments:
+  - First logfile should be at 14:00
+  
+  Results:
+  - 
+
+  Files: 
+  - 
 
 
 */

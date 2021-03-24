@@ -56,15 +56,15 @@ U8X8_SSD1306_128X32_UNIVISION_HW_I2C oled(14, 12, U8X8_PIN_NONE);   // Adafruit 
 // ----------------------------------------------------------------------------
 // User defined global variable declarations
 // ----------------------------------------------------------------------------
-byte          sleepAlarmMinutes     = 1;  // Rolling minutes alarm
+byte          sleepAlarmMinutes     = 0;  // Rolling minutes alarm
 byte          sleepAlarmHours       = 0;  // Rolling hours alarm
-byte          loggingAlarmMinutes   = 10;  // Rolling minutes alarm
-byte          loggingAlarmHours     = 0;  // Rolling hours alarm
-byte          sleepAlarmMode        = 5;  // Sleep alarm mode
-byte          loggingAlarmMode      = 5;  // Logging alarm mode
-byte          initialAlarmMode      = 6;  // Initial alarm mode
+byte          loggingAlarmMinutes   = 0;  // Rolling minutes alarm
+byte          loggingAlarmHours     = 1;  // Rolling hours alarm
+byte          sleepAlarmMode        = 4;  // Sleep alarm mode
+byte          loggingAlarmMode      = 4;  // Logging alarm mode
+byte          initialAlarmMode      = 5;  // Initial alarm mode
 bool          sleepFlag             = false;  // Flag to indicate whether to sleep between new log files
-unsigned int  gnssTimeout           = 1;  // Timeout for GNSS signal acquisition (minutes)
+unsigned int  gnssTimeout           = 5;  // Timeout for GNSS signal acquisition (minutes)
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -75,8 +75,9 @@ volatile bool alarmFlag           = false;        // Flag for alarm interrupt se
 volatile bool wdtFlag             = false;        // Flag for watchdog timer interrupt service routine
 volatile int  wdtCounter          = 0;            // Counter for watchdog timer interrupts
 volatile int  wdtCounterMax       = 0;            // Counter for max watchdog timer interrupts
-bool          firstTimeFlag       = false;        // Flag to track configuration of u-blox GNSS
-bool          loggingFlag         = true;
+bool          firstTimeFlag       = true;         // Flag to track configuration of u-blox GNSS
+bool          gnssConfigFlag      = true;        //
+bool          loggingFlag         = true;         //
 bool          resetFlag           = false;        // Flag to force system reset using watchdog timer
 bool          rtcSyncFlag         = false;        // Flag to indicate if the RTC was synced with the GNSS
 char          logFileName[30]     = "";           // Log file name
@@ -153,7 +154,7 @@ void setup()
   Serial.print("Info: Initial alarm "); printAlarm();
 
   // Blink LED to indicate completion of setup
-  blinkLed(10, 1000);
+  blinkLed(10, 100);
 }
 
 // ----------------------------------------------------------------------------
@@ -175,6 +176,7 @@ void loop()
     // Check if program is running for first time or if sleep is enabled
     if (firstTimeFlag || sleepFlag)
     {
+      firstTimeFlag = false; // Clear flag
       qwiicPowerOn();       // Enable power to Qwiic connector
       peripheralPowerOn();  // Enable power to peripherals
       configureSd();        // Configure microSD
@@ -202,8 +204,11 @@ void loop()
   // Blink LED
   blinkLed(1, 25);
 
-  // Enter deep sleep
-  goToSleep();
+  // Check if sleep is enabled
+  if (firstTimeFlag || sleepFlag)
+  {
+    goToSleep(); // Enter deep sleep
+  }
 }
 
 // ----------------------------------------------------------------------------

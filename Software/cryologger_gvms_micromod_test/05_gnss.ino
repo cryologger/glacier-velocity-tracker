@@ -37,8 +37,9 @@ void configureGnss()
   gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM RAWX messages
 
   // Configure communication interfaces and satellite signals only if program is running for the first time
-  if (firstTimeFlag)
+  if (gnssConfigFlag)
   {
+    /*
     // Configure communciation interfaces
     bool setValueSuccess = true;
     //setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);  // Disable I2C
@@ -50,9 +51,9 @@ void configureGnss()
     {
       Serial.println("Warning: Communication interfaces not configured!");
     }
-
+    */
     // Configure satellite signals
-    setValueSuccess = true;
+    bool setValueSuccess = true;
     setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, 1);   // Enable GPS
     setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GLO_ENA, 1);   // Enable GLONASS
     setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 0);   // Disable Galileo
@@ -63,6 +64,8 @@ void configureGnss()
     {
       Serial.println("Warning: Satellite signals not configured!");
     }
+    gnssConfigFlag = false; // Clear flag
+    
     // Print current GNSS settings
     printGnssSettings();
   }
@@ -158,7 +161,7 @@ void logGnss()
   unsigned long loopStartTime = millis();
 
   // Create timestamped log file name
-  sprintf(logFileName, "20%02d%02d%02d_%02d%02d%02d_TW.ubx",
+  sprintf(logFileName, "20%02d%02d%02d_%02d%02d%02d_TOP.ubx",
           rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 
