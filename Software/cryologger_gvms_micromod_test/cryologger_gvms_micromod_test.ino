@@ -76,6 +76,7 @@ volatile bool wdtFlag             = false;        // Flag for watchdog timer int
 volatile int  wdtCounter          = 0;            // Counter for watchdog timer interrupts
 volatile int  wdtCounterMax       = 0;            // Counter for max watchdog timer interrupts
 bool          firstTimeFlag       = false;        // Flag to track configuration of u-blox GNSS
+bool          loggingFlag         = true;
 bool          resetFlag           = false;        // Flag to force system reset using watchdog timer
 bool          rtcSyncFlag         = false;        // Flag to indicate if the RTC was synced with the GNSS
 char          logFileName[30]     = "";           // Log file name
@@ -171,18 +172,26 @@ void loop()
 
     Serial.print("Info: Alarm trigger "); printDateTime();
 
-    qwiicPowerOn();       // Enable power to Qwiic connector
-    peripheralPowerOn();  // Enable power to peripherals
-    configureSd();        // Configure microSD
-    configureGnss();      // Configure u-blox GNSS
+    // Check if program is running for first time or if sleep is enabled
+    if (firstTimeFlag || sleepFlag)
+    {
+      qwiicPowerOn();       // Enable power to Qwiic connector
+      peripheralPowerOn();  // Enable power to peripherals
+      configureSd();        // Configure microSD
+      configureGnss();      // Configure u-blox GNSS
+    }
 
-    setLoggingAlarm();    // Set logging alarm
-    logGnss();            // Log u-blox GNSS data
-    logDebug();           // Log system debug information
+    // Log data
+    setLoggingAlarm();  // Set logging duration alarm
+    logGnss();          // Log u-blox GNSS data
+    logDebug();         // Log system debug information
 
-    alarmFlag = false;    // Clear logging alarm flag
-    setSleepAlarm();      // Set sleep alarm
-    
+    // Check if sleep is enabled
+    if (sleepFlag)
+    {
+      alarmFlag = false;    // Clear logging alarm flag
+      setSleepAlarm();      // Set sleep alarm
+    }
   }
   // Check for watchdog interrupt
   if (wdtFlag)

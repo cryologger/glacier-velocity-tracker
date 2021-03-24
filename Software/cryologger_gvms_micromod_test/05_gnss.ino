@@ -310,4 +310,7 @@ void logGnss()
 
   // Stop the loop timer
   timer.logGnss = millis() - loopStartTime;
+
+  // Set flag
+  loggingFlag = true;
 }
