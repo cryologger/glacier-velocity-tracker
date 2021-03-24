@@ -1,6 +1,7 @@
 // Enter deep sleep
 void goToSleep()
 {
+  firstTimeFlag = false; // Clear
 #if DEBUG
   Serial.end();         // Close Serial port
 #endif
@@ -29,6 +30,9 @@ void goToSleep()
       am_hal_gpio_pinconfig(x, g_AM_HAL_GPIO_DISABLE);
     }
   }
+
+  // Put OLED to sleep
+  //oled.sleepOn();
 
   // Disable power to Qwiic connector
   qwiicPowerOff();

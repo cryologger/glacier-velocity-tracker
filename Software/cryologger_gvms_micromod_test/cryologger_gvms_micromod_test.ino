@@ -15,18 +15,21 @@
 // ----------------------------------------------------------------------------
 // Libraries
 // ----------------------------------------------------------------------------
+#include <Arduino.h>
 #include <RTC.h>
 #include <SparkFun_u-blox_GNSS_Arduino_Library.h> // https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library
 #include <SdFat.h>                                // https://github.com/greiman/SdFat
 #include <SPI.h>
 #include <WDT.h>
+#include <U8g2lib.h>                              // https://github.com/olikraus/oled
 #include <Wire.h>
 
 // -----------------------------------------------------------------------------
 // Debugging
 // -----------------------------------------------------------------------------
 #define DEBUG       true  // Output debug messages to Serial Monitor
-#define DEBUG_GNSS  false  // Output GNSS information to Serial Monitor
+#define DEBUG_GNSS  true  // Output GNSS information to Serial Monitor
+#define DEBUG_OLED  false  // Output debug messages to OLED display
 
 // ----------------------------------------------------------------------------
 // Pin definitions
@@ -45,18 +48,23 @@ FsFile            logFile;
 FsFile            debugFile;
 SFE_UBLOX_GNSS    gnss;
 
+#if DEBUG_OLED
+//U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C oled(U8G2_R0, 14, 12, U8X8_PIN_NONE);
+U8X8_SSD1306_128X32_UNIVISION_HW_I2C oled(14, 12, U8X8_PIN_NONE);   // Adafruit Feather ESP8266/32u4 Boards + FeatherWing OLED
+#endif
+
 // ----------------------------------------------------------------------------
 // User defined global variable declarations
 // ----------------------------------------------------------------------------
-byte          sleepAlarmMinutes     = 0; // Rolling minutes alarm
-byte          sleepAlarmHours       = 1;  // Rolling hours alarm
-byte          loggingAlarmMinutes   = 0;  // Rolling minutes alarm
-byte          loggingAlarmHours     = 2;  // Rolling hours alarm
-byte          sleepAlarmMode        = 4;  // Sleep alarm mode
-byte          loggingAlarmMode      = 4;  // Logging alarm mode
-byte          initialAlarmMode      = 5;  // Initial alarm mode
-bool          sleepMode             = 1;  // Flag to indicate whether to sleep between new log files
-unsigned int  gnssTimeout           = 5;  // Timeout for GNSS signal acquisition (minutes)
+byte          sleepAlarmMinutes     = 1;  // Rolling minutes alarm
+byte          sleepAlarmHours       = 0;  // Rolling hours alarm
+byte          loggingAlarmMinutes   = 10;  // Rolling minutes alarm
+byte          loggingAlarmHours     = 0;  // Rolling hours alarm
+byte          sleepAlarmMode        = 5;  // Sleep alarm mode
+byte          loggingAlarmMode      = 5;  // Logging alarm mode
+byte          initialAlarmMode      = 6;  // Initial alarm mode
+bool          sleepFlag             = false;  // Flag to indicate whether to sleep between new log files
+unsigned int  gnssTimeout           = 1;  // Timeout for GNSS signal acquisition (minutes)
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -64,15 +72,14 @@ unsigned int  gnssTimeout           = 5;  // Timeout for GNSS signal acquisition
 const int     sdWriteSize         = 512;          // Write data to SD in blocks of 512 bytes
 const int     fileBufferSize      = 16384;        // Allocate 16 KB RAM for UBX message storage
 volatile bool alarmFlag           = false;        // Flag for alarm interrupt service routine
-volatile bool loggingFlag         = false;        // Flag to determine if data logging should start/stop
 volatile bool wdtFlag             = false;        // Flag for watchdog timer interrupt service routine
 volatile int  wdtCounter          = 0;            // Counter for watchdog timer interrupts
 volatile int  wdtCounterMax       = 0;            // Counter for max watchdog timer interrupts
-bool          gnssConfigFlag      = false;        // Flag to track configuration of u-blox GNSS
+bool          firstTimeFlag       = false;        // Flag to track configuration of u-blox GNSS
 bool          resetFlag           = false;        // Flag to force system reset using watchdog timer
 bool          rtcSyncFlag         = false;        // Flag to indicate if the RTC was synced with the GNSS
 char          logFileName[30]     = "";           // Log file name
-char          debugFileName[10]   = "debug.csv";  // Debugging log file name
+char          debugFileName[10]   = "debug.csv";  // Debug log file name
 unsigned int  debugCounter        = 0;            // Counter to track number of recorded debug messages
 unsigned int  maxBufferBytes      = 0;            // Maximum value of file buffer
 unsigned long previousMillis      = 0;            // Global millis() timer
@@ -126,11 +133,14 @@ void setup()
   //while (!Serial);      // Wait for user to open Serial Monitor
   delay(2000);          // Delay to allow user to open Serial Monitor
 
+  printLine();
   Serial.println("Cryologger - Glacier Velocity Measurement System");
+  printLine();
 
   printDateTime();      // Print RTC's current date and time
 
   // Configure devices
+  //configureOled();      // Configure OLED display
   configureWdt();       // Configure and start Watchdog Timer (WDT)
   configureGnss();      // Configure u-blox GNSS
   syncRtc();            // Acquire GNSS fix and sync RTC with GNSS
@@ -142,9 +152,7 @@ void setup()
   Serial.print("Info: Initial alarm "); printAlarm();
 
   // Blink LED to indicate completion of setup
-  blinkLed(3, 1000);
-  blinkLed(3, 100);
-  blinkLed(3, 1000);
+  blinkLed(10, 1000);
 }
 
 // ----------------------------------------------------------------------------
@@ -163,30 +171,19 @@ void loop()
 
     Serial.print("Info: Alarm trigger "); printDateTime();
 
-    // Toggle logging flag
-    loggingFlag = !loggingFlag;
+    qwiicPowerOn();       // Enable power to Qwiic connector
+    peripheralPowerOn();  // Enable power to peripherals
+    configureSd();        // Configure microSD
+    configureGnss();      // Configure u-blox GNSS
 
-    // Perform measurements
-    if (loggingFlag)
-    {
-      setLoggingAlarm();    // Set logging duration
-      peripheralPowerOn();  // Enable power to peripherals
-      configureSd();        // Configure microSD
-      qwiicPowerOn();       // Enable power to Qwiic connector
-      configureGnss();      // Configure u-blox GNSS
-      logGnss();            // Log data
-    }
+    setLoggingAlarm();    // Set logging alarm
+    logGnss();            // Log u-blox GNSS data
+    logDebug();           // Log system debug information
 
-    // Log system debug information
-    logDebug();
-
-    // Clear logging alarm flag
-    alarmFlag = false;
-
-    // Set the next RTC alarm
-    setSleepAlarm();
+    alarmFlag = false;    // Clear logging alarm flag
+    setSleepAlarm();      // Set sleep alarm
+    
   }
-
   // Check for watchdog interrupt
   if (wdtFlag)
   {

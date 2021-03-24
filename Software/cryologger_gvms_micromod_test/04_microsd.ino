@@ -22,6 +22,10 @@ void configureSd()
   else
   {
     online.microSd = true;
+#if DEBUG_OLED
+    oled.drawString(0, 0, "Init. microSD."); // Write something to the internal memory
+    delay(500);
+#endif
   }
   // Stop the loop timer
   timer.microSd = millis() - loopStartTime;

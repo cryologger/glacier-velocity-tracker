@@ -12,7 +12,7 @@ void createDebugFile()
   }
   else
   {
-    Serial.print("Info: Created debug file "); Serial.println(debugFileName);
+    Serial.print("Info: Created "); Serial.println(debugFileName);
   }
 
   // Write header to file

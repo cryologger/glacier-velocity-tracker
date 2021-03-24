@@ -22,6 +22,10 @@ void configureGnss()
   else
   {
     online.gnss = true;
+#if DEBUG_OLED
+    oled.clearDisplay();
+    oled.drawString(0, 0, "Init. GNSS."); // Write something to the internal memory
+#endif
   }
 
   // Configure u-blox GNSS
@@ -32,10 +36,9 @@ void configureGnss()
   gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM SFRBX messages
   gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM RAWX messages
 
-  // Configure communication interfaces and satellite signals only if first time program is running
+  // Configure communication interfaces and satellite signals only if program is running for the first time
   if (firstTimeFlag)
   {
-
     // Configure communciation interfaces
     bool setValueSuccess = true;
     //setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);  // Disable I2C
@@ -60,8 +63,6 @@ void configureGnss()
     {
       Serial.println("Warning: Satellite signals not configured!");
     }
-    gnssConfigFlag = true; // Set flag
-
     // Print current GNSS settings
     printGnssSettings();
   }
@@ -78,6 +79,10 @@ void syncRtc()
 
   Serial.println("Info: Acquiring GNSS fix...");
 
+#if DEBUG_OLED
+  oled.drawString(0, 1, "Get GNSS fix...");
+#endif
+
   // Attempt to acquire a valid GNSS position fix for up to 5 minutes
   while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 60UL * 1000UL)
   {
@@ -88,6 +93,10 @@ void syncRtc()
   if (!rtcSyncFlag)
   {
     Serial.println("Warning: Unable to sync RTC!");
+#if DEBUG_OLED
+    oled.clearDisplay();
+    oled.drawString(0, 1, "RTC sync fail");
+#endif
   }
 
   // Stop loop timer
@@ -128,6 +137,17 @@ void processNavPvt(UBX_NAV_PVT_data_t ubx)
 
     rtcSyncFlag = true; // Set flag
     Serial.print("Info: RTC time synced to "); printDateTime();
+
+    char dateTimeBuffer[25];
+    sprintf(dateTimeBuffer, "20%02d-%02d-%02d %02d:%02d:%02d",
+            rtc.year, rtc.month, rtc.dayOfMonth,
+            rtc.hour, rtc.minute, rtc.seconds, rtc.hundredths);
+
+#if DEBUG_OLED
+    oled.drawString(0, 1, "Info: RTC time synced to:");
+    oled.drawString(0, 2, dateTimeBuffer);
+    delay(500);
+#endif
   }
 }
 
@@ -207,7 +227,7 @@ void logGnss()
     }
 
     // Print bytes written every second
-    if (millis() > (previousMillis + 5000))
+    if (millis() > (previousMillis + 1000))
     {
 
       // Sync the log file
@@ -223,7 +243,9 @@ void logGnss()
       maxBufferBytes = gnss.getMaxFileBufferAvail();
 
       Serial.print("Max file buffer: "); Serial.println(maxBufferBytes);
-
+#if DEBUG_OLED
+      printBuffer();
+#endif
       // Warn if fileBufferSize was more than 80% full
       if (maxBufferBytes > ((fileBufferSize / 5) * 4))
       {
@@ -285,9 +307,6 @@ void logGnss()
   {
     Serial.println("Warning: Failed to close log file!");
   }
-
-  // Toggle logging flag
-  loggingFlag = false;
 
   // Stop the loop timer
   timer.logGnss = millis() - loopStartTime;
