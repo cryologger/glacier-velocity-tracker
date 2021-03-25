@@ -305,7 +305,7 @@ Test #2:
   - First logfile should be at 14:00
   
   Results:
-  - 
+  - Successful tests
 
   Files: 
   - 
@@ -327,7 +327,7 @@ Test #2:
   - First logfile should be at 14:00
   
   Results:
-  - 
+  - Successful tests
 
   Files: 
   - 
