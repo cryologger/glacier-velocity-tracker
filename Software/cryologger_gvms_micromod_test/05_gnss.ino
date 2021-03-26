@@ -1,12 +1,12 @@
 // Configure u-blox GNSS
 void configureGnss()
-{  
+{
   // Uncomment  line to enable GNSS debug messages on Serial
-  //gnss.enableDebugging(); 
-  
+  //gnss.enableDebugging();
+
   // Disable the "7F" check in checkUbloxI2C as RAWX data can legitimately contain 0x7F
-  gnss.disableUBX7Fcheck(); 
-  
+  gnss.disableUBX7Fcheck();
+
   // Allocate sufficient RAM to store RAWX messages (>2 KB)
   gnss.setFileBufferSize(fileBufferSize); // Must be called before gnss.begin()
 
@@ -15,48 +15,37 @@ void configureGnss()
   {
     Serial.println("Warning: u-blox failed to initialize!");
     online.gnss = false;
-
-    peripheralPowerOff(); // Disable power to peripherals
-    qwiicPowerOff(); // Disable power to Qwiic connector
-    wdt.stop(); // Stop watchdog timer
-    while (1)
-    {
-      blinkLed(2, 250);
-      blinkLed(2, 1000);
-    }
+#if DEBUG_OLED
+    u8g2.clearBuffer(); // Clear the internal memory
+    u8g2.drawStr(0, 10, "u-blox failed to initialize."); // Write something to the internal memory
+    u8g2.sendBuffer(); // Transfer internal memory to the display
+    delay(1000);
+#endif
+    peripheralPowerOff();
+    qwiicPowerOff();
+    while (1); // Force watchdog reset
   }
   else
   {
     online.gnss = true;
-#if DEBUG_OLED
-    oled.clearDisplay();
-    oled.drawString(0, 0, "Init. GNSS."); // Write something to the internal memory
-#endif
   }
 
-  // Configure u-blox GNSS
-  gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
-  gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
-  gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
-  gnss.setAutoPVTcallback(&processNavPvt);          // Enable automatic NAV PVT messages with callback to processNavPvt()
-  gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM SFRBX messages
-  gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM RAWX messages
 
   // Configure communication interfaces and satellite signals only if program is running for the first time
   if (gnssConfigFlag)
   {
     /*
-    // Configure communciation interfaces
-    bool setValueSuccess = true;
-    //setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);  // Disable I2C
-    setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);    // Disable SPI
-    setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 0);  // Disable UART1
-    setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);  // Disable UART2
-    setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_USB_ENABLED, 0);   // Disable USB
-    if (!setValueSuccess)
-    {
+      // Configure communciation interfaces
+      bool setValueSuccess = true;
+      //setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);  // Disable I2C
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);    // Disable SPI
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 0);  // Disable UART1
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);  // Disable UART2
+      setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_USB_ENABLED, 0);   // Disable USB
+      if (!setValueSuccess)
+      {
       Serial.println("Warning: Communication interfaces not configured!");
-    }
+      }
     */
     // Configure satellite signals
     bool setValueSuccess = true;
@@ -71,10 +60,18 @@ void configureGnss()
       Serial.println("Warning: Satellite signals not configured!");
     }
     gnssConfigFlag = false; // Clear flag
-    
+
     // Print current GNSS settings
     printGnssSettings();
   }
+
+  // Configure u-blox GNSS
+  gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
+  gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
+  gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
+  gnss.setAutoPVTcallback(&processNavPvt);          // Enable automatic NAV PVT messages with callback to processNavPvt()
+  gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM SFRBX messages
+  gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM RAWX messages
 }
 
 // Acquire valid GNSS fix and sync RTC
@@ -89,7 +86,10 @@ void syncRtc()
   Serial.println("Info: Acquiring GNSS fix...");
 
 #if DEBUG_OLED
-  oled.drawString(0, 1, "Get GNSS fix...");
+  u8g2.clearBuffer(); // Clear the internal memory
+  u8g2.drawStr(0, 10, "Acquiring GNSS fix..."); // Write something to the internal memory
+  u8g2.sendBuffer(); // Transfer internal memory to the display
+  delay(1000);
 #endif
 
   // Attempt to acquire a valid GNSS position fix for up to 5 minutes
@@ -103,8 +103,10 @@ void syncRtc()
   {
     Serial.println("Warning: Unable to sync RTC!");
 #if DEBUG_OLED
-    oled.clearDisplay();
-    oled.drawString(0, 1, "RTC sync fail");
+    u8g2.clearBuffer(); // Clear the internal memory
+    u8g2.drawStr(0, 10, "Unable to sync RTC!"); // Write to internal memory
+    u8g2.sendBuffer(); // Transfer internal memory to the display
+    delay(1000);
 #endif
   }
 
@@ -153,9 +155,10 @@ void processNavPvt(UBX_NAV_PVT_data_t ubx)
             rtc.hour, rtc.minute, rtc.seconds, rtc.hundredths);
 
 #if DEBUG_OLED
-    oled.drawString(0, 1, "Info: RTC time synced to:");
-    oled.drawString(0, 2, dateTimeBuffer);
-    delay(500);
+    u8g2.clearBuffer();
+    u8g2.drawStr(0, 10, "RTC synced with GNSS");
+    u8g2.sendBuffer();
+    delay(1000);
 #endif
   }
 }
@@ -167,7 +170,7 @@ void logGnss()
   unsigned long loopStartTime = millis();
 
   // Create timestamped log file name
-  sprintf(logFileName, "20%02d%02d%02d_%02d%02d%02d_TOP.ubx",
+  sprintf(logFileName, "20%02d%02d%02d_%02d%02d%02d.ubx",
           rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 
@@ -236,7 +239,7 @@ void logGnss()
     }
 
     // Print bytes written every second
-    if (millis() > (previousMillis + 1000))
+    if (millis() > (previousMillis + 30000))
     {
 
       // Sync the log file
@@ -252,8 +255,14 @@ void logGnss()
       maxBufferBytes = gnss.getMaxFileBufferAvail();
 
       Serial.print("Max file buffer: "); Serial.println(maxBufferBytes);
+
 #if DEBUG_OLED
-      printBuffer();
+      u8g2.clearBuffer();
+      u8g2.setCursor(0, 10);
+      u8g2.print(bytesWritten);
+      u8g2.setCursor(0, 20);
+      u8g2.print(maxBufferBytes);
+      u8g2.sendBuffer();
 #endif
       // Warn if fileBufferSize was more than 80% full
       if (maxBufferBytes > ((fileBufferSize / 5) * 4))

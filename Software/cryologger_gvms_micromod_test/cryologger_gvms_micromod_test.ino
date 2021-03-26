@@ -29,7 +29,7 @@
 // -----------------------------------------------------------------------------
 #define DEBUG       true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS  true  // Output GNSS information to Serial Monitor
-#define DEBUG_OLED  false  // Output debug messages to OLED display
+#define DEBUG_OLED  true  // Output debug messages to OLED display
 
 // ----------------------------------------------------------------------------
 // Pin definitions
@@ -49,22 +49,24 @@ FsFile            debugFile;
 SFE_UBLOX_GNSS    gnss;
 
 #if DEBUG_OLED
-//U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C oled(U8G2_R0, 14, 12, U8X8_PIN_NONE);
-U8X8_SSD1306_128X32_UNIVISION_HW_I2C oled(14, 12, U8X8_PIN_NONE);   // Adafruit Feather ESP8266/32u4 Boards + FeatherWing OLED
+U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE); // 0x3C
 #endif
 
 // ----------------------------------------------------------------------------
 // User defined global variable declarations
 // ----------------------------------------------------------------------------
-byte          sleepAlarmMinutes     = 0;  // Rolling minutes alarm
-byte          sleepAlarmHours       = 0;  // Rolling hours alarm
-byte          loggingAlarmMinutes   = 0;  // Rolling minutes alarm
-byte          loggingAlarmHours     = 1;  // Rolling hours alarm
-byte          sleepAlarmMode        = 4;  // Sleep alarm mode
-byte          loggingAlarmMode      = 4;  // Logging alarm mode
-byte          initialAlarmMode      = 5;  // Initial alarm mode
-bool          sleepFlag             = false;  // Flag to indicate whether to sleep between new log files
-unsigned int  gnssTimeout           = 5;  // Timeout for GNSS signal acquisition (minutes)
+byte          loggingStart          = 18;   // Logging start time (hour)
+byte          loggingEnd            = 21;   // Logging end time (hour)
+byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
+byte          sleepAlarmHours       = 0;    // Rolling hours alarm
+byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
+byte          loggingAlarmHours     = 0;    // Rolling hours alarm
+byte          sleepAlarmMode        = 4;    // Sleep alarm mode
+byte          loggingAlarmMode      = 4;    // Logging alarm mode
+byte          initialAlarmMode      = 4;    // Initial alarm mode
+bool          sleepFlag             = true; // Flag to indicate whether to sleep between new log files
+bool          gnssConfigFlag        = true; // Flag to indicate whether to configure the u-blox module
+unsigned int  gnssTimeout           = 10;    // Timeout for GNSS signal acquisition (minutes)
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -76,7 +78,6 @@ volatile bool wdtFlag             = false;        // Flag for watchdog timer int
 volatile int  wdtCounter          = 0;            // Counter for watchdog timer interrupts
 volatile int  wdtCounterMax       = 0;            // Counter for max watchdog timer interrupts
 bool          firstTimeFlag       = true;         // Flag to track configuration of u-blox GNSS
-bool          gnssConfigFlag      = true;        //
 bool          loggingFlag         = true;         //
 bool          resetFlag           = false;        // Flag to force system reset using watchdog timer
 bool          rtcSyncFlag         = false;        // Flag to indicate if the RTC was synced with the GNSS
@@ -128,7 +129,7 @@ void setup()
   peripheralPowerOn();  // Enable power to peripherials
 
   Wire.begin();         // Initalize I2C
-  Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
+  Wire.setClock(400000); // Set I2C clock speed to 400 kHz
   SPI.begin();          // Initialize SPI
 
   Serial.begin(115200); // Open Serial port
@@ -142,7 +143,7 @@ void setup()
   printDateTime();      // Print RTC's current date and time
 
   // Configure devices
-  //configureOled();      // Configure OLED display
+  configureOled();      // Configure OLED display
   configureWdt();       // Configure and start Watchdog Timer (WDT)
   configureGnss();      // Configure u-blox GNSS
   syncRtc();            // Acquire GNSS fix and sync RTC with GNSS
@@ -179,6 +180,7 @@ void loop()
       firstTimeFlag = false; // Clear flag
       qwiicPowerOn();       // Enable power to Qwiic connector
       peripheralPowerOn();  // Enable power to peripherals
+      configureOled();      // Configure OLED display
       configureSd();        // Configure microSD
       configureGnss();      // Configure u-blox GNSS
     }
@@ -239,14 +241,7 @@ extern "C" void am_watchdog_isr(void)
   }
   else
   {
-    wdt.stop(); // Stop the watchdog timer
-    peripheralPowerOff(); // Disable power to peripherals
-    qwiicPowerOff(); // Disable power to Qwiic connector
-    while (1)
-    {
-      blinkLed(2, 250);
-      blinkLed(3, 1000);
-    }
+    while (1); // Force reset
   }
   wdtFlag = true; // Set the watchdog flag
   wdtCounter++; // Increment watchdog interrupt counter

@@ -7,24 +7,25 @@ void configureSd()
   // Initialize microSD
   if (!sd.begin(SdSpiConfig(PIN_SD_CS, DEDICATED_SPI)))
   {
-    Serial.println("Warning: microSD initialization failed.");
+    Serial.println("Warning: microSD failed to initialize.");
     online.microSd = false;
-
-    peripheralPowerOff(); // Disable power to peripherals
-    qwiicPowerOff(); // Disable power to Qwiic connector
-    wdt.stop(); // Stop watchdog timer
-    while (1)
-    {
-      blinkLed(2, 250);
-      blinkLed(1, 1000);
-    }
+#if DEBUG_OLED
+    u8g2.clearBuffer();
+    u8g2.drawStr(0, 10, "microSD failed to initialize.");
+    u8g2.sendBuffer();
+#endif
+    peripheralPowerOff();
+    qwiicPowerOff();
+    while (1); // Force watchdog reset
   }
   else
   {
     online.microSd = true;
 #if DEBUG_OLED
-    oled.drawString(0, 0, "Init. microSD."); // Write something to the internal memory
-    delay(500);
+    u8g2.clearBuffer();
+    u8g2.drawStr(0, 10, "microSD initialized.");
+    u8g2.sendBuffer();
+    delay(1000);
 #endif
   }
   // Stop the loop timer
