@@ -1,5 +1,5 @@
 # Cryologger - Glacier Velocity Measurement System
-![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/master/Archive/v1.0/Images/DSC_1890.JPG)
+![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Archive/v1.0/Images/DSC_1890.JPG)
 
 ## Background
 
