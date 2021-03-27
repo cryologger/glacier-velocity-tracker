@@ -29,7 +29,7 @@
 // -----------------------------------------------------------------------------
 #define DEBUG       true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS  true  // Output GNSS information to Serial Monitor
-#define DEBUG_OLED  true  // Output debug messages to OLED display
+#define DEBUG_OLED  false  // Output debug messages to OLED display
 
 // ----------------------------------------------------------------------------
 // Pin definitions
@@ -87,6 +87,7 @@ unsigned int  debugCounter        = 0;            // Counter to track number of 
 unsigned int  maxBufferBytes      = 0;            // Maximum value of file buffer
 unsigned long previousMillis      = 0;            // Global millis() timer
 unsigned long bytesWritten        = 0;            // Counter for tracking bytes written to microSD
+unsigned long rtcDrift            = 0;            // Counter for drift of RTC
 
 // ----------------------------------------------------------------------------
 // Unions/structures
@@ -197,6 +198,7 @@ void loop()
       setSleepAlarm();      // Set sleep alarm
     }
   }
+  
   // Check for watchdog interrupt
   if (wdtFlag)
   {

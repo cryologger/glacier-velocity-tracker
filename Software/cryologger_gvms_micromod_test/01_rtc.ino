@@ -26,7 +26,7 @@ void configureRtc()
   // Set initial rollover alarm
   //rtc.setAlarm(0, 0, 0, 0, 0, 0);
 
-// Set initial time alarm
+  // Set initial time alarm
   rtc.setAlarm(17, 0, 0, 0, 0, 0);
 
   // Set the alarm mode
@@ -38,6 +38,9 @@ void configureRtc()
   // Clear the RTC alarm interrupt
   //rtc.clearInterrupt();
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
+
+  // Clear alarm flag
+  alarmFlag = false;
 }
 
 // Read the real-time clock
@@ -59,7 +62,7 @@ void setSleepAlarm()
 
   // Set time specific alarm
   rtc.setAlarm(17, 0, 0, 0, 0, 0);
-  
+
   // Set the RTC alarm mode
   rtc.setAlarmMode(sleepAlarmMode); // Alarm match on hundredths, seconds, minutes, hours
 

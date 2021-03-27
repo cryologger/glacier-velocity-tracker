@@ -1,7 +1,11 @@
 // Enter deep sleep
 void goToSleep()
 {
+
+
 #if DEBUG
+  Serial.println("Info: Entering deep sleep");
+  Serial.flush();
   Serial.end();         // Close Serial port
 #endif
   Wire.end();           // Disable I2C
@@ -41,10 +45,6 @@ void goToSleep()
   online.microSd = false;
   online.logGnss = false;
   online.logDebug = false;
-
-  // Power down flash, SRAM, cache
-  //am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_CACHE); // Turn off CACHE
-  //am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_SRAM_64K_DTCM); // Retain lower 64K SRAM
 
   // Power down flash, SRAM, cache
   am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_ALL); // Power down all memory during deepsleep

@@ -140,13 +140,23 @@ void processNavPvt(UBX_NAV_PVT_data_t ubx)
 #endif
 
   // Check if date and time are valid and sync RTC with GNSS
-  if (dateValidFlag && timeValidFlag)
+  if (/*dateValidFlag && */timeValidFlag)
   {
+    // Get the RTC's date and time
+    rtc.getTime();
+
+    // Calculate drift
+    char rtcDriftBuffer[50];
+    sprintf(rtcDriftBuffer, "%dy %dm %dd %02d:%02d:%02d",
+            ((ubx.year - 2000) - rtc.year), (ubx.month - rtc.month), (ubx.day - rtc.dayOfMonth),
+            (ubx.hour - rtc.hour), (ubx.min - rtc.minute), (ubx.sec - rtc.seconds));
+
     // Set RTC date and time
     rtc.setTime(ubx.hour, ubx.min, ubx.sec, ubx.iTOW % 1000,
                 ubx.day, ubx.month, ubx.year - 2000);
 
     rtcSyncFlag = true; // Set flag
+    Serial.print("Info: RTC drfit: "); Serial.println(rtcDriftBuffer);
     Serial.print("Info: RTC time synced to "); printDateTime();
 
     char dateTimeBuffer[25];
