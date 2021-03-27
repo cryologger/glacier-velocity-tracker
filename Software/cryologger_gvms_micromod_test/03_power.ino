@@ -2,10 +2,12 @@
 void goToSleep()
 {
 #if DEBUG
-  Serial.end(); // Close Serial port
+  Serial.end();         // Close Serial port
 #endif
-  SPI.end(); // Disable SPI
-  power_adc_disable(); // Disable ADC
+  Wire.end();           // Disable I2C
+  SPI.end();            // Disable SPI
+  power_adc_disable();  // Disable ADC
+
   digitalWrite(LED_BUILTIN, LOW); // Turn off LED
 
   // Force peripherals off
@@ -19,24 +21,34 @@ void goToSleep()
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART0);
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART1);
 
-  // Disable all pads except G1, G2 and LED
+  // Disable all pads except G1 (33), G2 (34) and LED_BUILTIN (19)
   for (int x = 0; x < 50; x++)
   {
-    if ((x != ap3_gpio_pin2pad(PIN_PWC_POWER)) &&
-        (x != ap3_gpio_pin2pad(PIN_QWIIC_POWER)) &&
-        (x != ap3_gpio_pin2pad(LED_BUILTIN)))
+    if ((x != 33) && (x != 34) && (x != 19))
     {
       am_hal_gpio_pinconfig(x, g_AM_HAL_GPIO_DISABLE);
     }
   }
 
-  qwiicPowerOff();      // Disable power to Qwiic connector
-  peripheralPowerOff(); // Disable power to peripherals
+  // Disable power to Qwiic connector
+  qwiicPowerOff();
 
-  // Disable power to Flash, SRAM, and cache
-  am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_CACHE); // Turn off CACHE
-  am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_FLASH_512K); // Turn off everything but lower 512k
-  am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_SRAM_64K_DTCM); // Turn off everything but lower 64k
+  // Disable power to peripherals
+  peripheralPowerOff();
+
+  // Clear online/offline flags
+  online.gnss = false;
+  online.microSd = false;
+  online.logGnss = false;
+  online.logDebug = false;
+
+  // Power down flash, SRAM, cache
+  //am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_CACHE); // Turn off CACHE
+  //am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_SRAM_64K_DTCM); // Retain lower 64K SRAM
+
+  // Power down flash, SRAM, cache
+  am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_ALL); // Power down all memory during deepsleep
+  am_hal_pwrctrl_memory_deepsleep_retain(AM_HAL_PWRCTRL_MEM_SRAM_384K); // Retain SRAM
 
   // Keep the 32kHz clock running for RTC
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
@@ -56,18 +68,16 @@ void goToSleep()
 // Wake from deep sleep
 void wakeUp()
 {
-  // Enable power to SRAM, turn on entire Flash
-  am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_MAX);
-
   // Return to using the main clock
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
   am_hal_stimer_config(AM_HAL_STIMER_HFRC_3MHZ);
 
-  ap3_adc_setup();
-
-  SPI.begin(); // Enable SPI
+  ap3_adc_setup();        // Enable ADC
+  Wire.begin();           // Enable I2C
+  Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
+  SPI.begin();            // Enable SPI
 #if DEBUG
-  Serial.begin(115200); // Open Serial port
+  Serial.begin(115200);   // Open Serial port
 #endif
 }
 
@@ -75,6 +85,7 @@ void wakeUp()
 void qwiicPowerOn()
 {
   digitalWrite(PIN_QWIIC_POWER, HIGH);
+  delay(2500);
 }
 
 // Disable power to Qwiic connector

@@ -24,10 +24,13 @@ void configureRtc()
   //rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
   // Set initial rollover alarm
-  rtc.setAlarm(0, 0, 0, 0, 0, 0);
+  //rtc.setAlarm(0, 0, 0, 0, 0, 0);
+
+// Set initial time alarm
+  rtc.setAlarm(17, 0, 0, 0, 0, 0);
 
   // Set the alarm mode
-  rtc.setAlarmMode(5); // Alarm match on hundredths, seconds
+  rtc.setAlarmMode(initialAlarmMode);
 
   // Attach alarm interrupt
   rtc.attachInterrupt();
@@ -52,13 +55,16 @@ void setSleepAlarm()
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
 
   // Set RTC  alarm
-  rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
+  //rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
+  // Set time specific alarm
+  rtc.setAlarm(17, 0, 0, 0, 0, 0);
+  
   // Set the RTC alarm mode
-  rtc.setAlarmMode(5); // Alarm match on hundredths, seconds, minutes, hours
+  rtc.setAlarmMode(sleepAlarmMode); // Alarm match on hundredths, seconds, minutes, hours
 
   // Print the next RTC alarm date and time
-  Serial.print("Info: Current time is "); printDateTime();
+  Serial.print("Info: Current time "); printDateTime();
   Serial.print("Info: Sleeping until "); printAlarm();
 }
 
@@ -68,13 +74,17 @@ void setLoggingAlarm()
   //rtc.clearInterrupt();
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
 
-  rtc.setAlarm((rtc.hour + loggingAlarmHours) % 24, (rtc.minute + loggingAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
+  // Set rolling alarm
+  //rtc.setAlarm((rtc.hour + loggingAlarmHours) % 24, (rtc.minute + loggingAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
+
+  // Set specific alarm
+  rtc.setAlarm(19, 0, 0, 0, 0, 0);
 
   // Set the RTC alarm mode
   rtc.setAlarmMode(loggingAlarmMode); // Alarm match on hundredths, seconds,  minutes, hours
 
   // Print the next RTC alarm date and time
-  Serial.print("Info: Current time is "); printDateTime();
+  //Serial.print("Info: Current time "); printDateTime();
   Serial.print("Info: Logging until "); printAlarm();
 }
 

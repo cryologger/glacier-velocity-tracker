@@ -12,12 +12,14 @@ void createDebugFile()
   }
   else
   {
-    Serial.print("Info: Created debug file "); Serial.println(debugFileName);
+    Serial.print("Info: Created "); Serial.println(debugFileName);
   }
 
   // Write header to file
-  debugFile.println("datetime,timer_voltage,timer_rtc,timer_microsd,timer_sensors,timer_gnss,"
-                    "bytes_written,max_buffer,online_microsd,online_gnss,online_dataLogging,online_debugLogging,rtc_drift,watchdog,sample");
+  debugFile.println("datetime,online_microSd,online_gnss,online_logGnss,online_logDebug,"
+                    "timer_microsd,timer_logGnss,timer_logDebug,bytesWritten,maxBufferBytes,"
+                    "wdtCounterMax, debugCounter");
+
 
   // Sync the debug file
   if (!debugFile.sync())
@@ -38,29 +40,47 @@ void createDebugFile()
   }
 }
 
-
 // Log debugging information
 void logDebug()
 {
+  // Start loop timer
+  unsigned long loopStartTime = millis();
+
+  // Increment debug counter
+  debugCounter++;
+
+  // Open debug file for writing
+  if (!debugFile.open(debugFileName, O_APPEND | O_WRITE))
+  {
+    Serial.println("Warning: Failed to open debug file.");
+    online.logDebug = false; // Set flag
+    return;
+  }
+  else
+  {
+    Serial.print("Info: Opened "); Serial.println(debugFileName);
+    online.logDebug = true; // Set flag
+  }
+
+  // Create datetime string
   char dateTime[30];
   sprintf(dateTime, "20%02d-%02d-%02d %02d:%02d:%02d",
           rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 
-  // Open debug file for writing
-  // O_CREAT - Create the file if it does not exist
-  // O_APPEND - Seek to the end of the file prior to each write
-  // O_WRITE - Open the file for writing
-  if (!debugFile.open(debugFileName, O_APPEND | O_WRITE))
-  {
-    Serial.println("Warning: Failed to open debug file.");
-    return;
-  }
-
   // Log debugging information
   debugFile.print(dateTime);            debugFile.print(",");
+  debugFile.print(online.microSd);      debugFile.print(",");
+  debugFile.print(online.gnss);         debugFile.print(",");
+  debugFile.print(online.logGnss);      debugFile.print(",");
+  debugFile.print(online.logDebug);     debugFile.print(",");
+  debugFile.print(timer.microSd);       debugFile.print(",");
+  debugFile.print(timer.logGnss);       debugFile.print(",");
+  debugFile.print(timer.logDebug);      debugFile.print(",");
   debugFile.print(bytesWritten);        debugFile.print(",");
-  debugFile.println(maxBufferBytes);
+  debugFile.print(maxBufferBytes);      debugFile.print(",");
+  debugFile.print(wdtCounterMax);       debugFile.print(",");
+  debugFile.println(debugCounter);
 
   // Sync the debug file
   if (!debugFile.sync())
@@ -85,5 +105,6 @@ void logDebug()
   {
     Serial.println("Warning: Failed to close debug file.");
   }
-
+  // Stop the loop timer
+  timer.logDebug = millis() - loopStartTime;
 }

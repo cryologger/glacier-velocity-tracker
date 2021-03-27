@@ -1,5 +1,5 @@
 // Configure the Watchdog Timer
-void configureWdt() 
+void configureWdt()
 {
   /*
     Simplified WDT Clock Divider Selections
@@ -10,18 +10,18 @@ void configureWdt()
     WDT_1_16HZ  = 1/16th Hz LFRC clock
   */
   // Set the watchdog timer interrupt and reset periods
-  wdt.configure(WDT_16HZ, 128, 240); // 16 Hz clock, 10-second interrupt period, 15-second reset period
-  //wdt.configure(WDT_1HZ, 32, 64); // 1 Hz clock, 32-second interrupt period, 64-second reset period
+  //wdt.configure(WDT_16HZ, 128, 240); // 16 Hz clock, 10-second interrupt period, 15-second reset period
+  wdt.configure(WDT_1HZ, 32, 64); // 1 Hz clock, 32-second interrupt period, 64-second reset period
 
   // Start the watchdog timer
   wdt.start();
 }
 
 // Reset the watchdog timer
-void petDog() 
+void petDog()
 {
   wdt.restart(); // Restart the watchdog timer
-  //DEBUG_PRINT("Watchdog interrupt: "); DEBUG_PRINTLN(watchdogCounter);
-  watchdogFlag = false; // Clear watchdog flag
-  watchdogCounter = 0; // Reset watchdog interrupt counter
+  //DEBUG_PRINT("Watchdog interrupt: "); DEBUG_PRINTLN(wdtCounter);
+  wdtFlag = false; // Clear watchdog flag
+  wdtCounter = 0; // Reset watchdog interrupt counter
 }
