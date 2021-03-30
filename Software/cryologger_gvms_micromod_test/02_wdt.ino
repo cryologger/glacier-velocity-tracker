@@ -10,8 +10,8 @@ void configureWdt()
     WDT_1_16HZ  = 1/16th Hz LFRC clock
   */
   // Set the watchdog timer interrupt and reset periods
-  //wdt.configure(WDT_16HZ, 128, 240); // 16 Hz clock, 10-second interrupt period, 15-second reset period
-  wdt.configure(WDT_1HZ, 64, 128); // 1 Hz clock, 64-second interrupt period, 128-second reset period
+  wdt.configure(WDT_16HZ, 128, 240); // 16 Hz clock, 10-second interrupt period, 15-second reset period
+  //wdt.configure(WDT_1HZ, 64, 128); // 1 Hz clock, 64-second interrupt period, 128-second reset period
 
   // Start the watchdog timer
   wdt.start();

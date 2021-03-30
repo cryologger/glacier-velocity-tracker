@@ -29,7 +29,7 @@
 // -----------------------------------------------------------------------------
 #define DEBUG       true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS  true  // Output GNSS information to Serial Monitor
-#define DEBUG_OLED  false  // Output debug messages to OLED display
+#define DEBUG_OLED  true  // Output debug messages to OLED display
 
 // ----------------------------------------------------------------------------
 // Pin definitions
@@ -57,16 +57,16 @@ U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE); // 0x3C
 // ----------------------------------------------------------------------------
 byte          loggingStart          = 18;   // Logging start time (hour)
 byte          loggingEnd            = 21;   // Logging end time (hour)
-byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
+byte          sleepAlarmMinutes     = 1;    // Rolling minutes alarm
 byte          sleepAlarmHours       = 0;    // Rolling hours alarm
-byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
+byte          loggingAlarmMinutes   = 5;    // Rolling minutes alarm
 byte          loggingAlarmHours     = 0;    // Rolling hours alarm
-byte          sleepAlarmMode        = 4;    // Sleep alarm mode
-byte          loggingAlarmMode      = 4;    // Logging alarm mode
-byte          initialAlarmMode      = 4;    // Initial alarm mode
+byte          sleepAlarmMode        = 5;    // Sleep alarm mode
+byte          loggingAlarmMode      = 5;    // Logging alarm mode
+byte          initialAlarmMode      = 6;    // Initial alarm mode
 bool          sleepFlag             = true; // Flag to indicate whether to sleep between new log files
 bool          gnssConfigFlag        = true; // Flag to indicate whether to configure the u-blox module
-unsigned int  gnssTimeout           = 10;    // Timeout for GNSS signal acquisition (minutes)
+unsigned int  gnssTimeout           = 1;    // Timeout for GNSS signal acquisition (minutes)
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -87,7 +87,7 @@ unsigned int  debugCounter        = 0;            // Counter to track number of 
 unsigned int  maxBufferBytes      = 0;            // Maximum value of file buffer
 unsigned long previousMillis      = 0;            // Global millis() timer
 unsigned long bytesWritten        = 0;            // Counter for tracking bytes written to microSD
-unsigned long rtcDrift            = 0;            // Counter for drift of RTC
+long          rtcDrift            = 0;            // Counter for drift of RTC
 
 // ----------------------------------------------------------------------------
 // Unions/structures
@@ -112,6 +112,7 @@ struct struct_timer
   unsigned long battery;
   unsigned long sensors;
   unsigned long gnss;
+  unsigned long syncRtc;
   unsigned long logDebug;
   unsigned long logGnss;
 } timer;
@@ -178,12 +179,13 @@ void loop()
     // Check if program is running for first time or if sleep is enabled
     if (firstTimeFlag || sleepFlag)
     {
-      firstTimeFlag = false; // Clear flag
-      qwiicPowerOn();       // Enable power to Qwiic connector
-      peripheralPowerOn();  // Enable power to peripherals
-      configureOled();      // Configure OLED display
-      configureSd();        // Configure microSD
-      configureGnss();      // Configure u-blox GNSS
+      firstTimeFlag = false;  // Clear flag
+      qwiicPowerOn();         // Enable power to Qwiic connector
+      peripheralPowerOn();    // Enable power to peripherals
+      configureOled();        // Configure OLED display
+      configureSd();          // Configure microSD
+      configureGnss();        // Configure u-blox GNSS
+      syncRtc();              // Synchronize RTC
     }
 
     // Log data
@@ -194,8 +196,11 @@ void loop()
     // Check if sleep is enabled
     if (sleepFlag)
     {
-      alarmFlag = false;    // Clear logging alarm flag
-      setSleepAlarm();      // Set sleep alarm
+      setSleepAlarm();  // Set sleep alarm
+    }
+    else
+    {
+      alarmFlag = true; // Force logging
     }
   }
   

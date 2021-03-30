@@ -340,7 +340,7 @@ Test #2:
   
   - Location: Outside
   - Start: 2021-03-26 17:08
-  - End: 2021-03-
+  - End: 2021-03-29 0:24
   - Sleep: 22 hours (20:00 - 18:00)
   - Logging: 2 hour (18:00 - 20:00)
   - Frequency: 1 Hz
@@ -353,7 +353,9 @@ Test #2:
   - First logfile should be at 18:00
   
   Results:
-  - 
+  - Partial success.
+  - RTC sync never obtained sync on boot so first file looked to be 
+  - First file appeared to be the correct size
 
   Files: 
   - 

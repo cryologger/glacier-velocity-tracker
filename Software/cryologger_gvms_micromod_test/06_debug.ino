@@ -17,8 +17,8 @@ void createDebugFile()
 
   // Write header to file
   debugFile.println("datetime,online_microSd,online_gnss,online_logGnss,online_logDebug,"
-                    "timer_microsd,timer_logGnss,timer_logDebug,bytesWritten,maxBufferBytes,"
-                    "wdtCounterMax, debugCounter");
+                    "timer_microsd,timer_gnss,timer_syncRtc,timer_logGnss,timer_logDebug,"
+                    "rtcDrift,bytesWritten,maxBufferBytes,wdtCounterMax,debugCounter");
 
 
   // Sync the debug file
@@ -75,8 +75,11 @@ void logDebug()
   debugFile.print(online.logGnss);      debugFile.print(",");
   debugFile.print(online.logDebug);     debugFile.print(",");
   debugFile.print(timer.microSd);       debugFile.print(",");
+  debugFile.print(timer.gnss);          debugFile.print(",");
+  debugFile.print(timer.syncRtc);       debugFile.print(",");
   debugFile.print(timer.logGnss);       debugFile.print(",");
   debugFile.print(timer.logDebug);      debugFile.print(",");
+  debugFile.print(rtcDrift);            debugFile.print(",");
   debugFile.print(bytesWritten);        debugFile.print(",");
   debugFile.print(maxBufferBytes);      debugFile.print(",");
   debugFile.print(wdtCounterMax);       debugFile.print(",");

@@ -1,6 +1,9 @@
 // Configure u-blox GNSS
 void configureGnss()
 {
+  // Start loop timer
+  unsigned long loopStartTime = millis();
+
   // Uncomment  line to enable GNSS debug messages on Serial
   //gnss.enableDebugging();
 
@@ -72,6 +75,11 @@ void configureGnss()
   gnss.setAutoPVTcallback(&processNavPvt);          // Enable automatic NAV PVT messages with callback to processNavPvt()
   gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM SFRBX messages
   gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM RAWX messages
+  gnss.logRXMSFRBX();                               // Enable UBX-RXM-SFRBX data logging
+  gnss.logRXMRAWX();                                // Enable UBX-RXM-RAWX data logging
+
+  // Stop the loop timer
+  timer.gnss = millis() - loopStartTime;
 }
 
 // Acquire valid GNSS fix and sync RTC
@@ -82,6 +90,8 @@ void syncRtc()
 
   // Clear flag
   rtcSyncFlag = false;
+
+  gnss.flushPVT(); // Flush NAV-PVT
 
   Serial.println("Info: Acquiring GNSS fix...");
 
@@ -98,6 +108,7 @@ void syncRtc()
     petDog(); // Reset watchdog timer
     gnss.checkUblox(); // Check for arrival of new data and process it
     gnss.checkCallbacks(); // Check if callbacks are waiting to be processed
+    gnss.clearFileBuffer(); // Clear file buffer
   }
   if (!rtcSyncFlag)
   {
@@ -110,9 +121,8 @@ void syncRtc()
 #endif
   }
 
-  // Stop loop timer
-  unsigned long loopEndTime = millis() - loopStartTime;
-  Serial.print("Timer: syncRtc() "); Serial.print(loopEndTime); Serial.println(" ms.");
+  // Stop the loop timer
+  timer.syncRtc = millis() - loopStartTime;
 }
 
 // Callback function to process UBX-NAV-PVT data
@@ -140,23 +150,23 @@ void processNavPvt(UBX_NAV_PVT_data_t ubx)
 #endif
 
   // Check if date and time are valid and sync RTC with GNSS
-  if (/*dateValidFlag && */timeValidFlag)
+  if (dateValidFlag && timeValidFlag)
   {
     // Get the RTC's date and time
     rtc.getTime();
 
-    // Calculate drift
-    char rtcDriftBuffer[50];
-    sprintf(rtcDriftBuffer, "%dy %dm %dd %02d:%02d:%02d",
-            ((ubx.year - 2000) - rtc.year), (ubx.month - rtc.month), (ubx.day - rtc.dayOfMonth),
-            (ubx.hour - rtc.hour), (ubx.min - rtc.minute), (ubx.sec - rtc.seconds));
+    // Calculate RTC drift
+    unsigned long us;
+    unsigned long rtcEpoch = rtc.getEpoch();
+    unsigned long gnssEpoch = gnss.getEpoch(us);
+    rtcDrift = gnssEpoch - rtcEpoch;
 
     // Set RTC date and time
     rtc.setTime(ubx.hour, ubx.min, ubx.sec, ubx.iTOW % 1000,
                 ubx.day, ubx.month, ubx.year - 2000);
 
     rtcSyncFlag = true; // Set flag
-    Serial.print("Info: RTC drfit: "); Serial.println(rtcDriftBuffer);
+    Serial.print("Info: RTC drift: "); Serial.println(rtcDrift);
     Serial.print("Info: RTC time synced to "); printDateTime();
 
     char dateTimeBuffer[25];
@@ -205,11 +215,11 @@ void logGnss()
   // Reset bytesWritten counter
   bytesWritten = 0;
 
-  // Enable UBX-RXM-SFRBX data logging
-  gnss.logRXMSFRBX();
 
-  // Enable UBX-RXM-RAWX data logging
-  gnss.logRXMRAWX();
+
+
+  gnss.clearMaxFileBufferAvail(); // Reset max file buffer size
+
 
   // Log data until logging alarm triggers
   while (!alarmFlag)
@@ -249,7 +259,7 @@ void logGnss()
     }
 
     // Print bytes written every second
-    if (millis() > (previousMillis + 30000))
+    if (millis() > (previousMillis + 5000))
     {
 
       // Sync the log file
