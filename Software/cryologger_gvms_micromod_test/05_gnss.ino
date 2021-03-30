@@ -72,11 +72,12 @@ void configureGnss()
   gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
   gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
   gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
-  gnss.setAutoPVTcallback(&processNavPvt);          // Enable automatic NAV PVT messages with callback to processNavPvt()
-  gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM SFRBX messages
-  gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM RAWX messages
-  gnss.logRXMSFRBX();                               // Enable UBX-RXM-SFRBX data logging
-  gnss.logRXMRAWX();                                // Enable UBX-RXM-RAWX data logging
+  //gnss.setAutoPVTcallback(&processNavPvt);          // Enable automatic NAV PVT messages with callback to processNavPvt()
+  gnss.setAutoPVT(true);                            // Enable automatic NAV-PVT messages
+  gnss.setAutoRXMSFRBX(true);                       // Enable automatic RXM-SFRBX messages
+  gnss.setAutoRXMRAWX(true);                        // Enable automatic RXM-RAWX messages
+  gnss.logRXMSFRBX();                               // Enable RXM-SFRBX data logging
+  gnss.logRXMRAWX();                                // Enable RXM-RAWX data logging
 
   // Stop the loop timer
   timer.gnss = millis() - loopStartTime;
@@ -91,96 +92,63 @@ void syncRtc()
   // Clear flag
   rtcSyncFlag = false;
 
-  gnss.flushPVT(); // Flush NAV-PVT
-
   Serial.println("Info: Acquiring GNSS fix...");
-
-#if DEBUG_OLED
-  u8g2.clearBuffer(); // Clear the internal memory
-  u8g2.drawStr(0, 10, "Acquiring GNSS fix..."); // Write something to the internal memory
-  u8g2.sendBuffer(); // Transfer internal memory to the display
-  delay(1000);
-#endif
 
   // Attempt to acquire a valid GNSS position fix for up to 5 minutes
   while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 60UL * 1000UL)
   {
     petDog(); // Reset watchdog timer
-    gnss.checkUblox(); // Check for arrival of new data and process it
-    gnss.checkCallbacks(); // Check if callbacks are waiting to be processed
     gnss.clearFileBuffer(); // Clear file buffer
+
+    // Check for UBX-NAV-PVT messages
+    if (gnss.getPVT())
+    {
+      // Blink LED
+      digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+
+      bool dateValidFlag = gnss.getConfirmedDate();
+      bool timeValidFlag = gnss.getConfirmedTime();
+      byte fixType = gnss.getFixType();
+
+#if DEBUG_GNSS
+      char gnssBuffer[100];
+      sprintf(gnssBuffer, "%04u-%02d-%02d %02d:%02d:%02d.%03d,%ld,%ld,%d,%d,%d,%d,%d",
+              gnss.getYear(), gnss.getMonth(), gnss.getDay(),
+              gnss.getHour(), gnss.getMinute(), gnss.getSecond(), gnss.getMillisecond(),
+              gnss.getLatitude(), gnss.getLongitude(), gnss.getSIV(),
+              gnss.getPDOP(), gnss.getFixType(),
+              dateValidFlag, timeValidFlag);
+      Serial.println(gnssBuffer);
+#endif
+
+      // Check if date and time are valid and sync RTC with GNSS
+      if (dateValidFlag && timeValidFlag)
+      {
+        // Get the RTC's date and time
+        rtc.getTime();
+
+        // Calculate RTC drift
+        unsigned long us;
+        unsigned long rtcEpoch = rtc.getEpoch(); // Get RTC epoch time
+        unsigned long gnssEpoch = gnss.getEpoch(us); // Get GNSS epoch time
+        rtcDrift = gnssEpoch - rtcEpoch;
+
+        // Set RTC date and time
+        rtc.setEpoch(gnssEpoch);
+
+        rtcSyncFlag = true; // Set flag
+        Serial.print("Info: RTC drift: "); Serial.println(rtcDrift);
+        Serial.print("Info: RTC time synced to "); printDateTime();
+      }
+    }
   }
   if (!rtcSyncFlag)
   {
     Serial.println("Warning: Unable to sync RTC!");
-#if DEBUG_OLED
-    u8g2.clearBuffer(); // Clear the internal memory
-    u8g2.drawStr(0, 10, "Unable to sync RTC!"); // Write to internal memory
-    u8g2.sendBuffer(); // Transfer internal memory to the display
-    delay(1000);
-#endif
   }
-
+  
   // Stop the loop timer
   timer.syncRtc = millis() - loopStartTime;
-}
-
-// Callback function to process UBX-NAV-PVT data
-void processNavPvt(UBX_NAV_PVT_data_t ubx)
-{
-  // Reset watchdog timer
-  petDog();
-
-  // Blink LED
-  digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-
-  bool dateValidFlag = ubx.flags2.bits.confirmedDate;
-  bool timeValidFlag = ubx.flags2.bits.confirmedTime;
-  byte fixType = ubx.fixType;
-
-#if DEBUG_GNSS
-  char gnssBuffer[200];
-  sprintf(gnssBuffer, "%04u-%02d-%02d %02d:%02d:%02d.%03d,%ld,%ld,%d,%d,%d,%d,%d",
-          ubx.year, ubx.month, ubx.day,
-          ubx.hour, ubx.min, ubx.sec, ubx.iTOW % 1000,
-          ubx.lat, ubx.lon, ubx.numSV,
-          ubx.pDOP, ubx.fixType,
-          dateValidFlag, timeValidFlag);
-  Serial.println(gnssBuffer);
-#endif
-
-  // Check if date and time are valid and sync RTC with GNSS
-  if (dateValidFlag && timeValidFlag)
-  {
-    // Get the RTC's date and time
-    rtc.getTime();
-
-    // Calculate RTC drift
-    unsigned long us;
-    unsigned long rtcEpoch = rtc.getEpoch();
-    unsigned long gnssEpoch = gnss.getEpoch(us);
-    rtcDrift = gnssEpoch - rtcEpoch;
-
-    // Set RTC date and time
-    rtc.setTime(ubx.hour, ubx.min, ubx.sec, ubx.iTOW % 1000,
-                ubx.day, ubx.month, ubx.year - 2000);
-
-    rtcSyncFlag = true; // Set flag
-    Serial.print("Info: RTC drift: "); Serial.println(rtcDrift);
-    Serial.print("Info: RTC time synced to "); printDateTime();
-
-    char dateTimeBuffer[25];
-    sprintf(dateTimeBuffer, "20%02d-%02d-%02d %02d:%02d:%02d",
-            rtc.year, rtc.month, rtc.dayOfMonth,
-            rtc.hour, rtc.minute, rtc.seconds, rtc.hundredths);
-
-#if DEBUG_OLED
-    u8g2.clearBuffer();
-    u8g2.drawStr(0, 10, "RTC synced with GNSS");
-    u8g2.sendBuffer();
-    delay(1000);
-#endif
-  }
 }
 
 // Log UBX-RXM-RAWX/SFRBX data

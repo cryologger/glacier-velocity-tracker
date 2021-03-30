@@ -29,7 +29,7 @@
 // -----------------------------------------------------------------------------
 #define DEBUG       true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS  true  // Output GNSS information to Serial Monitor
-#define DEBUG_OLED  true  // Output debug messages to OLED display
+#define DEBUG_OLED  false  // Output debug messages to OLED display
 
 // ----------------------------------------------------------------------------
 // Pin definitions
@@ -66,7 +66,7 @@ byte          loggingAlarmMode      = 5;    // Logging alarm mode
 byte          initialAlarmMode      = 6;    // Initial alarm mode
 bool          sleepFlag             = true; // Flag to indicate whether to sleep between new log files
 bool          gnssConfigFlag        = true; // Flag to indicate whether to configure the u-blox module
-unsigned int  gnssTimeout           = 1;    // Timeout for GNSS signal acquisition (minutes)
+unsigned int  gnssTimeout           = 10;    // Timeout for GNSS signal acquisition (minutes)
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
