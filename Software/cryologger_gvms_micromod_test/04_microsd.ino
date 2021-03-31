@@ -9,11 +9,7 @@ void configureSd()
   {
     Serial.println("Warning: microSD failed to initialize.");
     online.microSd = false;
-#if DEBUG_OLED
-    u8g2.clearBuffer();
-    u8g2.drawStr(0, 10, "microSD failed to initialize.");
-    u8g2.sendBuffer();
-#endif
+
     peripheralPowerOff();
     qwiicPowerOff();
     while (1); // Force watchdog reset
@@ -21,12 +17,6 @@ void configureSd()
   else
   {
     online.microSd = true;
-#if DEBUG_OLED
-    u8g2.clearBuffer();
-    u8g2.drawStr(0, 10, "microSD initialized.");
-    u8g2.sendBuffer();
-    delay(1000);
-#endif
   }
   // Stop the loop timer
   timer.microSd = millis() - loopStartTime;

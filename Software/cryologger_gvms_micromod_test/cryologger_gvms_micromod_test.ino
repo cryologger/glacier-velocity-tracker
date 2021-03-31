@@ -15,13 +15,11 @@
 // ----------------------------------------------------------------------------
 // Libraries
 // ----------------------------------------------------------------------------
-#include <Arduino.h>
 #include <RTC.h>
 #include <SparkFun_u-blox_GNSS_Arduino_Library.h> // https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library
 #include <SdFat.h>                                // https://github.com/greiman/SdFat
 #include <SPI.h>
 #include <WDT.h>
-#include <U8g2lib.h>                              // https://github.com/olikraus/oled
 #include <Wire.h>
 
 // -----------------------------------------------------------------------------
@@ -29,7 +27,6 @@
 // -----------------------------------------------------------------------------
 #define DEBUG       true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS  true  // Output GNSS information to Serial Monitor
-#define DEBUG_OLED  false  // Output debug messages to OLED display
 
 // ----------------------------------------------------------------------------
 // Pin definitions
@@ -48,10 +45,6 @@ FsFile            logFile;
 FsFile            debugFile;
 SFE_UBLOX_GNSS    gnss;
 
-#if DEBUG_OLED
-U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE); // 0x3C
-#endif
-
 // ----------------------------------------------------------------------------
 // User defined global variable declarations
 // ----------------------------------------------------------------------------
@@ -59,14 +52,14 @@ byte          loggingStart          = 18;   // Logging start time (hour)
 byte          loggingEnd            = 21;   // Logging end time (hour)
 byte          sleepAlarmMinutes     = 1;    // Rolling minutes alarm
 byte          sleepAlarmHours       = 0;    // Rolling hours alarm
-byte          loggingAlarmMinutes   = 5;    // Rolling minutes alarm
+byte          loggingAlarmMinutes   = 2;    // Rolling minutes alarm
 byte          loggingAlarmHours     = 0;    // Rolling hours alarm
 byte          sleepAlarmMode        = 5;    // Sleep alarm mode
 byte          loggingAlarmMode      = 5;    // Logging alarm mode
 byte          initialAlarmMode      = 6;    // Initial alarm mode
 bool          sleepFlag             = true; // Flag to indicate whether to sleep between new log files
 bool          gnssConfigFlag        = true; // Flag to indicate whether to configure the u-blox module
-unsigned int  gnssTimeout           = 10;    // Timeout for GNSS signal acquisition (minutes)
+unsigned int  gnssTimeout           = 5;    // Timeout for GNSS signal acquisition (minutes)
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -145,7 +138,6 @@ void setup()
   printDateTime();      // Print RTC's current date and time
 
   // Configure devices
-  configureOled();      // Configure OLED display
   configureWdt();       // Configure and start Watchdog Timer (WDT)
   configureGnss();      // Configure u-blox GNSS
   syncRtc();            // Acquire GNSS fix and sync RTC with GNSS
@@ -182,7 +174,6 @@ void loop()
       firstTimeFlag = false;  // Clear flag
       qwiicPowerOn();         // Enable power to Qwiic connector
       peripheralPowerOn();    // Enable power to peripherals
-      configureOled();        // Configure OLED display
       configureSd();          // Configure microSD
       configureGnss();        // Configure u-blox GNSS
       syncRtc();              // Synchronize RTC

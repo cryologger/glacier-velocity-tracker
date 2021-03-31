@@ -18,12 +18,7 @@ void configureGnss()
   {
     Serial.println("Warning: u-blox failed to initialize!");
     online.gnss = false;
-#if DEBUG_OLED
-    u8g2.clearBuffer(); // Clear the internal memory
-    u8g2.drawStr(0, 10, "u-blox failed to initialize."); // Write something to the internal memory
-    u8g2.sendBuffer(); // Transfer internal memory to the display
-    delay(1000);
-#endif
+
     peripheralPowerOff();
     qwiicPowerOff();
     while (1); // Force watchdog reset
@@ -130,7 +125,7 @@ void syncRtc()
         // Calculate RTC drift
         unsigned long us;
         unsigned long rtcEpoch = rtc.getEpoch(); // Get RTC epoch time
-        unsigned long gnssEpoch = gnss.getEpoch(us); // Get GNSS epoch time
+        unsigned long gnssEpoch = gnss.getUnixEpoch(us); // Get GNSS epoch time
         rtcDrift = gnssEpoch - rtcEpoch;
 
         // Set RTC date and time
@@ -244,14 +239,6 @@ void logGnss()
 
       Serial.print("Max file buffer: "); Serial.println(maxBufferBytes);
 
-#if DEBUG_OLED
-      u8g2.clearBuffer();
-      u8g2.setCursor(0, 10);
-      u8g2.print(bytesWritten);
-      u8g2.setCursor(0, 20);
-      u8g2.print(maxBufferBytes);
-      u8g2.sendBuffer();
-#endif
       // Warn if fileBufferSize was more than 80% full
       if (maxBufferBytes > ((fileBufferSize / 5) * 4))
       {

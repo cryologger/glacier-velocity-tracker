@@ -1,8 +1,6 @@
 // Enter deep sleep
 void goToSleep()
 {
-
-
 #if DEBUG
   Serial.println("Info: Entering deep sleep");
   Serial.flush();
