@@ -20,8 +20,14 @@ void configureWdt()
 // Reset the watchdog timer
 void petDog()
 {
+  // Start the loop timer
+  unsigned long loopStartTime = micros();
+
   wdt.restart(); // Restart the watchdog timer
   //DEBUG_PRINT("Watchdog interrupt: "); DEBUG_PRINTLN(wdtCounter);
   wdtFlag = false; // Clear watchdog flag
   wdtCounter = 0; // Reset watchdog interrupt counter
+
+  // Stop the loop timer
+  timer.wdt = micros() - loopStartTime;
 }

@@ -1,9 +1,16 @@
+void readBattery()
+{
+  // Start loop timer
+  unsigned long loopStartTime = millis();
+
+  // Stop the loop timer
+  timer.battery = millis() - loopStartTime;
+}
+
 // Enter deep sleep
 void goToSleep()
 {
 #if DEBUG
-  Serial.println("Info: Entering deep sleep");
-  Serial.flush();
   Serial.end();         // Close Serial port
 #endif
   Wire.end();           // Disable I2C
@@ -83,7 +90,13 @@ void wakeUp()
 void qwiicPowerOn()
 {
   digitalWrite(PIN_QWIIC_POWER, HIGH);
-  delay(2500);
+  // Non-blocking delay to allow Qwiic devices time to power up
+  // https://arduino.stackexchange.com/questions/12587/how-can-i-handle-the-millis-rollover
+  unsigned long currentMillis = millis();
+  while (millis() - currentMillis < qwiicPowerDelay)
+  {
+    petDog(); // Restart watchdog timer
+  }
 }
 
 // Disable power to Qwiic connector
@@ -96,14 +109,23 @@ void qwiicPowerOff()
 void peripheralPowerOn()
 {
   digitalWrite(PIN_PWC_POWER, HIGH);
-  delay(250);
+  // Non-blocking delay
+  unsigned long currentMillis = millis();
+  while (millis() - currentMillis < sdPowerDelay)
+  {
+    petDog();
+  }
 }
 
 // Disable power to microSD and peripherals
 void peripheralPowerOff()
 {
+  unsigned long currentMillis = millis();
+  while (millis() - currentMillis < sdPowerDelay)
+  {
+    petDog();
+  }
   digitalWrite(PIN_PWC_POWER, LOW);
-  delay(250);
 }
 
 // Non-blocking blink LED (https://forum.arduino.cc/index.php?topic=503368.0)

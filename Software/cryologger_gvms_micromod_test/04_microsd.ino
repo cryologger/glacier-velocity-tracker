@@ -7,9 +7,9 @@ void configureSd()
   // Initialize microSD
   if (!sd.begin(SdSpiConfig(PIN_SD_CS, DEDICATED_SPI)))
   {
-    Serial.println("Warning: microSD failed to initialize.");
+    DEBUG_PRINTLN("Warning: microSD failed to initialize. Reattempting...");
     online.microSd = false;
-
+    
     peripheralPowerOff();
     qwiicPowerOff();
     while (1); // Force watchdog reset
@@ -23,31 +23,31 @@ void configureSd()
 }
 
 // Update the file create timestamp
-void updateFileCreate()
+void updateFileCreate(FsFile *dataFile)
 {
   // Get the RTC's current date and time
   rtc.getTime();
 
   // Update the file create timestamp
-  if (!logFile.timestamp(T_CREATE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
+  if (!dataFile->timestamp(T_CREATE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
   {
-    Serial.print("Warning: Could not update file create timestamp.");
+    DEBUG_PRINT("Warning: Could not update file create timestamp.");
   }
 }
 
 // Update the file access and write timestamps
-void updateFileAccess()
+void updateFileAccess(FsFile *dataFile)
 {
   // Get the RTC's current date and time
   rtc.getTime();
 
   // Update the file access and write timestamps
-  if (!logFile.timestamp(T_ACCESS, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
+  if (!dataFile->timestamp(T_ACCESS, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
   {
-    Serial.print("Warning: Could not update file access timestamp.");
+    DEBUG_PRINT("Warning: Could not update file access timestamp.");
   }
-  if (!logFile.timestamp(T_WRITE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
+  if (!dataFile->timestamp(T_WRITE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
   {
-    Serial.print("Warning: Could not update file write timestamp.");
+    DEBUG_PRINT("Warning: Could not update file write timestamp.");
   }
 }

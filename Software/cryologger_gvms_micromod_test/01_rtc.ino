@@ -43,8 +43,19 @@ void configureRtc()
 // Read the real-time clock
 void readRtc()
 {
+  // Start the loop timer
+  unsigned long loopStartTime = micros();
+
   // Get the RTC's current date and time
   rtc.getTime();
+
+  // Get RTC's UNIX Epoch time
+  //unixtime = rtc.getEpoch();
+
+  //DEBUG_PRINT("Info: Unix epoch time "); DEBUG_PRINTLN(unixtime);
+
+  // Stop the loop timer
+  timer.rtc = micros() - loopStartTime;
 }
 
 // Set RTC alarm
@@ -67,8 +78,8 @@ void setSleepAlarm()
   alarmFlag = false;
 
   // Print the next RTC alarm date and time
-  Serial.print("Info: Current time "); printDateTime();
-  Serial.print("Info: Sleeping until "); printAlarm();
+  DEBUG_PRINT("Info: Current time "); printDateTime();
+  DEBUG_PRINT("Info: Sleeping until "); printAlarm();
 }
 
 void setLoggingAlarm()
@@ -90,8 +101,8 @@ void setLoggingAlarm()
   alarmFlag = false;
 
   // Print the next RTC alarm date and time
-  //Serial.print("Info: Current time "); printDateTime();
-  Serial.print("Info: Logging until "); printAlarm();
+  //DEBUG_PRINT("Info: Current time "); printDateTime();
+  DEBUG_PRINT("Info: Logging until "); printAlarm();
 }
 
 // Print the RTC's date and time
@@ -102,7 +113,7 @@ void printDateTime()
   sprintf(dateTimeBuffer, "20%02d-%02d-%02d %02d:%02d:%02d",
           rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds, rtc.hundredths);
-  Serial.println(dateTimeBuffer);
+  DEBUG_PRINTLN(dateTimeBuffer);
 }
 
 // Print the RTC's alarm
@@ -113,5 +124,5 @@ void printAlarm()
   sprintf(alarmBuffer, "20%02d-%02d-%02d %02d:%02d:%02d",
           rtc.year, rtc.alarmMonth, rtc.alarmDayOfMonth,
           rtc.alarmHour, rtc.alarmMinute, rtc.alarmSeconds, rtc.alarmHundredths);
-  Serial.println(alarmBuffer);
+  DEBUG_PRINTLN(alarmBuffer);
 }

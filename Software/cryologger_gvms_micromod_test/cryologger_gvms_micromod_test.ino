@@ -23,10 +23,25 @@
 #include <Wire.h>
 
 // -----------------------------------------------------------------------------
-// Debugging
+// Debugging macros
 // -----------------------------------------------------------------------------
 #define DEBUG       true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS  true  // Output GNSS information to Serial Monitor
+
+#if DEBUG
+#define DEBUG_PRINT(x)            Serial.print(x)
+#define DEBUG_PRINTLN(x)          Serial.println(x)
+#define DEBUG_PRINT_DEC(x, y)     Serial.print(x, y)
+#define DEBUG_PRINTLN_DEC(x, y)   Serial.println(x, y)
+#define DEBUG_WRITE(x)            Serial.write(x)
+
+#else
+#define DEBUG_PRINT(x)
+#define DEBUG_PRINTLN(x)
+#define DEBUG_PRINT_DEC(x, y)
+#define DEBUG_PRINTLN_DEC(x, y)
+#define DEBUG_WRITE(x)
+#endif
 
 // ----------------------------------------------------------------------------
 // Pin definitions
@@ -50,16 +65,18 @@ SFE_UBLOX_GNSS    gnss;
 // ----------------------------------------------------------------------------
 byte          loggingStart          = 18;   // Logging start time (hour)
 byte          loggingEnd            = 21;   // Logging end time (hour)
-byte          sleepAlarmMinutes     = 1;    // Rolling minutes alarm
-byte          sleepAlarmHours       = 0;    // Rolling hours alarm
 byte          loggingAlarmMinutes   = 2;    // Rolling minutes alarm
 byte          loggingAlarmHours     = 0;    // Rolling hours alarm
-byte          sleepAlarmMode        = 5;    // Sleep alarm mode
 byte          loggingAlarmMode      = 5;    // Logging alarm mode
-byte          initialAlarmMode      = 6;    // Initial alarm mode
+
+byte          sleepAlarmMinutes     = 1;    // Rolling minutes alarm
+byte          sleepAlarmHours       = 0;    // Rolling hours alarm
+byte          sleepAlarmMode        = 5;    // Sleep alarm mode
 bool          sleepFlag             = true; // Flag to indicate whether to sleep between new log files
+
+byte          initialAlarmMode      = 6;    // Initial alarm mode
 bool          gnssConfigFlag        = true; // Flag to indicate whether to configure the u-blox module
-unsigned int  gnssTimeout           = 5;    // Timeout for GNSS signal acquisition (minutes)
+unsigned int  gnssTimeout           = 1;    // Timeout for GNSS signal acquisition (minutes)
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -71,11 +88,12 @@ volatile bool wdtFlag             = false;        // Flag for watchdog timer int
 volatile int  wdtCounter          = 0;            // Counter for watchdog timer interrupts
 volatile int  wdtCounterMax       = 0;            // Counter for max watchdog timer interrupts
 bool          firstTimeFlag       = true;         // Flag to track configuration of u-blox GNSS
-bool          loggingFlag         = true;         //
 bool          resetFlag           = false;        // Flag to force system reset using watchdog timer
 bool          rtcSyncFlag         = false;        // Flag to indicate if the RTC was synced with the GNSS
 char          logFileName[30]     = "";           // Log file name
 char          debugFileName[10]   = "debug.csv";  // Debug log file name
+unsigned int  sdPowerDelay        = 250;          // Delay before enabling/disabling power to microSD (milliseconds)
+unsigned int  qwiicPowerDelay     = 2500;         // Delay after enabling power to Qwiic connector (milliseconds)
 unsigned int  debugCounter        = 0;            // Counter to track number of recorded debug messages
 unsigned int  maxBufferBytes      = 0;            // Maximum value of file buffer
 unsigned long previousMillis      = 0;            // Global millis() timer
@@ -127,12 +145,14 @@ void setup()
   Wire.setClock(400000); // Set I2C clock speed to 400 kHz
   SPI.begin();          // Initialize SPI
 
+#if DEBUG
   Serial.begin(115200); // Open Serial port
-  //while (!Serial);      // Wait for user to open Serial Monitor
-  delay(2000);          // Delay to allow user to open Serial Monitor
+  //while (!Serial);    // Wait for user to open Serial Monitor
+  blinkLed(2, 1000);    // Delay to allow user to open Serial Monitor
+#endif
 
   printLine();
-  Serial.println("Cryologger - Glacier Velocity Measurement System");
+  DEBUG_PRINTLN("Cryologger - Glacier Velocity Measurement System");
   printLine();
 
   printDateTime();      // Print RTC's current date and time
@@ -145,8 +165,8 @@ void setup()
   createDebugFile();    // Create debug log file
   configureRtc();       // Configure real-time clock (RTC) alarm
 
-  Serial.print("Info: Datetime "); printDateTime();
-  Serial.print("Info: Initial alarm "); printAlarm();
+  DEBUG_PRINT("Info: Datetime "); printDateTime();
+  DEBUG_PRINT("Info: Initial alarm "); printAlarm();
 
   // Blink LED to indicate completion of setup
   blinkLed(10, 100);
@@ -166,7 +186,10 @@ void loop()
     // Clear alarm flag
     alarmFlag = false;
 
-    Serial.print("Info: Alarm trigger "); printDateTime();
+    DEBUG_PRINT("Info: Alarm trigger "); printDateTime();
+
+    // Set logging alarm
+    setLoggingAlarm();
 
     // Check if program is running for first time or if sleep is enabled
     if (firstTimeFlag || sleepFlag)
@@ -180,7 +203,6 @@ void loop()
     }
 
     // Log data
-    setLoggingAlarm();  // Set logging duration alarm
     logGnss();          // Log u-blox GNSS data
     logDebug();         // Log system debug information
 
@@ -191,10 +213,10 @@ void loop()
     }
     else
     {
-      alarmFlag = true; // Force logging
+      alarmFlag = true; // Continue logging
     }
   }
-  
+
   // Check for watchdog interrupt
   if (wdtFlag)
   {
@@ -239,7 +261,10 @@ extern "C" void am_watchdog_isr(void)
   }
   else
   {
-    while (1); // Force reset
+    //wdt.stop(); // Stop watchdog timer
+    //peripheralPowerOff(); // Disable power to peripherals
+    //qwiicPowerOff(); // Disable power to Qwiic connector
+    while (1);
   }
   wdtFlag = true; // Set the watchdog flag
   wdtCounter++; // Increment watchdog interrupt counter

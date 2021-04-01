@@ -7,12 +7,12 @@ void createDebugFile()
   // O_WRITE - Open the file for writing
   if (!debugFile.open(debugFileName, O_CREAT | O_APPEND | O_WRITE))
   {
-    Serial.println("Warning: Failed to create debug file.");
+    DEBUG_PRINTLN("Warning: Failed to create debug file.");
     return;
   }
   else
   {
-    Serial.print("Info: Created "); Serial.println(debugFileName);
+    DEBUG_PRINT("Info: Created "); DEBUG_PRINTLN(debugFileName);
   }
 
   // Write header to file
@@ -20,23 +20,19 @@ void createDebugFile()
                     "timer_microsd,timer_gnss,timer_syncRtc,timer_logGnss,timer_logDebug,"
                     "rtcDrift,bytesWritten,maxBufferBytes,wdtCounterMax,debugCounter");
 
-
   // Sync the debug file
   if (!debugFile.sync())
   {
-    Serial.println("Warning: Failed to sync debug file.");
+    DEBUG_PRINTLN("Warning: Failed to sync debug file.");
   }
 
   // Update the file create timestamp
-  if (!debugFile.timestamp(T_CREATE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
-  {
-    Serial.print("Warning: Could not update file create timestamp.");
-  }
+  updateFileCreate(&debugFile);
 
   // Close log file
   if (!debugFile.close())
   {
-    Serial.println("Warning: Failed to close debug file.");
+    DEBUG_PRINTLN("Warning: Failed to close debug file.");
   }
 }
 
@@ -52,13 +48,13 @@ void logDebug()
   // Open debug file for writing
   if (!debugFile.open(debugFileName, O_APPEND | O_WRITE))
   {
-    Serial.println("Warning: Failed to open debug file.");
+    DEBUG_PRINTLN("Warning: Failed to open debug file.");
     online.logDebug = false; // Set flag
     return;
   }
   else
   {
-    Serial.print("Info: Opened "); Serial.println(debugFileName);
+    DEBUG_PRINT("Info: Opened "); DEBUG_PRINTLN(debugFileName);
     online.logDebug = true; // Set flag
   }
 
@@ -88,25 +84,16 @@ void logDebug()
   // Sync the debug file
   if (!debugFile.sync())
   {
-    Serial.println("Warning: Failed to sync debug file.");
+    DEBUG_PRINTLN("Warning: Failed to sync debug file.");
   }
 
-  // Update the file access timestamp
-  if (!debugFile.timestamp(T_ACCESS, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
-  {
-    Serial.print("Warning: Could not update debug file access timestamp.");
-  }
-
-  // Update the file write timestamp
-  if (!debugFile.timestamp(T_WRITE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
-  {
-    Serial.print("Warning: Could not update debug file write timestamp.");
-  }
+  // Update file access timestamps
+  updateFileAccess(&debugFile);
 
   // Close the debug file
   if (!debugFile.close())
   {
-    Serial.println("Warning: Failed to close debug file.");
+    DEBUG_PRINTLN("Warning: Failed to close debug file.");
   }
   // Stop the loop timer
   timer.logDebug = millis() - loopStartTime;

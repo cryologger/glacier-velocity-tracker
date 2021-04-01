@@ -16,7 +16,7 @@ void configureGnss()
   // Initialize u-blox GNSS
   if (!gnss.begin(Wire))
   {
-    Serial.println("Warning: u-blox failed to initialize!");
+    DEBUG_PRINTLN("Warning: u-blox failed to initialize!");
     online.gnss = false;
 
     peripheralPowerOff();
@@ -27,7 +27,6 @@ void configureGnss()
   {
     online.gnss = true;
   }
-
 
   // Configure communication interfaces and satellite signals only if program is running for the first time
   if (gnssConfigFlag)
@@ -42,7 +41,7 @@ void configureGnss()
       setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_USB_ENABLED, 0);   // Disable USB
       if (!setValueSuccess)
       {
-      Serial.println("Warning: Communication interfaces not configured!");
+      DEBUG_PRINTLN("Warning: Communication interfaces not configured!");
       }
     */
     // Configure satellite signals
@@ -55,7 +54,7 @@ void configureGnss()
     delay(2000);
     if (!setValueSuccess)
     {
-      Serial.println("Warning: Satellite signals not configured!");
+      DEBUG_PRINTLN("Warning: Satellite signals not configured!");
     }
     gnssConfigFlag = false; // Clear flag
 
@@ -67,10 +66,9 @@ void configureGnss()
   gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
   gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
   gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
-  //gnss.setAutoPVTcallback(&processNavPvt);          // Enable automatic NAV PVT messages with callback to processNavPvt()
   gnss.setAutoPVT(true);                            // Enable automatic NAV-PVT messages
-  gnss.setAutoRXMSFRBX(true);                       // Enable automatic RXM-SFRBX messages
-  gnss.setAutoRXMRAWX(true);                        // Enable automatic RXM-RAWX messages
+  gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM-SFRBX messages
+  gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM-RAWX messages
   gnss.logRXMSFRBX();                               // Enable RXM-SFRBX data logging
   gnss.logRXMRAWX();                                // Enable RXM-RAWX data logging
 
@@ -87,13 +85,12 @@ void syncRtc()
   // Clear flag
   rtcSyncFlag = false;
 
-  Serial.println("Info: Acquiring GNSS fix...");
+  DEBUG_PRINTLN("Info: Acquiring GNSS fix...");
 
   // Attempt to acquire a valid GNSS position fix for up to 5 minutes
   while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 60UL * 1000UL)
   {
     petDog(); // Reset watchdog timer
-    gnss.clearFileBuffer(); // Clear file buffer
 
     // Check for UBX-NAV-PVT messages
     if (gnss.getPVT())
@@ -113,7 +110,7 @@ void syncRtc()
               gnss.getLatitude(), gnss.getLongitude(), gnss.getSIV(),
               gnss.getPDOP(), gnss.getFixType(),
               dateValidFlag, timeValidFlag);
-      Serial.println(gnssBuffer);
+      DEBUG_PRINTLN(gnssBuffer);
 #endif
 
       // Check if date and time are valid and sync RTC with GNSS
@@ -123,25 +120,24 @@ void syncRtc()
         rtc.getTime();
 
         // Calculate RTC drift
-        unsigned long us;
         unsigned long rtcEpoch = rtc.getEpoch(); // Get RTC epoch time
-        unsigned long gnssEpoch = gnss.getUnixEpoch(us); // Get GNSS epoch time
-        rtcDrift = gnssEpoch - rtcEpoch;
+        //unsigned long gnssEpoch = gnss.getUnixEpoch(); // Get GNSS epoch time
+        //rtcDrift = gnssEpoch - rtcEpoch;
 
         // Set RTC date and time
-        rtc.setEpoch(gnssEpoch);
+        //rtc.setEpoch(gnssEpoch);
 
         rtcSyncFlag = true; // Set flag
-        Serial.print("Info: RTC drift: "); Serial.println(rtcDrift);
-        Serial.print("Info: RTC time synced to "); printDateTime();
+        DEBUG_PRINT("Info: RTC drift: "); DEBUG_PRINTLN(rtcDrift);
+        DEBUG_PRINT("Info: RTC time synced to "); printDateTime();
       }
     }
   }
   if (!rtcSyncFlag)
   {
-    Serial.println("Warning: Unable to sync RTC!");
+    DEBUG_PRINTLN("Warning: Unable to sync RTC!");
   }
-  
+
   // Stop the loop timer
   timer.syncRtc = millis() - loopStartTime;
 }
@@ -163,26 +159,21 @@ void logGnss()
   // O_WRITE  - Open the file for writing
   if (!logFile.open(logFileName, O_CREAT | O_APPEND | O_WRITE))
   {
-    Serial.print("Warning: Failed to create log file"); Serial.println(logFileName);
+    DEBUG_PRINT("Warning: Failed to create log file"); DEBUG_PRINTLN(logFileName);
     return;
   }
   else
   {
-    Serial.print("Info: Created log file "); Serial.println(logFileName);
+    DEBUG_PRINT("Info: Created log file "); DEBUG_PRINTLN(logFileName);
     online.logGnss = true;
   }
 
   // Update file create timestamp
-  updateFileCreate();
+  updateFileCreate(&logFile);
 
-  // Reset bytesWritten counter
-  bytesWritten = 0;
-
-
-
-
+  bytesWritten = 0;               // Reset bytesWritten counter
+  gnss.clearFileBuffer();         // Clear file buffer
   gnss.clearMaxFileBufferAvail(); // Reset max file buffer size
-
 
   // Log data until logging alarm triggers
   while (!alarmFlag)
@@ -222,27 +213,26 @@ void logGnss()
     }
 
     // Print bytes written every second
-    if (millis() > (previousMillis + 5000))
-    {
-
+    if (millis() - previousMillis > 5000)
+    {      
       // Sync the log file
       if (!logFile.sync())
       {
-        Serial.println("Warning: Failed to sync log file!");
+        DEBUG_PRINTLN("Warning: Failed to sync log file!");
       }
 
       // Print number of bytes written to SD card
-      Serial.print(bytesWritten); Serial.print(" bytes written. ");
+      DEBUG_PRINT(bytesWritten); DEBUG_PRINT(" bytes written. ");
 
       // Get max file buffer size
       maxBufferBytes = gnss.getMaxFileBufferAvail();
 
-      Serial.print("Max file buffer: "); Serial.println(maxBufferBytes);
+      DEBUG_PRINT("Max file buffer: "); DEBUG_PRINTLN(maxBufferBytes);
 
       // Warn if fileBufferSize was more than 80% full
       if (maxBufferBytes > ((fileBufferSize / 5) * 4))
       {
-        Serial.println("Warning: File buffer > 80 % full. Data loss may have occurrred.");
+        DEBUG_PRINTLN("Warning: File buffer > 80 % full. Data loss may have occurrred.");
       }
 
       previousMillis = millis(); // Update previousMillis
@@ -284,26 +274,26 @@ void logGnss()
   }
 
   // Print total number of bytes written to SD card
-  Serial.print("Info: Total bytes written is "); Serial.println(bytesWritten);
+  DEBUG_PRINT("Info: Total bytes written is "); DEBUG_PRINTLN(bytesWritten);
 
   // Sync the log file
   if (!logFile.sync())
   {
-    Serial.println("Warning: Failed to sync log file!");
+    DEBUG_PRINTLN("Warning: Failed to sync log file!");
   }
 
   // Update file access timestamps
-  updateFileAccess();
+  updateFileAccess(&logFile);
 
   // Close the log file
   if (!logFile.close())
   {
-    Serial.println("Warning: Failed to close log file!");
+    DEBUG_PRINTLN("Warning: Failed to close log file!");
   }
 
+  // Free RAM allocated for file storage and PVT processing
+  gnss.end();
+  
   // Stop the loop timer
   timer.logGnss = millis() - loopStartTime;
-
-  // Set flag
-  loggingFlag = true;
 }
