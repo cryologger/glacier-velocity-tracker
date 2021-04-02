@@ -4,18 +4,18 @@ void readBattery()
   unsigned long loopStartTime = millis();
 
   // Stop the loop timer
-  timer.voltage = millis() - loopStartTime;
+  timer.battery = millis() - loopStartTime;
 }
 
 // Enter deep sleep
 void goToSleep()
 {
 #if DEBUG
-  Serial.end();         // Disable Serial
+  Serial.end();         // Close Serial port
 #endif
   Wire.end();           // Disable I2C
   SPI.end();            // Disable SPI
-  power_adc_disable();  // Disable power to ADC
+  power_adc_disable();  // Disable ADC
 
   digitalWrite(LED_BUILTIN, LOW); // Turn off LED
 
@@ -30,12 +30,10 @@ void goToSleep()
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART0);
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART1);
 
-  // Disable all pads except G1, G2 and LED
+  // Disable all pads except G1 (33), G2 (34) and LED_BUILTIN (19)
   for (int x = 0; x < 50; x++)
   {
-    if ((x != ap3_gpio_pin2pad(PIN_PWC_POWER)) &&
-        (x != ap3_gpio_pin2pad(PIN_QWIIC_POWER)) &&
-        (x != ap3_gpio_pin2pad(LED_BUILTIN)))
+    if ((x != 33) && (x != 34) && (x != 19))
     {
       am_hal_gpio_pinconfig(x, g_AM_HAL_GPIO_DISABLE);
     }
@@ -47,16 +45,15 @@ void goToSleep()
   // Disable power to peripherals
   peripheralPowerOff();
 
-  // Mark devices as offline
+  // Clear online/offline flags
   online.gnss = false;
   online.microSd = false;
-  online.dataLogging = false;
-  online.debugLogging = false;
+  online.logGnss = false;
+  online.logDebug = false;
 
-  // Disable power to flash, SRAM, and cache
-  am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_CACHE); // Turn off CACHE
-  am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_FLASH_512K); // Turn off everything but lower 512k
-  am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_SRAM_64K_DTCM); // Turn off everything but lower 64k
+  // Power down flash, SRAM, cache
+  am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_ALL); // Power down all memory during deepsleep
+  am_hal_pwrctrl_memory_deepsleep_retain(AM_HAL_PWRCTRL_MEM_SRAM_384K); // Retain SRAM
 
   // Keep the 32kHz clock running for RTC
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
@@ -76,28 +73,25 @@ void goToSleep()
 // Wake from deep sleep
 void wakeUp()
 {
-  // Enable power to SRAM, turn on entire flash
-  am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_MAX);
-
   // Return to using the main clock
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
   am_hal_stimer_config(AM_HAL_STIMER_HFRC_3MHZ);
 
-  ap3_adc_setup();      // Enable power to ADC (v2.x)
-  Wire.begin();         // Enable I2C
-  SPI.begin();          // Enable SPI
+  ap3_adc_setup();        // Enable ADC
+  Wire.begin();           // Enable I2C
+  Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
+  SPI.begin();            // Enable SPI
 #if DEBUG
-  Serial.begin(115200); // Enable Serial
+  Serial.begin(115200);   // Open Serial port
 #endif
-
 }
 
 // Enable power to Qwiic connector
 void qwiicPowerOn()
 {
   digitalWrite(PIN_QWIIC_POWER, HIGH);
-
   // Non-blocking delay to allow Qwiic devices time to power up
+  // https://arduino.stackexchange.com/questions/12587/how-can-i-handle-the-millis-rollover
   unsigned long currentMillis = millis();
   while (millis() - currentMillis < qwiicPowerDelay)
   {
@@ -114,20 +108,19 @@ void qwiicPowerOff()
 // Enable power to microSD and peripherals
 void peripheralPowerOn()
 {
+  digitalWrite(PIN_PWC_POWER, HIGH);
   // Non-blocking delay
-  // norwegiancreations.com/2018/10/arduino-tutorial-avoiding-the-overflow-issue-when-using-millis-and-micros/
   unsigned long currentMillis = millis();
   while (millis() - currentMillis < sdPowerDelay)
   {
     petDog();
   }
-  digitalWrite(PIN_PWC_POWER, HIGH);
 }
 
 // Disable power to microSD and peripherals
 void peripheralPowerOff()
 {
-  // Non-blocking delay to allow microSD time to complete writing
+  // Non-blocking delay
   unsigned long currentMillis = millis();
   while (millis() - currentMillis < sdPowerDelay)
   {
@@ -150,6 +143,6 @@ void blinkLed(byte ledFlashes, unsigned int ledDelay)
       i++;
     }
   }
-  // Ensure LED is off at end of blink cycle
+  // Turn off LED
   digitalWrite(LED_BUILTIN, LOW);
 }
