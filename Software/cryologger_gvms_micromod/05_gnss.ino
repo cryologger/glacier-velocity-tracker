@@ -114,14 +114,14 @@ void syncRtc()
 #endif
 
       // Check if date and time are valid and sync RTC with GNSS
-      if (dateValidFlag && timeValidFlag)
+      if (/*dateValidFlag &&*/ timeValidFlag)
       {
         unsigned long rtcEpoch = rtc.getEpoch();        // Get RTC epoch time
         unsigned long gnssEpoch = gnss.getUnixEpoch();  // Get GNSS epoch time
         rtc.setEpoch(gnssEpoch);                        // Set RTC date and time
         rtcDrift = gnssEpoch - rtcEpoch;                // Calculate RTC drift
         rtcSyncFlag = true;                             // Set flag
-        
+
         DEBUG_PRINT("Info: RTC drift: "); DEBUG_PRINTLN(rtcDrift);
         DEBUG_PRINT("Info: RTC time synced to "); printDateTime();
       }
@@ -136,16 +136,19 @@ void syncRtc()
   timer.syncRtc = millis() - loopStartTime;
 }
 
+// Create timestamped log file name
+void getLogFileName()
+{
+  sprintf(logFileName, "20%02d%02d%02d_%02d%02d%02d.ubx",
+          rtc.year, rtc.month, rtc.dayOfMonth,
+          rtc.hour, rtc.minute, rtc.seconds);
+}
+
 // Log UBX-RXM-RAWX/SFRBX data
 void logGnss()
 {
   // Start loop timer
   unsigned long loopStartTime = millis();
-
-  // Create timestamped log file name
-  sprintf(logFileName, "20%02d%02d%02d_%02d%02d%02d.ubx",
-          rtc.year, rtc.month, rtc.dayOfMonth,
-          rtc.hour, rtc.minute, rtc.seconds);
 
   // Create a new log file and open for writing
   // O_CREAT  - Create the file if it does not exist

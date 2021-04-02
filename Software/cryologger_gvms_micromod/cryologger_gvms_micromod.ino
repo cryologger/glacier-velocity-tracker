@@ -9,13 +9,12 @@
     - SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic)
 
     Comments:
-    - Minimal debugging code for testing purposes
+    -
 */
 
 // ----------------------------------------------------------------------------
 // Libraries
 // ----------------------------------------------------------------------------
-#include <FastLED.h>
 #include <RTC.h>
 #include <SparkFun_u-blox_GNSS_Arduino_Library.h> // https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library
 #include <SdFat.h>                                // https://github.com/greiman/SdFat
@@ -56,7 +55,6 @@
 // ----------------------------------------------------------------------------
 APM3_RTC          rtc;
 APM3_WDT          wdt;
-CRGB led[1];
 SdFs              sd;
 FsFile            logFile;
 FsFile            debugFile;
@@ -84,6 +82,7 @@ byte          initialAlarmMode      = 4;    // Initial alarm mode
 // Flags
 bool          sleepFlag             = true; // Flag to indicate whether to sleep between new log files
 bool          gnssConfigFlag        = true; // Flag to indicate whether to configure the u-blox module
+unsigned int  gnssTimeout           = 1;    // Timeout for GNSS signal acquisition (minutes)
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -99,7 +98,7 @@ bool          resetFlag           = false;        // Flag to force system reset 
 bool          rtcSyncFlag         = false;        // Flag to indicate if the RTC was synced with the GNSS
 char          logFileName[30]     = "";           // Log file name
 char          debugFileName[10]   = "debug.csv";  // Debug log file name
-unsigned int  gnssTimeout         = 5;            // Timeout for GNSS signal acquisition (minutes)
+
 unsigned int  sdPowerDelay        = 250;          // Delay before enabling/disabling power to microSD (milliseconds)
 unsigned int  qwiicPowerDelay     = 2500;         // Delay after enabling power to Qwiic connector (milliseconds)
 unsigned int  debugCounter        = 0;            // Counter to track number of recorded debug messages
@@ -145,8 +144,6 @@ void setup()
   pinMode(PIN_QWIIC_POWER, OUTPUT);
   pinMode(PIN_PWC_POWER, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
-
-  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(led, 1);  // GRB ordering is typical
 
   qwiicPowerOn();       // Enable power to Qwiic connector
   peripheralPowerOn();  // Enable power to peripherials
@@ -200,6 +197,7 @@ void loop()
 
     // Set logging alarm
     setLoggingAlarm();
+    getLogFileName();
 
     // Check if program is running for first time or if sleep is enabled
     if (firstTimeFlag || sleepFlag)
@@ -251,8 +249,9 @@ void loop()
 extern "C" void am_rtc_isr(void)
 {
   // Clear the RTC alarm interrupt
-  rtc.clearInterrupt();
-
+  //rtc.clearInterrupt();
+  am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
+  
   // Set alarm flag
   alarmFlag = true;
 }
