@@ -5,20 +5,21 @@
 ** ***Work in progress*** **
 
 ## Introduction
-A low-cost and open-source glacier velocity measurement system based on the u-blox ZED-F9P GNSS receiver. The code is powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board and is dedicated to logging UBX messages from the u-blox ZED-F9P.
+A low-cost, open-source glacier velocity measurement system based on the u-blox ZED-F9P GNSS receiver and powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board.
 
 
+## Methods
 
-## Design
-
-### Principles
+### Design Principles
 * Inexpensive
 * Power efficienct
 * Robust
 * User friendly
 * Off-the-shelf components
 
-### Materials 
+### Bill of Materials 
+
+**Table 1.** Components making up the glacier velocity measurement system, current as of April 3, 2021.
 
 | Component | Product | Cost (USD) |
 | --- | --- | :---: | 
@@ -27,14 +28,16 @@ A low-cost and open-source glacier velocity measurement system based on the u-bl
 | GNSS Receiver | SparkFun GPS-RTK-SMA Breakout - ZED-F9P | $219.95 |
 | GNSS Antenna | SparkFun GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106 | $124.95 |
 | Voltage Regulator | Pololu 5V, 600mA Step-Down Voltage Regulator D36V6F5 | $4.95 |
-| microSD Card| Western Digital Industrial Grade Extended Temperature 32 GB | $57.00 |
+| microSD Card| Western Digital SDSDQED-032G-XI Industrial Grade 32 GB microSD | $57.00 |
 | Solar Panel | Voltaic Systems 9 Watt 18 Volt Solar Panel | $89.00 |
 | Solar Panel Bracket | Voltaic Systems Solar Panel Bracket - Large | $18.00 |
+| Solar Panel Hardware | Voltaic Systems Panel Post Nuts - Stainless Steel | $ 4.00 |
 | Charge Controller | Genasun GV-5 65W 5A Solar charge controller with MPPT  | $68.00 |
 | Battery | Deka SOLAR Gel 48 Ah 8G40C | $150.00 |
 | Enclosure | L-Com 14x12x7 Inch Weatherproof NEMA Enclosure | $118.00 |
 | Pole Mount | L-Com Enclosure Pole Mounting Kit | $53.30 |
-| **Total** | | **$938.05** |
+| Tripod | | | 
+| **Total** | | |
 
 
 ### Carrier Board
