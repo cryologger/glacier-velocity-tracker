@@ -26,7 +26,7 @@
 // -----------------------------------------------------------------------------
 // Debugging macros
 // -----------------------------------------------------------------------------
-#define DEBUG       true  // Output debug messages to Serial Monitor
+#define DEBUG       false  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS  false  // Output GNSS information to Serial Monitor
 
 #if DEBUG
@@ -62,8 +62,11 @@ FsFile            debugFile;
 SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 
 // ----------------------------------------------------------------------------
-// User defined global variable declarations
+// User defined logging/sleeping variables
 // ----------------------------------------------------------------------------
+
+// Logging mode 
+byte          loggingMode           = 2;    // 1 = daily, 2 = rolling
 
 // Daily alarm
 byte          loggingStartTime      = 16;   // Logging start hour (UTC)
@@ -78,9 +81,7 @@ byte          sleepAlarmHours       = 1;    // Rolling hours alarm
 // Alarm modes
 byte          loggingAlarmMode      = 4;    // Logging alarm mode
 byte          sleepAlarmMode        = 4;    // Sleep alarm mode
-byte          initialAlarmMode      = 4;    // Initial alarm mode
-
-unsigned int  gnssTimeout           = 5;    // Timeout for GNSS signal acquisition (minutes)
+byte          initialAlarmMode      = 5;    // Initial alarm mode
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -91,10 +92,11 @@ volatile bool alarmFlag           = false;        // Flag for alarm interrupt se
 volatile bool wdtFlag             = false;        // Flag for watchdog timer interrupt service routine
 volatile int  wdtCounter          = 0;            // Counter for watchdog timer interrupts
 volatile int  wdtCounterMax       = 0;            // Counter for max watchdog timer interrupts
-bool          gnssConfigFlag      = true; // Flag to indicate whether to configure the u-blox module
+bool          gnssConfigFlag      = true;         // Flag to indicate whether to configure the u-blox module
 char          logFileName[30]     = "";           // Log file name
 char          debugFileName[10]   = "debug.csv";  // Debug log file name
 unsigned int  debugCounter        = 0;            // Counter to track number of recorded debug messages
+unsigned int  gnssTimeout         = 5;            // Timeout for GNSS signal acquisition (minutes)
 unsigned int  maxBufferBytes      = 0;            // Maximum value of file buffer
 unsigned long previousMillis      = 0;            // Global millis() timer
 unsigned long bytesWritten        = 0;            // Counter for tracking bytes written to microSD

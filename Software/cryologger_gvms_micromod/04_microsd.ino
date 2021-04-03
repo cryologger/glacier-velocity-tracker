@@ -16,6 +16,7 @@ void configureSd()
     {
       DEBUG_PRINTLN("Warning: microSD failed to initialize.");
       online.microSd = false;
+      blinkLed(25, 250);
     }
   }
   else

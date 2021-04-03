@@ -25,6 +25,7 @@ void configureGnss()
     {
       DEBUG_PRINTLN("Warning: u-blox failed to initialize! Please check wiring.");
       online.gnss = false;
+      blinkLed(10, 500);
     }
   }
   else
