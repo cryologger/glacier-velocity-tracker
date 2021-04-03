@@ -24,7 +24,7 @@ void configureRtc()
   //rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
   // Set the alarm mode
-  rtc.setAlarmMode(6);
+  rtc.setAlarmMode(initialAlarmMode);
 
   // Attach alarm interrupt
   rtc.attachInterrupt();
@@ -63,10 +63,10 @@ void setSleepAlarm()
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
 
   // Set daily alarm
-  rtc.setAlarm(loggingStartTime, 0, 0, 0, 0, 0);
+  //rtc.setAlarm(loggingStartTime, 0, 0, 0, 0, 0);
 
-  // Set RTC alarm
-  //rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
+  // Set rolling RTC alarm
+  rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
   // Set RTC alarm mode
   rtc.setAlarmMode(sleepAlarmMode); // Alarm match on hundredths, seconds, minutes, hours
@@ -86,10 +86,10 @@ void setLoggingAlarm()
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
 
   // Set daily alarm
-  rtc.setAlarm(loggingStopTime, 0, 0, 0, 0, 0);
+  //rtc.setAlarm(loggingStopTime, 0, 0, 0, 0, 0);
 
   // Set rolling alarm
-  //rtc.setAlarm((rtc.hour + loggingAlarmHours) % 24, (rtc.minute + loggingAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
+  rtc.setAlarm((rtc.hour + loggingAlarmHours) % 24, (rtc.minute + loggingAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
   // Set RTC alarm mode
   rtc.setAlarmMode(loggingAlarmMode); // Alarm match on hundredths, seconds,  minutes, hours

@@ -9,10 +9,16 @@ void configureSd()
   {
     DEBUG_PRINTLN("Warning: microSD failed to initialize. Reattempting...");
     online.microSd = false;
-    
+
+    blinkLed(2, 1000);
     peripheralPowerOff();
     qwiicPowerOff();
-    while (1); // Force watchdog reset
+    // Force watchdog reset
+    while (1)
+    {
+      blinkLed(1, 2000); // Force watchdog reset
+      blinkLed(6, 250); // Force watchdog reset
+    }
   }
   else
   {

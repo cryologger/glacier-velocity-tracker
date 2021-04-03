@@ -21,7 +21,11 @@ void configureGnss()
 
     peripheralPowerOff();
     qwiicPowerOff();
-    while (1); // Force watchdog reset
+    while (1)
+    {
+      blinkLed(1, 2000); // Force watchdog reset
+      blinkLed(3, 250); // Force watchdog reset
+    }
   }
   else
   {
@@ -85,7 +89,7 @@ void syncRtc()
   // Clear flag
   rtcSyncFlag = false;
 
-  DEBUG_PRINTLN("Info: Acquiring GNSS fix...");
+  DEBUG_PRINTLN("Info: Attempting to acquire a GNSS fix...");
 
   // Attempt to acquire a valid GNSS position fix for up to 5 minutes
   while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 60UL * 1000UL)
@@ -114,7 +118,7 @@ void syncRtc()
 #endif
 
       // Check if date and time are valid and sync RTC with GNSS
-      if (/*dateValidFlag &&*/ timeValidFlag)
+      if (fixType == 3 && dateValidFlag && timeValidFlag)
       {
         unsigned long rtcEpoch = rtc.getEpoch();        // Get RTC epoch time
         unsigned long gnssEpoch = gnss.getUnixEpoch();  // Get GNSS epoch time
@@ -209,7 +213,7 @@ void logGnss()
       digitalWrite(LED_BUILTIN, LOW);
     }
 
-    // Print bytes written every second
+    // Periodically print number of bytes written
     if (millis() - previousMillis > 5000)
     {
       // Sync the log file
