@@ -8,16 +8,14 @@ void configureSd()
   if (!sd.begin(SdSpiConfig(PIN_SD_CS, DEDICATED_SPI)))
   {
     DEBUG_PRINTLN("Warning: microSD failed to initialize. Reattempting...");
-    online.microSd = false;
-
-    blinkLed(2, 1000);
-    peripheralPowerOff();
-    qwiicPowerOff();
-    // Force watchdog reset
-    while (1)
+    
+    // Delay between initialization attempts
+    myDelay(250);
+    
+    if (!sd.begin(SdSpiConfig(PIN_SD_CS, DEDICATED_SPI)))
     {
-      blinkLed(1, 2000); // Force watchdog reset
-      blinkLed(6, 250); // Force watchdog reset
+      DEBUG_PRINTLN("Warning: microSD failed to initialize.");
+      online.microSd = false;
     }
   }
   else

@@ -53,7 +53,7 @@ void goToSleep()
 
   // Power down flash, SRAM, cache
   am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_ALL); // Power down all memory during deepsleep
-  am_hal_pwrctrl_memory_deepsleep_retain(AM_HAL_PWRCTRL_MEM_SRAM_384K); // Retain SRAM
+  am_hal_pwrctrl_memory_deepsleep_retain(AM_HAL_PWRCTRL_MEM_SRAM_384K); // Retain all SRAM
 
   // Keep the 32kHz clock running for RTC
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
@@ -90,13 +90,7 @@ void wakeUp()
 void qwiicPowerOn()
 {
   digitalWrite(PIN_QWIIC_POWER, HIGH);
-  // Non-blocking delay to allow Qwiic devices time to power up
-  // https://arduino.stackexchange.com/questions/12587/how-can-i-handle-the-millis-rollover
-  unsigned long currentMillis = millis();
-  while (millis() - currentMillis < qwiicPowerDelay)
-  {
-    petDog(); // Restart watchdog timer
-  }
+  myDelay(2500); // Non-blocking delay to allow Qwiic devices time to power up
 }
 
 // Disable power to Qwiic connector
@@ -109,23 +103,13 @@ void qwiicPowerOff()
 void peripheralPowerOn()
 {
   digitalWrite(PIN_PWC_POWER, HIGH);
-  // Non-blocking delay
-  unsigned long currentMillis = millis();
-  while (millis() - currentMillis < sdPowerDelay)
-  {
-    petDog();
-  }
+  myDelay(250); // Non-blocking delay
 }
 
 // Disable power to microSD and peripherals
 void peripheralPowerOff()
 {
-  // Non-blocking delay
-  unsigned long currentMillis = millis();
-  while (millis() - currentMillis < sdPowerDelay)
-  {
-    petDog();
-  }
+  myDelay(250); // Non-blocking delay
   digitalWrite(PIN_PWC_POWER, LOW);
 }
 
@@ -145,4 +129,19 @@ void blinkLed(byte ledFlashes, unsigned int ledDelay)
   }
   // Turn off LED
   digitalWrite(LED_BUILTIN, LOW);
+}
+
+// Non-blocking delay (ms: duration)
+// https://arduino.stackexchange.com/questions/12587/how-can-i-handle-the-millis-rollover
+void myDelay(unsigned long ms)
+{
+  unsigned long start = millis();         // Start: timestamp
+  for (;;)
+  {
+    petDog();                             // Reset watchdog timer
+    unsigned long now = millis();         // Now: timestamp
+    unsigned long elapsed = now - start;  // Elapsed: duration
+    if (elapsed >= ms)                    // Comparing durations: OK
+      return;
+  }
 }

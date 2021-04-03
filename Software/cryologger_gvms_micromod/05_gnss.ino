@@ -16,15 +16,15 @@ void configureGnss()
   // Initialize u-blox GNSS
   if (!gnss.begin(Wire))
   {
-    DEBUG_PRINTLN("Warning: u-blox failed to initialize!");
-    online.gnss = false;
+    DEBUG_PRINTLN("Warning: u-blox failed to initialize. Reattempting...");
 
-    peripheralPowerOff();
-    qwiicPowerOff();
-    while (1)
+    // Delay between initialization attempts
+    myDelay(2000);
+    
+    if (!gnss.begin(Wire))
     {
-      blinkLed(1, 2000); // Force watchdog reset
-      blinkLed(3, 250); // Force watchdog reset
+      DEBUG_PRINTLN("Warning: u-blox failed to initialize! Please check wiring.");
+      online.gnss = false;
     }
   }
   else
@@ -55,7 +55,7 @@ void configureGnss()
     setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 0);   // Disable Galileo
     setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, 0);   // Disable BeiDou
     setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0); // Disable QZSS
-    delay(2000);
+    myDelay(2000);
     if (!setValueSuccess)
     {
       DEBUG_PRINTLN("Warning: Satellite signals not configured!");
@@ -87,7 +87,7 @@ void syncRtc()
   unsigned long loopStartTime = millis();
 
   // Clear flag
-  rtcSyncFlag = false;
+  bool rtcSyncFlag = false;
 
   DEBUG_PRINTLN("Info: Attempting to acquire a GNSS fix...");
 

@@ -12,7 +12,7 @@ void configureRtc()
   // 7: Alarm match hundredths                                      (every second)
 
   // Manually set the RTC date and time
-  //rtc.setTime(12, 59, 50, 0, 1, 11, 21); // 2021-11-01 12:59:50.000 (hour, minutes, seconds, hundredths, day, month, year)
+  //rtc.setTime(12, 59, 50, 0, 1, 11, 21); // hour, minutes, seconds, hundredths, day, month, year
 
   // Get time before starting rolling alarm
   //rtc.getTime();
@@ -46,10 +46,7 @@ void readRtc()
   // Get the RTC's current date and time
   rtc.getTime();
 
-  // Get RTC's UNIX Epoch time
-  //unixtime = rtc.getEpoch();
-
-  //DEBUG_PRINT("Info: Unix epoch time "); DEBUG_PRINTLN(unixtime);
+  //DEBUG_PRINT("Info: Unix epoch time "); DEBUG_PRINTLN(rtc.getEpoch());
 
   // Stop the loop timer
   timer.rtc = micros() - loopStartTime;
