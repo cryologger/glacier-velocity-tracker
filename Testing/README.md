@@ -371,3 +371,27 @@
 - 20210403_000000.ubx
 - ...
 - 20210403_180000.ubx
+
+## April 3, 2021 
+
+### Test 1:
+- Location: Outside
+- Start: 2021-04-03 18:00
+- End: 2021-04-04 
+- Sleep: 1 hours
+- Logging: 2 hour
+- Frequency: 1 Hz
+- SparkFun TOP106
+- SanDisk Industrial 32 GB
+- Protocol: I2C
+- u-blox GPS-RTK-SMA
+
+#### Comments:
+- First logfile should be 2021-04-04 18:00
+- DEBUG = false
+
+#### Results:
+-
+
+#### Files: 
+- 
