@@ -11,9 +11,10 @@ Messages are streamed directly to a microSD card in UBX format. Log files are co
 
 ### Principles
 * Inexpensive
-* Power efficiency
-* Reliable
+* Power efficienct
 * Robust
+* User friendly
+* Off-the-shelf components
 
 #### Materials 
 
@@ -32,6 +33,11 @@ Messages are streamed directly to a microSD card in UBX format. Log files are co
 | Enclosure | L-Com 14x12x7 Inch Weatherproof NEMA Enclosure | $118.00 |
 | Pole Mount | L-Com Enclosure Pole Mounting Kit | $53.30 |
 | **Total** | | **$938.05** |
+
+## Measurements
+
+While fully configurable, the system is currently programmed to wake daily and log UBX RAWX/SFRBX messages at 1 Hz from both GPS and GLONASS constellations for 3 hours. 
+
 
 ## Repository Contents
 * **/Software** - Contains the Arduino code.
