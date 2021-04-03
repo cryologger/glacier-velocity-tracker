@@ -2,6 +2,8 @@
 
 ![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Archive/v1.0/Images/DSC_1890.JPG)
 
+** ***Work in progress*** **
+
 ## Introduction
 A low-cost and open-source glacier velocity measurement system based on the u-blox ZED-F9P GNSS receiver. The code is powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board and is dedicated to logging UBX messages from the u-blox ZED-F9P.
 
@@ -16,7 +18,7 @@ Messages are streamed directly to a microSD card in UBX format. Log files are co
 * User friendly
 * Off-the-shelf components
 
-#### Materials 
+### Materials 
 
 | Component | Product | Cost (USD) |
 | --- | --- | :---: | 
@@ -33,6 +35,13 @@ Messages are streamed directly to a microSD card in UBX format. Log files are co
 | Enclosure | L-Com 14x12x7 Inch Weatherproof NEMA Enclosure | $118.00 |
 | Pole Mount | L-Com Enclosure Pole Mounting Kit | $53.30 |
 | **Total** | | **$938.05** |
+
+
+### Carrier Board
+A simple carrier board was designed to simplify the wiring and deployment of the Cryologger GVMS. The carrier board also provides a robust 5 mm screw terminal for the battery conneciton, and an optional resistor divider to measure the battery voltage.
+
+![Carrier Board](https://user-images.githubusercontent.com/22924092/113482276-e6d40c00-946b-11eb-8e7a-b277b068f311.png)
+
 
 ## Measurements
 
