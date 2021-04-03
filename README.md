@@ -28,10 +28,10 @@ Messages are streamed directly to a microSD card in UBX format. Log files are co
 | Solar Panel | Voltaic Systems 9 Watt 18 Volt Solar Panel | $89.00 |
 | Solar Panel Bracket | Voltaic Systems Solar Panel Bracket - Large | $18.00 |
 | Charge Controller | Genasun GV-5 65W 5A Solar charge controller with MPPT  | $68.00 |
-| Battery | Deka SOLAR 48 Ah 8G40C * | $100.00 |
+| Battery | Deka SOLAR 48 Ah 8G40C | $150.00 |
 | Enclosure | L-Com 14x12x7 Inch Weatherproof NEMA Enclosure | $118.00 |
 | Pole Mount | L-Com Enclosure Pole Mounting Kit | $53.30 |
-| Total | |  |
+| **Total** | | **$938.05** |
 
 ## Repository Contents
 * **/Software** - Contains the Arduino code.
