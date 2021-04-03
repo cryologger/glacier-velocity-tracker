@@ -27,7 +27,7 @@ Messages are streamed directly to a microSD card in UBX format. Log files are co
 | GNSS | SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic) | $219.95 |
 | GNSS Antenna | GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106 | $124.95 |
 | Voltage Regulator | Pololu 5V, 600mA Step-Down Voltage Regulator D36V6F5 | $4.95 |
-| microSD Card| Western Digital Industrial Grade Extended Temperature 32 GB | $ 57.00 |
+| microSD Card| Western Digital Industrial Grade Extended Temperature 32 GB | $57.00 |
 | Solar Panel | Voltaic Systems 9 Watt 18 Volt Solar Panel | $89.00 |
 | Solar Panel Bracket | Voltaic Systems Solar Panel Bracket - Large | $18.00 |
 | Charge Controller | Genasun GV-5 65W 5A Solar charge controller with MPPT  | $68.00 |
