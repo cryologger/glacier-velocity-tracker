@@ -2,19 +2,18 @@
 
 ![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Archive/v1.0/Images/DSC_1890.JPG)
 
-**Project status: Under active development as of March 22, 2021.**
-
 ## Introduction
-A low-cost, open-source glacier velocity measurement system based on the u-blox ZED-F9P intended for use with Precise Point Positioning (PPP) techniques.
+A low-cost and open-source glacier velocity measurement system based on the u-blox ZED-F9P GNSS receiver. The code is powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board and is dedicated to logging UBX messages from the u-blox ZED-F9P.
 
-## Objectives
+Messages are streamed directly to a microSD card in UBX format. Log files are converted to RINEX using RTKLIB and then submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
+
+## Design
+
+### Principles
 * Inexpensive
 * Power efficiency
 * Reliable
 * Robust
-
-## Design
-
 
 #### Materials 
 
@@ -23,28 +22,28 @@ A low-cost, open-source glacier velocity measurement system based on the u-blox 
 | Processor | SparkFun MicroMod Artemis Processor | $14.95 |
 | Carrier Board | SparkFun MicroMod Data Logging Carrier Board | $19.95 |
 | GNSS | SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic) | $219.95 |
-| GNSS antenna | GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106 | $124.95 |
-| Voltage Regulator | SparkFun Buck-Boost Converter | $9.95 |
-| Enclosure |  | ~$50.00 |
-| Solar Panel |  | ~$100.00 |
-| Battery |  | ~$100.00 |
-
-## Measurements
-The code will be powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board and is dedicated to logging UBX messages from the u-blox ZED-F9P.
-
-Messages are streamed directly to a microSD card in UBX format without being processed. Log files can then be analysed afterwards using u-blox's u-center or RTKLIB and converted to RINEX in preparation for submission to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
+| GNSS Antenna | GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106 | $124.95 |
+| Voltage Regulator | Pololu 5V, 600mA Step-Down Voltage Regulator D36V6F5 | $4.95 |
+| microSD Card| Western Digital Industrial Grade Extended Temperature 32 GB | $ 57.00 |
+| Solar Panel | Voltaic Systems 9 Watt 18 Volt Solar Panel | $89.00 |
+| Solar Panel Bracket | Voltaic Systems Solar Panel Bracket - Large | $18.00 |
+| Charge Controller | Genasun GV-5 65W 5A Solar charge controller with MPPT  | $68.00 |
+| Battery | Deka SOLAR 48 Ah 8G40C * | $100.00 |
+| Enclosure | L-Com 14x12x7 Inch Weatherproof NEMA Enclosure | $118.00 |
+| Pole Mount | L-Com Enclosure Pole Mounting Kit | $53.30 |
+| Total | |  |
 
 ## Repository Contents
-* **/Software** - Contains the Arduino code and firmware binaries
+* **/Software** - Contains the Arduino code.
 
-* **/Hardware** - Autodesk Eagle PCB schematic and board design files
+* **/Hardware** - Autodesk Eagle PCB schematic and board design files.
 
-* **/Bill of Materials** - Information on components and their associated costs
+* **/Bill of Materials** - Information on components and their associated costs.
 
-* **/Archive** - Previous design iterations
+* **/Archive** - Previous design iterations.
 
 ## Documentation
-* Currently in progress
+* Currently in progress.
 
 ## License Information
 This project is released under the MIT License (http://opensource.org/licenses/MIT).
