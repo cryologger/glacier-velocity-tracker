@@ -375,6 +375,7 @@
 ## April 3, 2021 
 
 ### Test 1:
+- Version: 2.0.0
 - Location: Outside
 - Start: 2021-04-03 18:00
 - End: 2021-04-04 
