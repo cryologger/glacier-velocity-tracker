@@ -20,12 +20,17 @@ void configureGnss()
 
     // Delay between initialization attempts
     myDelay(2000);
-    
+
     if (!gnss.begin(Wire))
     {
       DEBUG_PRINTLN("Warning: u-blox failed to initialize! Please check wiring.");
       online.gnss = false;
-      blinkLed(10, 500);
+      logDebug(); // Log system debug information
+      while (1); // Force watchdog timer to reset system
+    }
+    else
+    {
+      online.gnss = true;
     }
   }
   else
@@ -88,7 +93,7 @@ void syncRtc()
   unsigned long loopStartTime = millis();
 
   // Clear flag
-  bool rtcSyncFlag = false;
+  rtcSyncFlag = false;
 
   DEBUG_PRINTLN("Info: Attempting to acquire a GNSS fix...");
 
@@ -173,7 +178,12 @@ void logGnss()
   // Update file create timestamp
   updateFileCreate(&logFile);
 
-  bytesWritten = 0;               // Reset bytesWritten counter
+  // Reset counters
+  bytesWritten      = 0;
+  writeFailCounter  = 0;
+  syncFailCounter   = 0;
+  closeFailCounter  = 0;
+  
   gnss.clearFileBuffer();         // Clear file buffer
   gnss.clearMaxFileBufferAvail(); // Reset max file buffer size
 
@@ -202,7 +212,11 @@ void logGnss()
       gnss.extractFileBufferData((uint8_t *)&myBuffer, sdWriteSize);
 
       // Write exactly sdWriteSize bytes from myBuffer to the ubxDataFile on the SD card
-      logFile.write(myBuffer, sdWriteSize);
+      if (!logFile.write(myBuffer, sdWriteSize))
+      {
+        DEBUG_PRINTLN("Warning: Failed to write to log file!");
+        writeFailCounter++; // Count number of failed writes to microSD
+      }
 
       // Update bytesWritten
       bytesWritten += sdWriteSize;
@@ -221,7 +235,9 @@ void logGnss()
       if (!logFile.sync())
       {
         DEBUG_PRINTLN("Warning: Failed to sync log file!");
+        syncFailCounter++; // Count number of failed file syncs
       }
+
 
       // Print number of bytes written to SD card
       DEBUG_PRINT(bytesWritten); DEBUG_PRINT(" bytes written. ");
@@ -282,6 +298,7 @@ void logGnss()
   if (!logFile.sync())
   {
     DEBUG_PRINTLN("Warning: Failed to sync log file!");
+    syncFailCounter++; // Count number of failed file syncs
   }
 
   // Update file access timestamps
@@ -291,6 +308,7 @@ void logGnss()
   if (!logFile.close())
   {
     DEBUG_PRINTLN("Warning: Failed to close log file!");
+    closeFailCounter++; // Count number of failed file closes
   }
 
   // Free RAM allocated for file storage and PVT processing
