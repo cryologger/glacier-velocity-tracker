@@ -1,23 +1,31 @@
-# Cryologger - Glacier Velocity Measurement System
+# Cryologger - Glacier Velocity Measurement System (GVMS)
 
 ![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Archive/v1.0/Images/DSC_1890.JPG)
 
 ** ***Work in progress*** **
 
-## Introduction
-A low-cost, open-source glacier velocity measurement system based on the u-blox ZED-F9P GNSS receiver and powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board.
+## 1.0 Introduction
+The low-cost, open-source Cryologger glacier velocity measurement system (GVMS) is designed to measure the daily displacement and annual velocities of glaciers in the Canadian Arctic. It is based on the u-blox ZED-F9P GNSS receiver and powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board.
 
+## 2.0 Methods
 
-## Methods
+### 2.1 Design
 
-### Design Principles
+Constructed using off-the-shelf components, the Cryologger GVMS design is planned for extended deployments of one year or more and is capable of providing long-term GNSS measurements.
+
+#### 2.1.1 Design principles
+
+The design of the glacier velocity measurement system places emphasis on the following design principles:
 * Inexpensive
-* Power efficienct
-* Robust
-* User friendly
 * Off-the-shelf components
+* Modular
+* Extensible
+* Power-efficient
+* Open-source
+* User friendly
+* Robust
 
-### Bill of Materials 
+#### 2.1.2 Bill of materials 
 
 **Table 1.** Components making up the glacier velocity measurement system, current as of April 3, 2021.
 
@@ -40,22 +48,27 @@ A low-cost, open-source glacier velocity measurement system based on the u-blox 
 | **Total** | | |
 
 
-### Carrier Board
-A simple carrier board was designed to simplify the wiring and deployment of the Cryologger GVMS, which also provides a robust 5 mm screw terminal for the battery connection, and an optional resistor divider to measure battery voltage.
+#### 2.1.3 Carrier board
+A carrier board was designed to simplify assembly and deployment of the Cryologger GVMS. It provides a 5 mm 2-pin screw terminal for the wiring the battery connection, and an optional resistor divider to measure battery voltage.
 
 ![Carrier Board](https://user-images.githubusercontent.com/22924092/113482276-e6d40c00-946b-11eb-8e7a-b277b068f311.png)
 
 
-## Measurements
+### 2.2 Measurements
 
-While fully configurable, the system is programmed to wake daily and log UBX RAWX/SFRBX messages at 1 Hz from both GPS and GLONASS constellations for a period of 3 hours. Messages are streamed directly to a microSD card in UBX format. Log files are converted to RINEX using RTKLIB and then submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
+By defalut, the system is programmed to wake daily and log UBX RAWX/SFRBX messages at 1 Hz from both GPS and GLONASS constellations for a period of 3 hours. Messages are streamed processed through the SparkFun u-blox GNSS library and written to a microSD card in UBX format. Log files can then be converted to RINEX using RTKLIB and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
 
-## Deployments
-Several systems are planned for deployment in the summer of 2021 on Mittie Glacier, Belcher Glacier, and Croker Bay Glacier in Nunavut, Canada.
-
-
+### 2.3 Deployments
+Several systems are planned for deployment in the summer of 2021. Potential deployment locations include the Mittie Glacier, Belcher Glacier, and Croker Bay Glacier in Nunavut, Canada.
 
 **Figure x.** Map of proposed deployments.
+
+## 3.0 Results
+
+## 4.0 Discussion
+
+## 5.0 Conclusion
+
 
 
 ## Repository Contents
@@ -67,8 +80,6 @@ Several systems are planned for deployment in the summer of 2021 on Mittie Glaci
 
 * **/Archive** - Previous design iterations.
 
-## Documentation
-* Currently in progress.
 
 ## License Information
 This project is released under the MIT License (http://opensource.org/licenses/MIT).
