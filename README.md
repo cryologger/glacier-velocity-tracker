@@ -1,4 +1,4 @@
-# Cryologger - Glacier Velocity Measurement System (GVMS)
+# Cryologger - Glacier Velocity Tracker
 
 ![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Archive/v1.0/Images/DSC_1890.JPG)
 
@@ -15,7 +15,7 @@ Constructed using off-the-shelf components, the Cryologger GVMS design is planne
 
 #### 2.1.1 Design principles
 
-The design of the glacier velocity measurement system places emphasis on the following design principles:
+The design of the system places emphasis on the following design principles:
 * Inexpensive
 * Off-the-shelf components
 * Modular
@@ -49,14 +49,14 @@ The design of the glacier velocity measurement system places emphasis on the fol
 
 
 #### 2.1.3 Carrier board
-A carrier board was designed to simplify assembly and deployment of the Cryologger GVMS. It provides a 5 mm 2-pin screw terminal for the wiring the battery connection, and an optional resistor divider to measure battery voltage.
+A carrier board was designed to simplify assembly and deployment of the Cryologger GVMS. It provides 5 mm, 2-pin screw terminals for wiring the battery connection, and an optional resistor divider to measure battery voltage.
 
 ![Carrier Board](https://user-images.githubusercontent.com/22924092/113482276-e6d40c00-946b-11eb-8e7a-b277b068f311.png)
 
 
 ### 2.2 Measurements
 
-By defalut, the system is programmed to wake daily and log UBX RAWX/SFRBX messages at 1 Hz from both GPS and GLONASS constellations for a period of 3 hours. Messages are streamed processed through the SparkFun u-blox GNSS library and written to a microSD card in UBX format. Log files can then be converted to RINEX using RTKLIB and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
+By default, the system is programmed to wake daily and log UBX RAWX/SFRBX messages at 1 Hz from both GPS and GLONASS constellations for a period of 3 hours. Messages are streamed processed through the SparkFun u-blox GNSS library and written to a microSD card in UBX format. Log files can then be converted to RINEX using RTKLIB and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
 
 ### 2.3 Deployments
 Several systems are planned for deployment in the summer of 2021. Potential deployment locations include the Mittie Glacier, Belcher Glacier, and Croker Bay Glacier in Nunavut, Canada.
