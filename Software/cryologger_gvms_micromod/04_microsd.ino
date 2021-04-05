@@ -5,18 +5,17 @@ void configureSd()
   unsigned long loopStartTime = millis();
 
   // Initialize microSD
-  if (!sd.begin(SdSpiConfig(PIN_SD_CS, DEDICATED_SPI)))
+  if (!sd.begin(PIN_SD_CS, SD_SCK_MHZ(24)))
   {
     DEBUG_PRINTLN("Warning: microSD failed to initialize. Reattempting...");
 
     // Delay between initialization attempts
     myDelay(250);
 
-    if (!sd.begin(SdSpiConfig(PIN_SD_CS, DEDICATED_SPI)))
+    if (!sd.begin(PIN_SD_CS, SD_SCK_MHZ(24)))
     {
       DEBUG_PRINTLN("Warning: microSD failed to initialize.");
       online.microSd = false;
-      logDebug(); // Log system debug information
       while (1); // Force watchdog timer to reset system
     }
     else

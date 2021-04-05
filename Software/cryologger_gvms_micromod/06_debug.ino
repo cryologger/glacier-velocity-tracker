@@ -90,6 +90,7 @@ void logDebug()
   if (!debugFile.sync())
   {
     DEBUG_PRINTLN("Warning: Failed to sync debug file.");
+    syncFailCounter++; // Count number of failed file syncs
   }
 
   // Update file access timestamps
@@ -99,6 +100,7 @@ void logDebug()
   if (!debugFile.close())
   {
     DEBUG_PRINTLN("Warning: Failed to close debug file.");
+    closeFailCounter++; // Count number of failed file closes
   }
   // Stop the loop timer
   timer.logDebug = millis() - loopStartTime;

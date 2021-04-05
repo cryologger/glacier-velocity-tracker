@@ -26,7 +26,7 @@
 // Debugging macros
 // -----------------------------------------------------------------------------
 #define DEBUG       true  // Output debug messages to Serial Monitor
-#define DEBUG_GNSS  false  // Output GNSS information to Serial Monitor
+#define DEBUG_GNSS  true  // Output GNSS information to Serial Monitor
 
 #if DEBUG
 #define DEBUG_PRINT(x)            Serial.print(x)
@@ -72,15 +72,15 @@ byte          loggingStartTime      = 16;   // Logging start hour (UTC)
 byte          loggingStopTime       = 19;   // Logging end hour (UTC)
 
 // Rolling alarm
-byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
-byte          loggingAlarmHours     = 2;    // Rolling hours alarm
-byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
-byte          sleepAlarmHours       = 1;    // Rolling hours alarm
+byte          loggingAlarmMinutes   = 30;    // Rolling minutes alarm
+byte          loggingAlarmHours     = 0;    // Rolling hours alarm
+byte          sleepAlarmMinutes     = 30;    // Rolling minutes alarm
+byte          sleepAlarmHours       = 0;    // Rolling hours alarm
 
 // Alarm modes
-byte          loggingAlarmMode      = 4;    // Logging alarm mode
-byte          sleepAlarmMode        = 4;    // Sleep alarm mode
-byte          initialAlarmMode      = 6;    // Initial alarm mode
+byte          loggingAlarmMode      = 5;    // Logging alarm mode
+byte          sleepAlarmMode        = 5;    // Sleep alarm mode
+byte          initialAlarmMode      = 5;    // Initial alarm mode
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -96,7 +96,7 @@ bool          rtcSyncFlag         = false;        // Flag to indicate if RTC has
 char          logFileName[30]     = "";           // Log file name
 char          debugFileName[10]   = "debug.csv";  // Debug log file name
 unsigned int  debugCounter        = 0;            // Counter to track number of recorded debug messages
-unsigned int  gnssTimeout         = 5;            // Timeout for GNSS signal acquisition (minutes)
+unsigned int  gnssTimeout         = 1;            // Timeout for GNSS signal acquisition (minutes)
 unsigned int  maxBufferBytes      = 0;            // Maximum value of file buffer
 unsigned long previousMillis      = 0;            // Global millis() timer
 unsigned long bytesWritten        = 0;            // Counter for tracking bytes written to microSD
@@ -147,6 +147,7 @@ void setup()
   peripheralPowerOn();    // Enable power to peripherials
 
   Wire.begin();           // Initalize I2C
+  Wire.setPullups(0);     // Disable internal I2C pull-ups to help reduce bus errors
   Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
   SPI.begin();            // Initialize SPI
 
@@ -219,7 +220,6 @@ void loop()
 
   // Enter deep sleep
   goToSleep();
-
 }
 
 // ----------------------------------------------------------------------------

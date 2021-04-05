@@ -238,7 +238,6 @@ void logGnss()
         syncFailCounter++; // Count number of failed file syncs
       }
 
-
       // Print number of bytes written to SD card
       DEBUG_PRINT(bytesWritten); DEBUG_PRINT(" bytes written. ");
 
