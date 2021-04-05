@@ -19,7 +19,7 @@ void createDebugFile()
   debugFile.println("datetime,online_microSd,online_gnss,online_logGnss,online_logDebug,"
                     "timer_microsd,timer_gnss,timer_syncRtc,timer_logGnss,timer_logDebug,"
                     "rtcSyncFlag,rtcDrift,bytesWritten,maxBufferBytes,wdtCounterMax,"
-                    "syncFailCounter,writeFailCounter,debugCounter");
+                    "writeFailCounter,syncFailCounter,closeFailCounter,debugCounter");
 
   // Sync the debug file
   if (!debugFile.sync())
@@ -81,8 +81,8 @@ void logDebug()
   debugFile.print(bytesWritten);        debugFile.print(",");
   debugFile.print(maxBufferBytes);      debugFile.print(",");
   debugFile.print(wdtCounterMax);       debugFile.print(",");
-  debugFile.print(syncFailCounter);     debugFile.print(",");
   debugFile.print(writeFailCounter);    debugFile.print(",");
+  debugFile.print(syncFailCounter);     debugFile.print(",");
   debugFile.print(closeFailCounter);    debugFile.print(",");
   debugFile.println(debugCounter);
 

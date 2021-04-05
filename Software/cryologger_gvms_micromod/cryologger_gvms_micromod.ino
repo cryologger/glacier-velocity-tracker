@@ -72,14 +72,14 @@ byte          loggingStartTime      = 16;   // Logging start hour (UTC)
 byte          loggingStopTime       = 19;   // Logging end hour (UTC)
 
 // Rolling alarm
-byte          loggingAlarmMinutes   = 30;    // Rolling minutes alarm
-byte          loggingAlarmHours     = 0;    // Rolling hours alarm
-byte          sleepAlarmMinutes     = 30;    // Rolling minutes alarm
-byte          sleepAlarmHours       = 0;    // Rolling hours alarm
+byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
+byte          loggingAlarmHours     = 2;    // Rolling hours alarm
+byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
+byte          sleepAlarmHours       = 1;    // Rolling hours alarm
 
 // Alarm modes
-byte          loggingAlarmMode      = 5;    // Logging alarm mode
-byte          sleepAlarmMode        = 5;    // Sleep alarm mode
+byte          loggingAlarmMode      = 4;    // Logging alarm mode
+byte          sleepAlarmMode        = 4;    // Sleep alarm mode
 byte          initialAlarmMode      = 5;    // Initial alarm mode
 
 // ----------------------------------------------------------------------------
