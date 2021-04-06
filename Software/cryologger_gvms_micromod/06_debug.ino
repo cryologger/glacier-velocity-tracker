@@ -18,7 +18,8 @@ void createDebugFile()
   // Write header to file
   debugFile.println("datetime,online_microSd,online_gnss,online_logGnss,online_logDebug,"
                     "timer_microsd,timer_gnss,timer_syncRtc,timer_logGnss,timer_logDebug,"
-                    "rtcDrift,bytesWritten,maxBufferBytes,wdtCounterMax,debugCounter");
+                    "rtcSyncFlag,rtcDrift,bytesWritten,maxBufferBytes,wdtCounterMax,"
+                    "writeFailCounter,syncFailCounter,closeFailCounter,debugCounter");
 
   // Sync the debug file
   if (!debugFile.sync())
@@ -75,16 +76,21 @@ void logDebug()
   debugFile.print(timer.syncRtc);       debugFile.print(",");
   debugFile.print(timer.logGnss);       debugFile.print(",");
   debugFile.print(timer.logDebug);      debugFile.print(",");
+  debugFile.print(rtcSyncFlag);         debugFile.print(",");
   debugFile.print(rtcDrift);            debugFile.print(",");
   debugFile.print(bytesWritten);        debugFile.print(",");
   debugFile.print(maxBufferBytes);      debugFile.print(",");
   debugFile.print(wdtCounterMax);       debugFile.print(",");
+  debugFile.print(writeFailCounter);    debugFile.print(",");
+  debugFile.print(syncFailCounter);     debugFile.print(",");
+  debugFile.print(closeFailCounter);    debugFile.print(",");
   debugFile.println(debugCounter);
 
   // Sync the debug file
   if (!debugFile.sync())
   {
     DEBUG_PRINTLN("Warning: Failed to sync debug file.");
+    syncFailCounter++; // Count number of failed file syncs
   }
 
   // Update file access timestamps
@@ -94,6 +100,7 @@ void logDebug()
   if (!debugFile.close())
   {
     DEBUG_PRINTLN("Warning: Failed to close debug file.");
+    closeFailCounter++; // Count number of failed file closes
   }
   // Stop the loop timer
   timer.logDebug = millis() - loopStartTime;

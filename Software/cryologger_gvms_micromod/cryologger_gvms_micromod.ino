@@ -1,6 +1,6 @@
 /*
-    Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0
-    Date:     April 3, 2021
+    Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0.0
+    Date:     April 4, 2021
     Author:   Adam Garbo
 
     Components:
@@ -9,8 +9,7 @@
     - SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic)
 
     Comments:
-    - Deployment prototype
-    - Long-term testing underway
+    - Long-term test code simulating deployment conditions.
 */
 
 // ----------------------------------------------------------------------------
@@ -26,8 +25,8 @@
 // -----------------------------------------------------------------------------
 // Debugging macros
 // -----------------------------------------------------------------------------
-#define DEBUG       false  // Output debug messages to Serial Monitor
-#define DEBUG_GNSS  false  // Output GNSS information to Serial Monitor
+#define DEBUG       true  // Output debug messages to Serial Monitor
+#define DEBUG_GNSS  true  // Output GNSS information to Serial Monitor
 
 #if DEBUG
 #define DEBUG_PRINT(x)            Serial.print(x)
@@ -93,13 +92,17 @@ volatile bool wdtFlag             = false;        // Flag for watchdog timer int
 volatile int  wdtCounter          = 0;            // Counter for watchdog timer interrupts
 volatile int  wdtCounterMax       = 0;            // Counter for max watchdog timer interrupts
 bool          gnssConfigFlag      = true;         // Flag to indicate whether to configure the u-blox module
+bool          rtcSyncFlag         = false;        // Flag to indicate if RTC has been synced with GNSS
 char          logFileName[30]     = "";           // Log file name
 char          debugFileName[10]   = "debug.csv";  // Debug log file name
 unsigned int  debugCounter        = 0;            // Counter to track number of recorded debug messages
-unsigned int  gnssTimeout         = 5;            // Timeout for GNSS signal acquisition (minutes)
+unsigned int  gnssTimeout         = 1;            // Timeout for GNSS signal acquisition (minutes)
 unsigned int  maxBufferBytes      = 0;            // Maximum value of file buffer
 unsigned long previousMillis      = 0;            // Global millis() timer
 unsigned long bytesWritten        = 0;            // Counter for tracking bytes written to microSD
+unsigned long syncFailCounter     = 0;
+unsigned long writeFailCounter    = 0;
+unsigned long closeFailCounter    = 0;
 long          rtcDrift            = 0;            // Counter for drift of RTC
 
 // ----------------------------------------------------------------------------
@@ -144,6 +147,7 @@ void setup()
   peripheralPowerOn();    // Enable power to peripherials
 
   Wire.begin();           // Initalize I2C
+  Wire.setPullups(0);     // Disable internal I2C pull-ups to help reduce bus errors
   Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
   SPI.begin();            // Initialize SPI
 
@@ -216,7 +220,6 @@ void loop()
 
   // Enter deep sleep
   goToSleep();
-
 }
 
 // ----------------------------------------------------------------------------

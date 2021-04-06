@@ -79,6 +79,7 @@ void wakeUp()
 
   ap3_adc_setup();        // Enable ADC
   Wire.begin();           // Enable I2C
+  Wire.setPullups(0);     // Disable internal I2C pull-ups to help reduce bus errors
   Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
   SPI.begin();            // Enable SPI
 #if DEBUG
