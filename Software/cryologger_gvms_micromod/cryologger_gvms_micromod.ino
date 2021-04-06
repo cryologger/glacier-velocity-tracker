@@ -1,6 +1,6 @@
 /*
-    Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0.0
-    Date:     April 4, 2021
+    Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0.1
+    Date:     April 6, 2021
     Author:   Adam Garbo
 
     Components:
