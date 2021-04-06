@@ -66,6 +66,9 @@ By default, the system is programmed to wake daily and log UBX RAWX/SFRBX messag
 ### 2.3 Deployments
 Several systems are planned for deployment in the summer of 2021. Potential deployment locations include the Mittie Glacier, Belcher Glacier, and Croker Bay Glacier in Nunavut, Canada.
 
+
+![deploy2](https://user-images.githubusercontent.com/22924092/113763675-f495c580-96e7-11eb-9eb1-5203dc91fd16.png)
+
 **Figure x.** Map of proposed deployments.
 
 ## 3.0 Results
