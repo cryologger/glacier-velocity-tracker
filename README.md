@@ -54,6 +54,11 @@ A carrier board was designed to simplify assembly and deployment of the Cryologg
 ![Carrier Board v2 0 0](https://user-images.githubusercontent.com/22924092/113581250-e61ab180-95f4-11eb-9a24-5372ff3434e1.png)
 
 
+
+#### 2.1.4 Mock-up
+![L-Com v16](https://user-images.githubusercontent.com/22924092/113727907-9525be80-96c3-11eb-9db5-a16260b8cdfe.png)
+
+
 ### 2.2 Measurements
 
 By default, the system is programmed to wake daily and log UBX RAWX/SFRBX messages at 1 Hz from both GPS and GLONASS constellations for a period of 3 hours. Messages are streamed processed through the SparkFun u-blox GNSS library and written to a microSD card in UBX format. Log files can then be converted to RINEX using RTKLIB and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
