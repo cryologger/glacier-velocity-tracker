@@ -1,5 +1,5 @@
 // Configure the real-time clock (RTC)
-void configureRtc()
+void setInitialAlarm()
 {
   // Alarm modes:
   // 0: Alarm interrupt disabled

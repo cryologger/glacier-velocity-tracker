@@ -75,7 +75,7 @@ void configureGnss()
   // Configure u-blox GNSS
   gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
   gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
-  gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
+  gnss.setNavigationFrequency(10);                   // Produce one navigation solution per second
   gnss.setAutoPVT(true);                            // Enable automatic NAV-PVT messages
   gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM-SFRBX messages
   gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM-RAWX messages
@@ -92,13 +92,13 @@ void syncRtc()
   // Start loop timer
   unsigned long loopStartTime = millis();
 
-  // Check if microSD and u-blox GNSS initialized successfully
-  if (online.microSd && online.gnss)
+  // Check u-blox GNSS initialized successfully
+  if (online.gnss)
   {
     // Clear flag
     rtcSyncFlag = false;
 
-    DEBUG_PRINTLN("Info: Attempting to acquire a GNSS fix...");
+    DEBUG_PRINTLN("Info: Attempting to synchronize RTC with GNSS...");
 
     // Attempt to acquire a valid GNSS position fix for up to 5 minutes
     while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 60UL * 1000UL)
@@ -137,16 +137,19 @@ void syncRtc()
 
           DEBUG_PRINT("Info: RTC drift: "); DEBUG_PRINTLN(rtcDrift);
           DEBUG_PRINT("Info: RTC time synced to "); printDateTime();
+          blinkLed(5, 1000);
         }
       }
     }
     if (!rtcSyncFlag)
     {
       DEBUG_PRINTLN("Warning: Unable to sync RTC!");
+      blinkLed(10, 500);
     }
   }
   else
   {
+    DEBUG_PRINTLN("Warning: microSD or GNSS offline!");
     // Clear flag
     rtcSyncFlag = false;
   }
