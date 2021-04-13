@@ -1,6 +1,6 @@
 /*
     Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0.2
-    Date:     April 11, 2021
+    Date:     April 13, 2021
     Author:   Adam Garbo
 
     Components:
@@ -9,8 +9,7 @@
     - SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic)
 
     Comments:
-    - Long-term test code simulating deployment conditions.
-    - 10 Hz stress test to measure current draw of system.
+    - Code is configured for long-term tests to simulate deployment.
 */
 
 // ----------------------------------------------------------------------------
@@ -66,22 +65,22 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // ----------------------------------------------------------------------------
 
 // Logging mode 
-byte          loggingMode           = 2;    // 1 = daily, 2 = rolling
+byte          loggingMode           = 1;    // 1 = daily, 2 = rolling
 
 // Daily alarm
 byte          loggingStartTime      = 16;   // Logging start hour (UTC)
 byte          loggingStopTime       = 19;   // Logging end hour (UTC)
 
 // Rolling alarm
-byte          loggingAlarmMinutes   = 5;    // Rolling minutes alarm
-byte          loggingAlarmHours     = 0;    // Rolling hours alarm
-byte          sleepAlarmMinutes     = 2;    // Rolling minutes alarm
-byte          sleepAlarmHours       = 0;    // Rolling hours alarm
+byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
+byte          loggingAlarmHours     = 2;    // Rolling hours alarm
+byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
+byte          sleepAlarmHours       = 2;    // Rolling hours alarm
 
 // Alarm modes
 byte          loggingAlarmMode      = 4;    // Logging alarm mode
 byte          sleepAlarmMode        = 4;    // Sleep alarm mode
-byte          initialAlarmMode      = 6;    // Initial alarm mode
+byte          initialAlarmMode      = 4;    // Initial alarm mode
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
