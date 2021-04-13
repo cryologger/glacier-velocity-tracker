@@ -52,9 +52,8 @@ The design of the system places emphasis on the following design principles:
 A carrier board was designed to simplify assembly and deployment of the Cryologger GVMS. It provides 5 mm, 2-pin screw terminals for wiring the battery connection, and an optional resistor divider to measure battery voltage.
 
 
-<p align="center"><img src="https://user-images.githubusercontent.com/22924092/114310709-b0287200-9ab9-11eb-8add-d01e9795377a.png" width="720"></p>
+<p align="center"><img width="720" src="https://user-images.githubusercontent.com/22924092/114622089-874fda80-9c7b-11eb-9545-e24993ba051d.png"></p>
 <p align="center"><b>Figure 5.</b> Open-source carrier board design.</p>
-
 
 
 
