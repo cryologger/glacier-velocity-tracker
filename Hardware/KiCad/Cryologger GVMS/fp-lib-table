@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name "Cryologger GVMS")(type KiCad)(uri "${KIPRJMOD}/Cryologger GVMS.pretty")(options "")(descr "Glacier velocity measurement system components"))
+)
