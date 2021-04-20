@@ -1,6 +1,6 @@
 /*
-    Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0.1
-    Date:     April 6, 2021
+    Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0.2
+    Date:     April 13, 2021
     Author:   Adam Garbo
 
     Components:
@@ -9,7 +9,7 @@
     - SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic)
 
     Comments:
-    - Long-term test code simulating deployment conditions.
+    - Code is configured for long-term tests to simulate deployment.
 */
 
 // ----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // ----------------------------------------------------------------------------
 
 // Logging mode 
-byte          loggingMode           = 2;    // 1 = daily, 2 = rolling
+byte          loggingMode           = 1;    // 1 = daily, 2 = rolling
 
 // Daily alarm
 byte          loggingStartTime      = 16;   // Logging start hour (UTC)
@@ -75,12 +75,12 @@ byte          loggingStopTime       = 19;   // Logging end hour (UTC)
 byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
 byte          loggingAlarmHours     = 2;    // Rolling hours alarm
 byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
-byte          sleepAlarmHours       = 1;    // Rolling hours alarm
+byte          sleepAlarmHours       = 2;    // Rolling hours alarm
 
 // Alarm modes
 byte          loggingAlarmMode      = 4;    // Logging alarm mode
 byte          sleepAlarmMode        = 4;    // Sleep alarm mode
-byte          initialAlarmMode      = 5;    // Initial alarm mode
+byte          initialAlarmMode      = 4;    // Initial alarm mode
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -96,7 +96,7 @@ bool          rtcSyncFlag         = false;        // Flag to indicate if RTC has
 char          logFileName[30]     = "";           // Log file name
 char          debugFileName[10]   = "debug.csv";  // Debug log file name
 unsigned int  debugCounter        = 0;            // Counter to track number of recorded debug messages
-unsigned int  gnssTimeout         = 1;            // Timeout for GNSS signal acquisition (minutes)
+unsigned int  gnssTimeout         = 5;            // Timeout for GNSS signal acquisition (minutes)
 unsigned int  maxBufferBytes      = 0;            // Maximum value of file buffer
 unsigned long previousMillis      = 0;            // Global millis() timer
 unsigned long bytesWritten        = 0;            // Counter for tracking bytes written to microSD
@@ -172,7 +172,7 @@ void setup()
   syncRtc();              // Acquire GNSS fix and sync RTC with GNSS
   configureSd();          // Configure microSD
   createDebugFile();      // Create debug log file
-  configureRtc();         // Configure real-time clock (RTC) alarm
+  setInitialAlarm();      // Configure initial real-time clock (RTC) alarm
 
   DEBUG_PRINT("Info: Datetime "); printDateTime();
   DEBUG_PRINT("Info: Initial alarm "); printAlarm();
