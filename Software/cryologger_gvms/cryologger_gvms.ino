@@ -1,6 +1,6 @@
 /*
     Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0.2
-    Date:     April 13, 2021
+    Date:     April 27, 2021
     Author:   Adam Garbo
 
     Components:
@@ -10,6 +10,7 @@
 
     Comments:
     - Code is configured for long-term tests to simulate deployment.
+    - First test of assembled prototype.
 */
 
 // ----------------------------------------------------------------------------
@@ -65,22 +66,22 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // ----------------------------------------------------------------------------
 
 // Logging mode 
-byte          loggingMode           = 1;    // 1 = daily, 2 = rolling
+byte          loggingMode           = 2;    // 1 = daily, 2 = rolling
 
 // Daily alarm
 byte          loggingStartTime      = 16;   // Logging start hour (UTC)
 byte          loggingStopTime       = 19;   // Logging end hour (UTC)
 
 // Rolling alarm
-byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
-byte          loggingAlarmHours     = 2;    // Rolling hours alarm
-byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
-byte          sleepAlarmHours       = 2;    // Rolling hours alarm
+byte          loggingAlarmMinutes   = 10;    // Rolling minutes alarm
+byte          loggingAlarmHours     = 0;    // Rolling hours alarm
+byte          sleepAlarmMinutes     = 5;    // Rolling minutes alarm
+byte          sleepAlarmHours       = 0;    // Rolling hours alarm
 
 // Alarm modes
-byte          loggingAlarmMode      = 4;    // Logging alarm mode
-byte          sleepAlarmMode        = 4;    // Sleep alarm mode
-byte          initialAlarmMode      = 4;    // Initial alarm mode
+byte          loggingAlarmMode      = 5;    // Logging alarm mode
+byte          sleepAlarmMode        = 5;    // Sleep alarm mode
+byte          initialAlarmMode      = 5;    // Initial alarm mode
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -170,12 +171,13 @@ void setup()
   configureWdt();         // Configure and start Watchdog Timer (WDT)
   configureGnss();        // Configure u-blox GNSS
   syncRtc();              // Acquire GNSS fix and sync RTC with GNSS
+  configureRtc();         // Configure RTC
   configureSd();          // Configure microSD
   createDebugFile();      // Create debug log file
-  setInitialAlarm();      // Configure initial real-time clock (RTC) alarm
+  setSleepAlarm();        // Configure initial real-time clock (RTC) alarm
 
-  DEBUG_PRINT("Info: Datetime "); printDateTime();
-  DEBUG_PRINT("Info: Initial alarm "); printAlarm();
+  //DEBUG_PRINT("Info: Datetime "); printDateTime();
+  //DEBUG_PRINT("Info: Initial alarm "); printAlarm();
 
   // Blink LED to indicate completion of setup
   blinkLed(10, 100);

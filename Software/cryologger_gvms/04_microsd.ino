@@ -20,6 +20,7 @@ void configureSd()
     }
     else
     {
+      DEBUG_PRINTLN("Info: microSD initialized.");
       online.microSd = true;
     }
   }

@@ -21,10 +21,12 @@ void printLoggingSettings()
   printLine();
   DEBUG_PRINTLN("Logging Configuration");
   printLine();
+  
+  DEBUG_PRINT("Logging mode: ");          printTab(3);  DEBUG_PRINTLN(loggingMode);
   DEBUG_PRINT("Logging start: ");         printTab(3);  DEBUG_PRINTLN(loggingStartTime);
   DEBUG_PRINT("Logging stop: ");          printTab(3);  DEBUG_PRINTLN(loggingStopTime);
-  DEBUG_PRINT("Rolling logging alarm: "); printTab(2);  DEBUG_PRINTLN(loggingAlarmHours);
-  DEBUG_PRINT("Rolling sleep alarm: ");   printTab(2);  DEBUG_PRINTLN(sleepAlarmHours);
+  DEBUG_PRINT("Rolling logging alarm: "); printTab(2);  DEBUG_PRINT(loggingAlarmHours); DEBUG_PRINT(" hours "); DEBUG_PRINT(loggingAlarmMinutes); DEBUG_PRINTLN(" minutes ");
+  DEBUG_PRINT("Rolling sleep alarm: ");   printTab(2);  DEBUG_PRINT(sleepAlarmHours); DEBUG_PRINT(" hours "); DEBUG_PRINT(sleepAlarmMinutes); DEBUG_PRINTLN(" minutes ");
   DEBUG_PRINT("Logging alarm mode: ");    printTab(2);  DEBUG_PRINTLN(loggingAlarmMode);
   DEBUG_PRINT("Sleep alarm mode: ");      printTab(2);  DEBUG_PRINTLN(sleepAlarmMode);
   DEBUG_PRINT("Initial alarm mode: ");    printTab(2);  DEBUG_PRINTLN(initialAlarmMode);
