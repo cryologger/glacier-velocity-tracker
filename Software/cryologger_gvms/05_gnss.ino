@@ -5,7 +5,7 @@ void configureGnss()
   unsigned long loopStartTime = millis();
 
   // Uncomment  line to enable GNSS debug messages on Serial
-  gnss.enableDebugging();
+  //gnss.enableDebugging();
 
   // Disable the "7F" check in checkUbloxI2C as RAWX data can legitimately contain 0x7F
   gnss.disableUBX7Fcheck();

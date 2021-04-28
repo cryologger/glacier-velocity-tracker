@@ -91,7 +91,7 @@ void wakeUp()
 void qwiicPowerOn()
 {
   digitalWrite(PIN_QWIIC_POWER, HIGH);
-  myDelay(2500); // Non-blocking delay to allow Qwiic devices time to power up
+  myDelay(250); // Non-blocking delay to allow Qwiic devices time to power up
 }
 
 // Disable power to Qwiic connector
@@ -104,7 +104,7 @@ void qwiicPowerOff()
 void peripheralPowerOn()
 {
   digitalWrite(PIN_PWC_POWER, HIGH);
-  myDelay(250); // Non-blocking delay
+  myDelay(2500); // Non-blocking delay to allow Qwiic devices time to power up
 }
 
 // Disable power to microSD and peripherals
