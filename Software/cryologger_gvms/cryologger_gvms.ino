@@ -66,7 +66,7 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // ----------------------------------------------------------------------------
 
 // Logging mode 
-byte          loggingMode           = 1;    // 1 = daily, 2 = rolling
+byte          loggingMode           = 2;    // 1 = daily, 2 = rolling
 
 // Daily alarm
 byte          loggingStartTime      = 16;   // Logging start hour (UTC)
@@ -74,9 +74,9 @@ byte          loggingStopTime       = 19;   // Logging end hour (UTC)
 
 // Rolling alarm
 byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
-byte          loggingAlarmHours     = 2;    // Rolling hours alarm
+byte          loggingAlarmHours     = 3;    // Rolling hours alarm
 byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
-byte          sleepAlarmHours       = 2;    // Rolling hours alarm
+byte          sleepAlarmHours       = 1;    // Rolling hours alarm
 
 // Alarm modes
 byte          loggingAlarmMode      = 4;    // Logging alarm mode
@@ -144,7 +144,7 @@ void setup()
   pinMode(PIN_PWC_POWER, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
-  //qwiicPowerOn();         // Enable power to Qwiic connector
+  qwiicPowerOn();         // Enable power to Qwiic connector
   peripheralPowerOn();    // Enable power to peripherials
 
   Wire.begin();           // Initalize I2C
@@ -198,7 +198,7 @@ void loop()
     getLogFileName();     // Get timestamped log file name
 
     // Configure devices
-    //qwiicPowerOn();       // Enable power to Qwiic connector
+    qwiicPowerOn();       // Enable power to Qwiic connector
     peripheralPowerOn();  // Enable power to peripherals
     configureSd();        // Configure microSD
     configureGnss();      // Configure u-blox GNSS
