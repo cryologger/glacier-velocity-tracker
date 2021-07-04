@@ -30,7 +30,7 @@ void configureGnss()
       {
         // Force watchdog timer to reset system
         blinkLed(3, 250);
-        myDelay(2000);
+        delay(2000);
       }
     }
     else
@@ -109,7 +109,7 @@ void syncRtc()
     DEBUG_PRINTLN("Info: Attempting to synchronize RTC with GNSS...");
 
     // Attempt to acquire a valid GNSS position fix for up to 5 minutes
-    while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 1UL * 1000UL)
+    while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 60UL * 1000UL)
     {
       petDog(); // Reset watchdog timer
 

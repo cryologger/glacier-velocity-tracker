@@ -1,6 +1,6 @@
 /*
-    Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0.2
-    Date:     June 22, 2021
+    Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0.3
+    Date:     July 4, 2021
     Author:   Adam Garbo
 
     Components:
@@ -9,8 +9,7 @@
     - SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic)
 
     Comments:
-    - Code is configured for long-term tests to simulate deployment.
-    - First test of assembled prototype.
+    - Code is configured for long-term deployments in the Yukon.
 */
 
 // ----------------------------------------------------------------------------
@@ -66,22 +65,22 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // ----------------------------------------------------------------------------
 
 // Logging mode 
-byte          loggingMode           = 2;    // 1 = daily, 2 = rolling
+byte          loggingMode           = 1;    // 1 = daily, 2 = rolling
 
 // Daily alarm
-byte          loggingStartTime      = 16;   // Logging start hour (UTC)
-byte          loggingStopTime       = 19;   // Logging end hour (UTC)
+byte          loggingStartTime      = 19;   // Logging start hour (UTC)
+byte          loggingStopTime       = 22;   // Logging end hour (UTC)
 
 // Rolling alarm
 byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
-byte          loggingAlarmHours     = 1;    // Rolling hours alarm
+byte          loggingAlarmHours     = 0;    // Rolling hours alarm
 byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
-byte          sleepAlarmHours       = 1;    // Rolling hours alarm
+byte          sleepAlarmHours       = 0;    // Rolling hours alarm
 
 // Alarm modes
 byte          loggingAlarmMode      = 4;    // Logging alarm mode
 byte          sleepAlarmMode        = 4;    // Sleep alarm mode
-byte          initialAlarmMode      = 5;    // Initial alarm mode
+byte          initialAlarmMode      = 4;    // Initial alarm mode
 
 // ----------------------------------------------------------------------------
 // Global variable declarations

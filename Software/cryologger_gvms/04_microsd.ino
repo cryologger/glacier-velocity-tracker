@@ -20,7 +20,7 @@ void configureSd()
       {
         // Force watchdog timer to reset system
         blinkLed(2, 250);
-        myDelay(2000);
+        delay(2000);
       }
     }
     else
