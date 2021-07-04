@@ -66,21 +66,21 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // ----------------------------------------------------------------------------
 
 // Logging mode 
-byte          loggingMode           = 1;    // 1 = daily, 2 = rolling
+byte          loggingMode           = 2;    // 1 = daily, 2 = rolling
 
 // Daily alarm
 byte          loggingStartTime      = 16;   // Logging start hour (UTC)
 byte          loggingStopTime       = 19;   // Logging end hour (UTC)
 
 // Rolling alarm
-byte          loggingAlarmMinutes   = 5;    // Rolling minutes alarm
-byte          loggingAlarmHours     = 0;    // Rolling hours alarm
-byte          sleepAlarmMinutes     = 5;    // Rolling minutes alarm
-byte          sleepAlarmHours       = 0;    // Rolling hours alarm
+byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
+byte          loggingAlarmHours     = 1;    // Rolling hours alarm
+byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
+byte          sleepAlarmHours       = 1;    // Rolling hours alarm
 
 // Alarm modes
-byte          loggingAlarmMode      = 5;    // Logging alarm mode
-byte          sleepAlarmMode        = 5;    // Sleep alarm mode
+byte          loggingAlarmMode      = 4;    // Logging alarm mode
+byte          sleepAlarmMode        = 4;    // Sleep alarm mode
 byte          initialAlarmMode      = 5;    // Initial alarm mode
 
 // ----------------------------------------------------------------------------
@@ -115,7 +115,6 @@ struct struct_online
 {
   bool microSd  = false;
   bool gnss     = false;
-  bool sensors  = false;
   bool logGnss  = false;
   bool logDebug = false;
 } online;
@@ -159,7 +158,7 @@ void setup()
 #endif
 
   printLine();
-  DEBUG_PRINTLN("Cryologger - Glacier Velocity Measurement System");
+  DEBUG_PRINTLN("Cryologger - Glacier Velocity Measurement System 7");
   printLine();
 
   printDateTime();      // Print RTC's current date and time
@@ -219,7 +218,7 @@ void loop()
   }
 
   // Blink LED
-  blinkLed(1, 25);
+  blinkLed(1, 100);
 
   // Enter deep sleep
   goToSleep();
