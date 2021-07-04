@@ -1,6 +1,6 @@
 /*
-    Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0.2
-    Date:     April 13, 2021
+    Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0.3
+    Date:     July 4, 2021
     Author:   Adam Garbo
 
     Components:
@@ -9,7 +9,7 @@
     - SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic)
 
     Comments:
-    - Code is configured for long-term tests to simulate deployment.
+    - Code is configured for long-term deployments in the Yukon.
 */
 
 // ----------------------------------------------------------------------------
@@ -68,14 +68,14 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 byte          loggingMode           = 1;    // 1 = daily, 2 = rolling
 
 // Daily alarm
-byte          loggingStartTime      = 16;   // Logging start hour (UTC)
-byte          loggingStopTime       = 19;   // Logging end hour (UTC)
+byte          loggingStartTime      = 19;   // Logging start hour (UTC)
+byte          loggingStopTime       = 22;   // Logging end hour (UTC)
 
 // Rolling alarm
 byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
-byte          loggingAlarmHours     = 2;    // Rolling hours alarm
+byte          loggingAlarmHours     = 0;    // Rolling hours alarm
 byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
-byte          sleepAlarmHours       = 2;    // Rolling hours alarm
+byte          sleepAlarmHours       = 0;    // Rolling hours alarm
 
 // Alarm modes
 byte          loggingAlarmMode      = 4;    // Logging alarm mode
@@ -114,7 +114,6 @@ struct struct_online
 {
   bool microSd  = false;
   bool gnss     = false;
-  bool sensors  = false;
   bool logGnss  = false;
   bool logDebug = false;
 } online;
@@ -158,7 +157,7 @@ void setup()
 #endif
 
   printLine();
-  DEBUG_PRINTLN("Cryologger - Glacier Velocity Measurement System");
+  DEBUG_PRINTLN("Cryologger - Glacier Velocity Measurement System 7");
   printLine();
 
   printDateTime();      // Print RTC's current date and time
@@ -172,7 +171,7 @@ void setup()
   syncRtc();              // Acquire GNSS fix and sync RTC with GNSS
   configureSd();          // Configure microSD
   createDebugFile();      // Create debug log file
-  setInitialAlarm();      // Configure initial real-time clock (RTC) alarm
+  setInitialAlarm();      // Configure RTC and set initial alarm
 
   DEBUG_PRINT("Info: Datetime "); printDateTime();
   DEBUG_PRINT("Info: Initial alarm "); printAlarm();
@@ -207,6 +206,8 @@ void loop()
     logGnss();            // Log u-blox GNSS data
     logDebug();           // Log system debug information
     setSleepAlarm();      // Set sleep alarm
+
+    printTimers();
   }
 
   // Check for watchdog interrupt
@@ -216,7 +217,7 @@ void loop()
   }
 
   // Blink LED
-  blinkLed(1, 25);
+  blinkLed(1, 100);
 
   // Enter deep sleep
   goToSleep();

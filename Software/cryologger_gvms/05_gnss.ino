@@ -26,15 +26,22 @@ void configureGnss()
       DEBUG_PRINTLN("Warning: u-blox failed to initialize! Please check wiring.");
       online.gnss = false;
       logDebug(); // Log system debug information
-      while (1); // Force watchdog timer to reset system
+      while (1)
+      {
+        // Force watchdog timer to reset system
+        blinkLed(3, 250);
+        delay(2000);
+      }
     }
     else
     {
+      DEBUG_PRINTLN("Info: u-blox initialized.");
       online.gnss = true;
     }
   }
   else
   {
+    DEBUG_PRINTLN("Info: u-blox initialized.");
     online.gnss = true;
   }
 
@@ -76,6 +83,7 @@ void configureGnss()
   gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
   gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
   gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
+
   gnss.setAutoPVT(true);                            // Enable automatic NAV-PVT messages
   gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM-SFRBX messages
   gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM-RAWX messages

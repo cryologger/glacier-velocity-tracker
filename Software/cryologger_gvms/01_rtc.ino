@@ -62,12 +62,14 @@ void setSleepAlarm()
   // Check for logging mode
   if (loggingMode == 1)
   {
+    DEBUG_PRINTLN(F("Info: Setting daily RTC alarm"));
     // Set daily alarm
     rtc.setAlarm(loggingStartTime, 0, 0, 0, 0, 0);
 
   }
   else if (loggingMode == 2)
   {
+    DEBUG_PRINTLN(F("Info: Setting rolling RTC alarm"));
     // Set rolling RTC alarm
     rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
   }

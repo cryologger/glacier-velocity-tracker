@@ -21,10 +21,12 @@ void printLoggingSettings()
   printLine();
   DEBUG_PRINTLN("Logging Configuration");
   printLine();
+
+  DEBUG_PRINT("Logging mode: ");          printTab(3);  DEBUG_PRINTLN(loggingMode);
   DEBUG_PRINT("Logging start: ");         printTab(3);  DEBUG_PRINTLN(loggingStartTime);
   DEBUG_PRINT("Logging stop: ");          printTab(3);  DEBUG_PRINTLN(loggingStopTime);
-  DEBUG_PRINT("Rolling logging alarm: "); printTab(2);  DEBUG_PRINTLN(loggingAlarmHours);
-  DEBUG_PRINT("Rolling sleep alarm: ");   printTab(2);  DEBUG_PRINTLN(sleepAlarmHours);
+  DEBUG_PRINT("Rolling logging alarm: "); printTab(2);  DEBUG_PRINT(loggingAlarmHours); DEBUG_PRINT(" hours "); DEBUG_PRINT(loggingAlarmMinutes); DEBUG_PRINTLN(" minutes ");
+  DEBUG_PRINT("Rolling sleep alarm: ");   printTab(2);  DEBUG_PRINT(sleepAlarmHours); DEBUG_PRINT(" hours "); DEBUG_PRINT(sleepAlarmMinutes); DEBUG_PRINTLN(" minutes ");
   DEBUG_PRINT("Logging alarm mode: ");    printTab(2);  DEBUG_PRINTLN(loggingAlarmMode);
   DEBUG_PRINT("Sleep alarm mode: ");      printTab(2);  DEBUG_PRINTLN(sleepAlarmMode);
   DEBUG_PRINT("Initial alarm mode: ");    printTab(2);  DEBUG_PRINTLN(initialAlarmMode);
@@ -58,5 +60,21 @@ void printGnssSettings()
   //DEBUG_PRINT("UBLOX_CFG_UART2_ENABLED: ");        printTab(1);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_UART2_ENABLED));
   DEBUG_PRINT("UBLOX_CFG_USB_ENABLED: ");          printTab(2);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_USB_ENABLED));
 
+  printLine();
+}
+
+void printTimers()
+{
+  //printLine();
+  DEBUG_PRINTLN("Function Execution Timers");
+  printLine();
+  DEBUG_PRINT("readWdt: ");     printTab(1);  DEBUG_PRINTLN(timer.wdt);
+  DEBUG_PRINT("readRtc: ");     printTab(1);  DEBUG_PRINTLN(timer.rtc);
+  DEBUG_PRINT("microSD: ");     printTab(1);  DEBUG_PRINTLN(timer.microSd);
+  DEBUG_PRINT("battery: ");     printTab(1);  DEBUG_PRINTLN(timer.battery);
+  DEBUG_PRINT("gnss: ");        printTab(2);  DEBUG_PRINTLN(timer.gnss);
+  DEBUG_PRINT("syncRtc: ");     printTab(1);  DEBUG_PRINTLN(timer.syncRtc);
+  DEBUG_PRINT("logDebug: ");    printTab(1);  DEBUG_PRINTLN(timer.logDebug);
+  DEBUG_PRINT("logGnss: ");     printTab(1);  DEBUG_PRINTLN(timer.logGnss);
   printLine();
 }
