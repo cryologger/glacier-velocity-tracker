@@ -62,15 +62,23 @@ A carrier board was designed to simplify assembly and deployment of the Cryologg
 
 By default, the system is programmed to wake daily and log UBX RAWX/SFRBX messages at 1 Hz from both GPS and GLONASS constellations for a period of 3 hours. Messages are streamed processed through the SparkFun u-blox GNSS library and written to a microSD card in UBX format. Log files can then be converted to RINEX using RTKLIB and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
 
-### 2.3 Deployments
+### 2.3 Operation
+
+#### 2.3.1 LED blink patterns
+
+* 10 seconds between LED blink - Watchdog interrupt. System is asleep.
+* 1 second between LED blinks - Attempting to synchronize real-time clock with u-blox receiver.
+* Sets of 2 LED blinks - Unable to initialize microSD card
+* Sets of 3 LED blinks - Unable to initialize u-blox receiver
+* Periodic fast LED blinks - Logging data to microSD card
+
+## 3.0 Results
+### 3.1 Deployments
 Several systems are planned for deployment in the summer of 2021. Potential deployment locations include the Mittie Glacier, Belcher Glacier, and Croker Bay Glacier in Nunavut, Canada.
 
 
 <p align="center"><img src="https://user-images.githubusercontent.com/22924092/113763675-f495c580-96e7-11eb-9eb1-5203dc91fd16.png" width="480"></p>
 <p align="center"><b>Figure 5.</b> Map of proposed Cryologger deployments in summer 2021.</p>
-
-
-## 3.0 Results
 
 ## 4.0 Discussion
 
