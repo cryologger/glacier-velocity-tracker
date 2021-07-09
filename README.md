@@ -57,22 +57,29 @@ A carrier board was designed to simplify assembly and deployment of the Cryologg
 ![L-Com v16](https://user-images.githubusercontent.com/22924092/113727907-9525be80-96c3-11eb-9db5-a16260b8cdfe.png)
 
 
-### 2.2 Measurements
+### 2.2 Data Logging
 
-The system is programmed to wake daily and log UBX RAWX/SFRBX messages at 1 Hz from both GPS and GLONASS constellations for a period of 3 hours. Messages are streamed processed through the SparkFun u-blox GNSS library and written to a microSD card in UBX format. Log files can then be converted to RINEX using RTKLIB and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
+
+The system is programmed to wake daily and log UBX RAWX/SFRBX messages at 1 Hz from both GPS and GLONASS constellations for a period of 3 hours. Messages are streamed processed through the SparkFun u-blox GNSS library and written to a microSD card in UBX format. 
 
 ### 2.3 Operation
 
-When the Cryologger is initially powered on, it will begin by attempting to establish a GNSS fix in order to sychrnoize the Artemis' onboard real-time clock. It will attempt to do so for up to 5 minutes, and the LED will blink every second during this time. 
+When initially powered on, the system will attempt to establish a GNSS fix and sychronize the real-time clock (RTC) of the MicroMod Artemis Processor for up to 5 minutes. During this time, the LED will blink once a second. Once the RTC is synchornized, the system will set an alarm to wake at the user-specified time and enter a low-power deep sleep. 
+
+While the system is in deep sleep, once every 10 seconds the Watchdog Timer (WDT) will wake the system to check the program has not frozen. The LED will blink briefly (100 ms) during this check. 
 
 
-#### 2.3.1 LED blink patterns
+#### 2.3.1 LED Blink Patterns
 
 * 10 seconds between LED blink - Watchdog interrupt. System is asleep.
 * 1 second between LED blinks - Attempting to synchronize real-time clock with u-blox receiver.
 * Sets of 2 LED blinks - Unable to initialize microSD card
 * Sets of 3 LED blinks - Unable to initialize u-blox receiver
 * Periodic fast LED blinks - Logging data to microSD card
+
+
+### 2.4 Data Processing
+Data is logged in u-blox's proprietary .ubx format. Log files can be converted to RINEX using RTKLIB or Emlid Studio and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
 
 ## 3.0 Results
 ### 3.1 Deployments
@@ -91,7 +98,7 @@ Several systems are planned for deployment in the summer of 2021. Potential depl
 ## Repository Contents
 * **/Software** - Contains the Arduino code.
 
-* **/Hardware** - Autodesk Eagle PCB schematic and board design files.
+* **/Hardware** - KiCad PCB schematic and board design files.
 
 * **/Bill of Materials** - Information on components and their associated costs.
 
