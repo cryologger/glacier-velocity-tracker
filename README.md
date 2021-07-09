@@ -23,7 +23,7 @@ The design of the system places emphasis on the following design principles:
 
 #### 2.1.2 Bill of materials 
 
-**Table 1.** Components making up the glacier velocity measurement system, current as of April 3, 2021.
+**Table 1.** Components making up the glacier velocity measurement system, current as of July 7, 2021.
 
 | Component | Product | Cost (USD) |
 | --- | --- | :---: | 
@@ -32,8 +32,8 @@ The design of the system places emphasis on the following design principles:
 | GNSS Receiver | SparkFun GPS-RTK-SMA Breakout - ZED-F9P | $219.95 |
 | GNSS Antenna | SparkFun GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106 | $124.95 |
 | Voltage Regulator | Pololu 5V, 600mA Step-Down Voltage Regulator D36V6F5 | $4.95 |
-| microSD Card| Western Digital SDSDQED-032G-XI Industrial Grade 32 GB microSD | $57.00 |
-| Electronics Enclosure | Hammond Manufacturing 1554 | |
+| microSD Card| SanDisk MAX Endurance 64 GB microSD | $20.00 |
+| Electronics Enclosure | Hammond Manufacturing 1554JL2GYCL | $20.00 |
 | Solar Panel | Voltaic Systems 9 Watt 18 Volt Solar Panel | $89.00 |
 | Solar Panel Bracket | Voltaic Systems Solar Panel Bracket - Medium | $18.00 |
 | Solar Panel Hardware | Voltaic Systems Panel Post Nuts - Stainless Steel | $ 4.00 |
@@ -41,8 +41,7 @@ The design of the system places emphasis on the following design principles:
 | Battery | Deka SOLAR Gel 48 Ah 8G40C | $150.00 |
 | Enclosure | L-Com 14x12x7 Inch Weatherproof NEMA Enclosure | $118.00 |
 | Pole Mount | L-Com Enclosure Pole Mounting Kit | $53.30 |
-| Tripod | Onset HOBO Weather Station m 3m Tripod |  | 
-| **Total** | | |
+| Tripod | Onset HOBO Weather Station m 3m Tripod |   | 
 
 
 #### 2.1.3 Carrier board
@@ -60,9 +59,12 @@ A carrier board was designed to simplify assembly and deployment of the Cryologg
 
 ### 2.2 Measurements
 
-By default, the system is programmed to wake daily and log UBX RAWX/SFRBX messages at 1 Hz from both GPS and GLONASS constellations for a period of 3 hours. Messages are streamed processed through the SparkFun u-blox GNSS library and written to a microSD card in UBX format. Log files can then be converted to RINEX using RTKLIB and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
+The system is programmed to wake daily and log UBX RAWX/SFRBX messages at 1 Hz from both GPS and GLONASS constellations for a period of 3 hours. Messages are streamed processed through the SparkFun u-blox GNSS library and written to a microSD card in UBX format. Log files can then be converted to RINEX using RTKLIB and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
 
 ### 2.3 Operation
+
+When the Cryologger is initially powered on, it will begin by attempting to establish a GNSS fix in order to sychrnoize the Artemis' onboard real-time clock. It will attempt to do so for up to 5 minutes, and the LED will blink every second during this time. 
+
 
 #### 2.3.1 LED blink patterns
 
