@@ -10,12 +10,11 @@ https://www.arduino.cc/en/software
 Add the following Additional Boards Manager URL:
 https://raw.githubusercontent.com/sparkfun/Arduino_Boards/master/IDE_Board_Manager/package_sparkfun_index.json
 
-## Step 3: Add libraries
+## Step 3: Add Libraries
 The glacier velocity measurement system requires two external libraries, which can either be downloaded using the Arduino IDE's Library Manager, or directly from GitHub.
 ### SparkFun u-blox Arduino GNSS Library
 - Version: 2.0.9
 - GitHub: https://github.com/sparkfun/SparkFun_u-blox_GNSS_Arduino_Library
-- 
 <img src="https://user-images.githubusercontent.com/22924092/125138969-a4ab0e00-e0dd-11eb-9df3-e183d7cd2e73.png" width="640">
 
 ### SdFat
@@ -23,10 +22,10 @@ The glacier velocity measurement system requires two external libraries, which c
 - Github URL: https://github.com/greiman/SdFat
 <img src="https://user-images.githubusercontent.com/22924092/125138913-83e2b880-e0dd-11eb-9d29-7a32b79902ea.png" width="640">
 
-## Step 4: Download Cryologger GVMS code
+## Step 4: Download Program
 * https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System
 
-## Step 5: Select microcontroller and configure serial port settings
+## Step 5: Select Harware & Configure Port Settings
 Navigate to Tools, click on Board.
 
 <img src="https://user-images.githubusercontent.com/22924092/125139193-1b480b80-e0de-11eb-9849-7009c75e1093.png" width="480">
@@ -39,8 +38,8 @@ Return to the main menu, navigate to SVL Baud Rate and select 460800 baud.
 
 <img src="https://user-images.githubusercontent.com/22924092/125139245-31ee6280-e0de-11eb-9bea-371367445301.png" width="480">
 
-##Step 6: Attempt to compile code
+## Step 6: Compile Program
 
-![image](https://user-images.githubusercontent.com/22924092/125139930-6f9fbb00-e0df-11eb-8bb1-87d007d0d7ff.png)
+<img src="https://user-images.githubusercontent.com/22924092/125139930-6f9fbb00-e0df-11eb-8bb1-87d007d0d7ff.png" width="640">
 
 
