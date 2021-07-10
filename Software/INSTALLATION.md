@@ -44,22 +44,21 @@ The glacier velocity measurement system requires two external libraries. These c
 <img src="https://user-images.githubusercontent.com/22924092/125139245-31ee6280-e0de-11eb-9bea-371367445301.png" width="480">
 
 ## Step 6: Download Glacier Velocity Measurement System Program
-Code for the Cryologger GVMS is available on GitHub from the following repository:
+Code for the Cryologger GVMS is made available on the following GitHubrepository:
 * https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System
-* The easiest approach is to download the entire repository locallly, which can be accomplished by clicking on "Code" and then "Download Zip"
-
-![image](https://user-images.githubusercontent.com/22924092/125165486-209c6900-e165-11eb-9ba5-05308af564b3.png)
+* Click on "Releases" and download the v2.0.3 .zip file:
+![image](https://user-images.githubusercontent.com/22924092/125166162-5858e000-e168-11eb-8b9d-ef07eb5580bc.png)
 
 ## Step 7: Test Program Compiliation
 * Navigate to the /Software/cryologger_gvms folder of the downloaded repository
 * Double click on the `cryologger_gvms.ino` file
 * Click on the checkmark in the upper left corner of the Arduino IDE program window
-* Watch debugging window for compilation errors and/or success messages
-<img src="https://user-images.githubusercontent.com/22924092/125139930-6f9fbb00-e0df-11eb-8bb1-87d007d0d7ff.png" width="640">
+* Watch debugging window for compilation errors
+<img src="https://user-images.githubusercontent.com/22924092/125166214-8dfdc900-e168-11eb-8a87-1f88e15ff32b.png" width="640">
 
 ## Step 7: Upload Program
-* Once the code has compiled successfully, connect the MicroMod Artemis Data Logging Carrier board via USB C. 
-* The board should appear as a USB device
+* Once the code has compiled successfully, connect the MicroMod Artemis Data Logging Carrier board via USB C cable. 
+* The board should appear under "Port" as a USB or COM device
 * Make any necessary changes to the code
 * Click on the right pointed arrow to upload the code
 * Watch debugging window for compilation errors and/or success messages
