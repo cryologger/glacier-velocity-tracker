@@ -1,6 +1,6 @@
 /*
     Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0.3
-    Date:     July 4, 2021
+    Date:     July 10, 2021
     Author:   Adam Garbo
 
     Components:
@@ -9,14 +9,14 @@
     - SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic)
 
     Comments:
-    - Code is configured for long-term deployments in the Yukon.
+    - Code is configured for long-term deployments on the Lowell Glacier in the Yukon, Canada.
 */
 
 // ----------------------------------------------------------------------------
 // Libraries
 // ----------------------------------------------------------------------------
 #include <RTC.h>
-#include <SparkFun_u-blox_GNSS_Arduino_Library.h> // https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library
+#include <SparkFun_u-blox_GNSS_Arduino_Library.h> // https://github.com/sparkfun/SparkFun_u-blox_GNSS_Arduino_Library
 #include <SdFat.h>                                // https://github.com/greiman/SdFat
 #include <SPI.h>
 #include <WDT.h>
