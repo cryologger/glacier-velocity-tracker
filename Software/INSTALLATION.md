@@ -3,26 +3,25 @@
 ## Step 1: Download Arduino IDE
 https://www.arduino.cc/en/software
 
-## Step 2: Add Additional Boards Manager
-
-<img src="https://user-images.githubusercontent.com/22924092/125138608-f2734680-e0dc-11eb-94d7-24572fc70e37.png" width="800">
-
-Add the following Additional Boards Manager URL:
+## Step 2: Add Additional Boards Manager URL:
+Add the following Additional Boards Manager URL as shown in the sceenshot below:
 https://raw.githubusercontent.com/sparkfun/Arduino_Boards/master/IDE_Board_Manager/package_sparkfun_index.json
+<img src="https://user-images.githubusercontent.com/22924092/125138608-f2734680-e0dc-11eb-94d7-24572fc70e37.png" width="800">
 
 ## Step 3: Add Libraries
 The glacier velocity measurement system requires two external libraries, which can either be downloaded using the Arduino IDE's Library Manager, or directly from GitHub.
-### SparkFun u-blox Arduino GNSS Library
+
+### 1) SparkFun u-blox Arduino GNSS Library
 - Version: 2.0.9
 - GitHub: https://github.com/sparkfun/SparkFun_u-blox_GNSS_Arduino_Library
 <img src="https://user-images.githubusercontent.com/22924092/125138969-a4ab0e00-e0dd-11eb-9df3-e183d7cd2e73.png" width="640">
 
-### SdFat
+### 2) SdFat
 - Version: 2.0.6
 - Github URL: https://github.com/greiman/SdFat
 <img src="https://user-images.githubusercontent.com/22924092/125138913-83e2b880-e0dd-11eb-9d29-7a32b79902ea.png" width="640">
 
-## Step 4: Download Program
+## Step 4: Download Glacier Velocity Measurement System Program
 * https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System
 
 ## Step 5: Select Harware & Configure Port Settings
@@ -38,8 +37,9 @@ Return to the main menu, navigate to SVL Baud Rate and select 460800 baud.
 
 <img src="https://user-images.githubusercontent.com/22924092/125139245-31ee6280-e0de-11eb-9bea-371367445301.png" width="480">
 
-## Step 6: Compile Program
+## Step 6: Test Program Compiliation
 
 <img src="https://user-images.githubusercontent.com/22924092/125139930-6f9fbb00-e0df-11eb-8bb1-87d007d0d7ff.png" width="640">
 
+## Step 7: Upload Program
 
