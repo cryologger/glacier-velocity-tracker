@@ -6,7 +6,7 @@ https://www.arduino.cc/en/software
 ## Step 2: Add Additional Boards Manager URL:
 * Navigate to: Preferences
 * Add the following Additional Boards Manager URL as shown in the sceenshot below:
-https://raw.githubusercontent.com/sparkfun/Arduino_Boards/master/IDE_Board_Manager/package_sparkfun_index.json
+https://raw.githubusercontent.com/sparkfun/Arduino_Boards/master/IDE_Board_Manager/package_sparkfun_index.json,https://raw.githubusercontent.com/sparkfun/Arduino_Apollo3/master/package_sparkfun_apollo3_index.json
 <img src="https://user-images.githubusercontent.com/22924092/125138608-f2734680-e0dc-11eb-94d7-24572fc70e37.png" width="800">
 
 ## Step 3: Install Board Definition

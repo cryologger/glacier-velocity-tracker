@@ -1,5 +1,7 @@
 # Cryologger - Glacier Velocity Measurement System
 
+***Work in progress**
+
 ## 1.0 Introduction
 The low-cost, open-source Cryologger glacier velocity measurement system (GVMS) is designed to measure the daily displacement and annual velocities of glaciers in the Canadian Arctic. It is based on the u-blox ZED-F9P GNSS receiver and powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board.
 
