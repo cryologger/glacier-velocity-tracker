@@ -9,7 +9,7 @@ The low-cost, open-source Cryologger glacier velocity measurement system (GVMS) 
 
 ### 2.1 Design
 
-The Cryologger GVMS is constructed using off-the-shelf components, and is intended for deployments of one year or more. Emphasis is placed on the following design principles:
+The Cryologger GVMS is constructed using off-the-shelf components, and is intended for deployments of one year or more. Emphasis is placed on a number of design principles, including:
 * Inexpensive
 * Off-the-shelf components
 * Modular
@@ -67,29 +67,21 @@ While the system is in deep sleep, the Watchdog Timer (WDT) will wake the system
 
 
 #### 2.3.1 LED Blink Patterns
-
 * 10 seconds between LED blink - Watchdog interrupt. System is in deep sleep.
 * 1 second between LED blinks - Attempting to synchronize real-time clock with u-blox receiver.
+* 10 quick LED blinks - RTC synchronized with u-blox receiver. Configuration complete.
 * Sets of 2 LED blinks - Unable to initialize microSD card
 * Sets of 3 LED blinks - Unable to initialize u-blox receiver
 * Periodic fast LED blinks - Logging data to microSD card
 
-
 ### 2.4 Data Processing
 Data is logged in u-blox's proprietary .ubx format. Log files can be converted to RINEX using RTKLIB or Emlid Studio and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
 
-## 3.0 Results
-### 3.1 Deployments
-Several systems are planned for deployment in the summer of 2021. Potential deployment locations include the Mittie Glacier, Belcher Glacier, and Croker Bay Glacier in Nunavut, Canada.
-
+### 3.0 Deployment
+Systems are planned for deployment in summer 2021 on the Lowell Glacier in Kluane National Park, Yukon as well as the Mittie, Belcher, and Croker Bay Glacier in Nunavut, Canada.
 
 <p align="center"><img src="https://user-images.githubusercontent.com/22924092/113763675-f495c580-96e7-11eb-9eb1-5203dc91fd16.png" width="480"></p>
 <p align="center"><b>Figure 5.</b> Map of proposed Cryologger deployments in summer 2021.</p>
-
-## 4.0 Discussion
-
-## 5.0 Conclusion
-
 
 
 ## Repository Contents
