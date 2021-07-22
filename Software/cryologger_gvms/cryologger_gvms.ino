@@ -1,6 +1,6 @@
 /*
     Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0.3
-    Date:     July 10, 2021
+    Date:     July 22, 2021
     Author:   Adam Garbo
 
     Components:
@@ -9,7 +9,7 @@
     - SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic)
 
     Comments:
-    - Code is configured for long-term deployments on the Lowell Glacier in the Yukon, Canada.
+    - Code is configured for long-term deployments from the CCGS Amundsen.
 */
 
 // ----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ volatile int  wdtCounterMax       = 0;            // Counter for max watchdog ti
 bool          gnssConfigFlag      = true;         // Flag to indicate whether to configure the u-blox module
 bool          rtcSyncFlag         = false;        // Flag to indicate if RTC has been synced with GNSS
 char          logFileName[30]     = "";           // Log file name
-char          debugFileName[10]   = "debug.csv";  // Debug log file name
+char          debugFileName[10]   = "GVMS_1_debug.csv";  // Debug log file name
 unsigned int  debugCounter        = 0;            // Counter to track number of recorded debug messages
 unsigned int  gnssTimeout         = 5;            // Timeout for GNSS signal acquisition (minutes)
 unsigned int  maxBufferBytes      = 0;            // Maximum value of file buffer
@@ -157,7 +157,7 @@ void setup()
 #endif
 
   printLine();
-  DEBUG_PRINTLN("Cryologger - Glacier Velocity Measurement System 7");
+  DEBUG_PRINTLN("Cryologger - Glacier Velocity Measurement System 1");
   printLine();
 
   printDateTime();      // Print RTC's current date and time

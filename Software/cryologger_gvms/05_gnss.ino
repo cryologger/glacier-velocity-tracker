@@ -169,7 +169,7 @@ void syncRtc()
 // Create timestamped log file name
 void getLogFileName()
 {
-  sprintf(logFileName, "20%02d%02d%02d_%02d%02d%02d.ubx",
+  sprintf(logFileName, "GVMS1_20%02d%02d%02d_%02d%02d%02d.ubx",
           rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 }
