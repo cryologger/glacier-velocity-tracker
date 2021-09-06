@@ -1,9 +1,9 @@
 # Cryologger - Glacier Velocity Measurement System
 
-***Work in progress**
+![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/Photos/DSC_6546.JPG)
 
 ## 1.0 Introduction
-The low-cost, open-source Cryologger glacier velocity measurement system (GVMS) is designed to measure the daily displacement and annual velocities of glaciers in the Canadian Arctic. It is based on the u-blox ZED-F9P GNSS receiver and powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board.
+The Cryologger glacier velocity measurement system (GVMS) is a low-cost, open-source multi-frequency GNSS receiver and data logger designed to measure the daily displacement and annual velocities of glaciers in the Canadian Arctic. It is based on the u-blox ZED-F9P GNSS receiver and powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board.
 
 ## 2.0 Methods
 
@@ -50,7 +50,6 @@ A carrier board was designed to simplify assembly and deployment of the Cryologg
 <p align="center"><b>Figure 5.</b> Open-source carrier board design.</p>
 
 
-
 #### 2.1.3 Mock-up
 ![L-Com v16](https://user-images.githubusercontent.com/22924092/113727907-9525be80-96c3-11eb-9db5-a16260b8cdfe.png)
 
@@ -78,7 +77,7 @@ While the system is in deep sleep, the Watchdog Timer (WDT) will wake the system
 Data is logged in u-blox's proprietary .ubx format. Log files can be converted to RINEX using RTKLIB or Emlid Studio and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
 
 ### 3.0 Deployment
-Systems are planned for deployment in summer 2021 on the Lowell Glacier in Kluane National Park, Yukon as well as the Mittie, Belcher, and Croker Bay Glacier in Nunavut, Canada.
+A total of five deployments were made in the summer of 2021. Two on the Lowell Glacier in Kluane National Park, Yukon and three on the Belcher Glacier and Southeast 2 Glacier, Devon Island, Nunavut, Canada.
 
 <p align="center"><img src="https://user-images.githubusercontent.com/22924092/113763675-f495c580-96e7-11eb-9eb1-5203dc91fd16.png" width="480"></p>
 <p align="center"><b>Figure 5.</b> Map of proposed Cryologger deployments in summer 2021.</p>
