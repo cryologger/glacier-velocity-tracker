@@ -77,11 +77,10 @@ While the system is in deep sleep, the Watchdog Timer (WDT) will wake the system
 Data is logged in u-blox's proprietary .ubx format. Log files can be converted to RINEX using RTKLIB or Emlid Studio and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
 
 ### 3.0 Deployment
-A total of five deployments were made in the summer of 2021. Two on the Lowell Glacier in Kluane National Park, Yukon and three on the Belcher Glacier and Southeast 2 Glacier, Devon Island, Nunavut, Canada.
+A total of five deployments were made in the summer of 2021. Two on the Lowell Glacier in Kluane National Park, Yukon and three on the Belcher and Southeast 2 glaciers, Devon Island, Nunavut, Canada.
 
-<p align="center"><img src="https://user-images.githubusercontent.com/22924092/113763675-f495c580-96e7-11eb-9eb1-5203dc91fd16.png" width="480"></p>
-<p align="center"><b>Figure 5.</b> Map of proposed Cryologger deployments in summer 2021.</p>
-
+<p align="center"><img src="https://user-images.githubusercontent.com/22924092/132999968-d2fa57f0-24c4-4a01-bd73-50567da31f49.png" width="720"></p>
+<p align="center"><b>Figure 5.</b> Map of Cryologger glacier velocity system deployments on Devon Island, Nunavut during the 2021 Amundsen Expedition.</p>
 
 ## Repository Contents
 * **/Software** - Contains the Arduino code.
