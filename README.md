@@ -80,8 +80,9 @@ Data is logged in u-blox's proprietary .ubx format. Log files can be converted t
 A total of five deployments were made in the summer of 2021. Two on the Lowell Glacier in Kluane National Park, Yukon and three on the Belcher and Southeast 2 glaciers, Devon Island, Nunavut, Canada.
 
 <p align="center"><img src="https://user-images.githubusercontent.com/22924092/132999968-d2fa57f0-24c4-4a01-bd73-50567da31f49.png" width="720"></p>
-<p align="center"><b>Figure 5.</b> Map of Cryologger glacier velocity system deployments on Devon Island, Nunavut during the 2021 Amundsen Expedition.</p>
+<p align="left"><b>Figure 5.</b> Map of Cryologger glacier velocity system deployments on Devon Island, Nunavut during the 2021 Amundsen Expedition. Copernicus Sentinel 2 data 2021, processed by ESA.</p>
 
+Base image: USGS/NASA Landsat-8 Mosaic, July/August/September 2015.
 ## Repository Contents
 * **/Software** - Contains the Arduino code.
 
