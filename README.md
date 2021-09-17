@@ -76,11 +76,14 @@ While the system is in deep sleep, the Watchdog Timer (WDT) will wake the system
 ### 2.4 Data Processing
 Data is logged in u-blox's proprietary .ubx format. Log files can be converted to RINEX using RTKLIB or Emlid Studio and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
 
-### 3.0 Deployment
-A total of five deployments were made in the summer of 2021. Two on the Lowell Glacier in Kluane National Park, Yukon and three on the Belcher and Southeast 2 glaciers, Devon Island, Nunavut, Canada.
+## 3.0 Deployments
+A total of five deployments were made in the summer of 2021. Two on the Lowell Glacier in Kluane National Park, Yukon (Figure 5) and three on the Belcher and Southeast 2 glaciers, Devon Island, Nunavut, Canada (Figure 5).
+
+<p align="center"><img src="https://user-images.githubusercontent.com/22924092/133788170-dc148b5a-be41-4dad-9bea-d87f751e8ac2.png" width="720"></p>
+<p align="left"><b>Figure 4.</b> Map of Cryologger glacier velocity system deployments on Lowell Glacier in Kluane National Park, Yukon during the summer 2021 field season. Imagery: Copernicus Sentinel 2 acquired 2021-07-28.</p>
 
 <p align="center"><img src="https://user-images.githubusercontent.com/22924092/133785308-99856546-a479-4e5f-8d66-12250404128f.png" width="720"></p>
-<p align="left"><b>Figure 5.</b> Map of Cryologger glacier velocity system deployments on Devon Island, Nunavut during the 2021 Amundsen Expedition. Imagery: Copernicus Sentinel 2 data 2021-08-28.</p>
+<p align="left"><b>Figure 5.</b> Map of Cryologger glacier velocity system deployments on Devon Island, Nunavut during the 2021 Amundsen Expedition. Imagery: Copernicus Sentinel 2 acquired 2021-08-28.</p>
 
 ## Repository Contents
 * **/Software** - Contains the Arduino code.
