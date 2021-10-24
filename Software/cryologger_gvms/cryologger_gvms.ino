@@ -10,6 +10,10 @@
 
     Comments:
     - Code is configured for long-term deployments from the CCGS Amundsen.
+    
+    Dependencies:
+    - Apollo3 Core v1.2.3
+    - SparkFun u-blox GNSS Arduino Library v2.0.9
 */
 
 // ----------------------------------------------------------------------------
