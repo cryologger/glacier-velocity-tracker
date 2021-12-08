@@ -1,5 +1,5 @@
 /*
-    Title:    Cryologger - Glacier Velocity Measurement System (GVMS) v2.0.3
+    Title:    Cryologger - Glacier Velocity Tracker (GVT) v2.0.3
     Date:     July 22, 2021
     Author:   Adam Garbo
 
