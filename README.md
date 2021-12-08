@@ -1,15 +1,15 @@
-# Cryologger - Glacier Velocity Measurement System
+# Cryologger - Glacier Velocity Tracker
 
 ![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Photos/DSC_6546.JPG)
 
 ## 1.0 Introduction
-The Cryologger glacier velocity measurement system (GVMS) is a low-cost, open-source multi-frequency GNSS receiver and data logger designed to measure the daily displacement and annual velocities of glaciers in the Canadian Arctic. It is based on the u-blox ZED-F9P GNSS receiver and powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board.
+The Cryologger glacier velocity tracker (GVT) is a low-cost, open-source multi-frequency GNSS receiver and data logger designed to measure the daily displacement and annual velocities of glaciers in the Canadian Arctic. It is based on the u-blox ZED-F9P GNSS receiver and powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board.
 
 ## 2.0 Methods
 
 ### 2.1 Design
 
-The Cryologger GVMS is constructed using off-the-shelf components, and is intended for deployments of one year or more. Emphasis is placed on a number of design principles, including:
+The Cryologger GVT is constructed using off-the-shelf components, and is intended for deployments of one year or more. Emphasis is placed on a number of design principles, including:
 * Inexpensive
 * Off-the-shelf components
 * Modular
@@ -21,7 +21,7 @@ The Cryologger GVMS is constructed using off-the-shelf components, and is intend
 
 #### 2.1.1 Bill of materials 
 
-**Table 1.** Components making up the glacier velocity measurement system.
+**Table 1.** Components making up the glacier velocity tracker.
 
 | Component | Product | Cost (USD) |
 | --- | --- | :---: | 
@@ -43,7 +43,7 @@ The Cryologger GVMS is constructed using off-the-shelf components, and is intend
 
 
 #### 2.1.2 Carrier board
-A carrier board was designed to simplify assembly and deployment of the Cryologger GVMS. It provides 5 mm, 2-pin screw terminals for wiring the battery connection, and an optional resistor divider to measure battery voltage.
+A carrier board was designed to simplify assembly and deployment of the Cryologger GVT. It provides 5 mm, 2-pin screw terminals for wiring the battery connection, and an optional resistor divider to measure battery voltage.
 
 
 <p align="center"><img width="720" src="https://user-images.githubusercontent.com/22924092/114622089-874fda80-9c7b-11eb-9545-e24993ba051d.png"></p>
