@@ -39,7 +39,7 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 | Battery | Deka SOLAR Gel 48 Ah 8G40C | $150.00 |
 | Enclosure | L-Com 14x12x7 Inch Weatherproof NEMA Enclosure | $118.00 |
 | Pole Mount | L-Com Enclosure Pole Mounting Kit | $53.30 |
-| Tripod | Onset HOBO Weather Station m 3m Tripod |   | 
+| Tripod | Onset HOBO Weather Station m 3m Tripod |  $200.00 | 
 
 
 #### 2.1.2 Carrier board
