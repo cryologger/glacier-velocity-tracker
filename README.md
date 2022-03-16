@@ -23,15 +23,19 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 
 **Table 1.** Components making up the glacier velocity tracker.
 
-| Component | Product | Cost (USD) |
+| Component | Product | Cost (USD) | 
 | --- | --- | :---: | 
-| Processor | SparkFun MicroMod Artemis Processor | $14.95 |
-| Carrier Board | SparkFun MicroMod Data Logging Carrier Board | $19.95 |
-| GNSS Receiver | SparkFun GPS-RTK-SMA Breakout - ZED-F9P | $219.95 |
-| GNSS Antenna | SparkFun GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106 | $124.95 |
+| Processor | SparkFun MicroMod Artemis Processor | $14.95 | 
+| Carrier Board | SparkFun MicroMod Data Logging Carrier Board | $19.95 | 
+| GNSS Receiver | SparkFun GPS-RTK-SMA Breakout - ZED-F9P | $219.95 | 
+| GNSS Antenna | SparkFun GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106 | $124.95 | 
+| GNSS antenna cable |	SparkFun Interface Cable - SMA Female to SMA Male (25cm) | $4.95 | 
 | Voltage Regulator | Pololu 5V, 600mA Step-Down Voltage Regulator D36V6F5 | $4.95 |
-| microSD Card| SanDisk MAX Endurance 64 GB microSD | $20.00 |
-| Electronics Enclosure | Hammond Manufacturing 1554JL2GYCL | $20.00 |
+| microSD Card| SanDisk MAX Endurance 64 GB microSD | $20.00 | 
+| Resistor |	1 Mohms 1% MBB02070C1004FRP00 | $0.25 |
+| Resistor |	10Mohm 1% 50ppm MBB02070C1005FRP00 | $0.25 |
+| Capacitor | 0.1 uF K104K15X7RF53L2 | $0.25 | 
+| Electronics Enclosure | Hammond Manufacturing 1554JL2GYCL | $14.99 | 
 | Solar Panel | Ameresco Solar 20 Watt Solar Panel 20J | $99.00 |
 | Solar Panel Bracket | Ameresco Solar HPM18-30 Solar Panel Pole Mount | $39.00 |
 | Charge Controller | Genasun GV-5 65W 5A Solar charge controller with MPPT  | $68.00 |
