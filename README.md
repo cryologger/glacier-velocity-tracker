@@ -32,9 +32,8 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 | Voltage Regulator | Pololu 5V, 600mA Step-Down Voltage Regulator D36V6F5 | $4.95 |
 | microSD Card| SanDisk MAX Endurance 64 GB microSD | $20.00 |
 | Electronics Enclosure | Hammond Manufacturing 1554JL2GYCL | $20.00 |
-| Solar Panel | Voltaic Systems 9 Watt 18 Volt Solar Panel | $89.00 |
-| Solar Panel Bracket | Voltaic Systems Solar Panel Bracket - Medium | $18.00 |
-| Solar Panel Hardware | Voltaic Systems Panel Post Nuts - Stainless Steel | $ 4.00 |
+| Solar Panel | Ameresco Solar 20 Watt Solar Panel 20J | $99.00 |
+| Solar Panel Bracket | Ameresco Solar HPM18-30 Solar Panel Pole Mount | $39.00 |
 | Charge Controller | Genasun GV-5 65W 5A Solar charge controller with MPPT  | $68.00 |
 | Battery | Deka SOLAR Gel 48 Ah 8G40C | $150.00 |
 | Enclosure | L-Com 14x12x7 Inch Weatherproof NEMA Enclosure | $118.00 |
