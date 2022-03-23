@@ -37,7 +37,7 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 | Capacitor | 0.1 uF K104K15X7RF53L2 | $0.25 | 
 | Electronics Enclosure | Hammond Manufacturing 1554JL2GYCL | $14.99 | 
 | Solar Panel | Ameresco Solar 20 Watt Solar Panel 20J | $99.00 |
-| Solar Panel Bracket | Ameresco Solar HPM18-30 Solar Panel Pole Mount | $39.00 |
+| Solar Panel Bracket | Ameresco Solar HPM18-30 Solar Panel Pole Mount (optional) | $39.00 |
 | Charge Controller | Genasun GV-5 65W 5A Solar charge controller with MPPT  | $68.00 |
 | Battery | Deka SOLAR Gel 48 Ah 8G40C | $150.00 |
 | Enclosure | L-Com 14x12x7 Inch Weatherproof NEMA Enclosure | $118.00 |
@@ -48,14 +48,12 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 #### 2.1.2 Carrier board
 A carrier board was designed to simplify assembly and deployment of the Cryologger GVT. It provides 5 mm, 2-pin screw terminals for wiring the battery connection, and an optional resistor divider to measure battery voltage.
 
-
 <p align="center"><img width="720" src="https://user-images.githubusercontent.com/22924092/114622089-874fda80-9c7b-11eb-9545-e24993ba051d.png"></p>
 <p align="center"><b>Figure 5.</b> Open-source carrier board design.</p>
 
 
 #### 2.1.3 Mock-up
 ![L-Com v16](https://user-images.githubusercontent.com/22924092/113727907-9525be80-96c3-11eb-9db5-a16260b8cdfe.png)
-
 
 ### 2.2 Data Logging
 
@@ -88,6 +86,11 @@ A total of five deployments were made in the summer of 2021. Two on the Lowell G
 <p align="center"><img src="https://user-images.githubusercontent.com/22924092/133785308-99856546-a479-4e5f-8d66-12250404128f.png" width="720"></p>
 <p align="left"><b>Figure 5.</b> Map of Cryologger glacier velocity system deployments on Devon Island, Nunavut during the 2021 Amundsen Expedition. Imagery: Copernicus Sentinel 2 acquired 2021-08-28.</p>
 
+## 4.0 Results
+Servicing of systems deployed on Devon Island and  Lowell Glacier  are planned for spring and summer 2022, respectively.
+
+## Changelog
+
 ## Repository Contents
 * **/Software** - Contains the Arduino code.
 
@@ -96,7 +99,6 @@ A total of five deployments were made in the summer of 2021. Two on the Lowell G
 * **/Bill of Materials** - Information on components and their associated costs.
 
 * **/Archive** - Previous design iterations.
-
 
 ## License Information
 This project is released under the MIT License (http://opensource.org/licenses/MIT).
