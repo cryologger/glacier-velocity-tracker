@@ -1,6 +1,6 @@
 /*
-    Title:    Cryologger - Glacier Velocity Tracker (GVT) v2.0.3
-    Date:     July 22, 2021
+    Title:    Cryologger - Glacier Velocity Tracker (GVT) v2.0.4
+    Date:     March 23, 2022
     Author:   Adam Garbo
 
     Components:
@@ -9,12 +9,13 @@
     - SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic)
 
     Comments:
-    - Code is configured for long-term deployments from the CCGS Amundsen.
-    
+    - Code is currently configured for short-term deployments during the 
+    2022 Arctic Bay field season.
+
     Dependencies:
     - Apollo3 Core v1.2.3
-    - SparkFun u-blox GNSS Arduino Library v2.0.9
-    - SdFat v2.0.7
+    - SparkFun u-blox GNSS Arduino Library v2.2.7
+    - SdFat v2.1.2
 */
 
 // ----------------------------------------------------------------------------
@@ -31,7 +32,7 @@
 // Debugging macros
 // -----------------------------------------------------------------------------
 #define DEBUG       true  // Output debug messages to Serial Monitor
-#define DEBUG_GNSS  true  // Output GNSS information to Serial Monitor
+#define DEBUG_GNSS  false  // Output GNSS information to Serial Monitor
 
 #if DEBUG
 #define DEBUG_PRINT(x)            Serial.print(x)
@@ -69,23 +70,23 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // User defined logging/sleeping variables
 // ----------------------------------------------------------------------------
 
-// Logging mode 
-byte          loggingMode           = 1;    // 1 = daily, 2 = rolling
+// Logging mode
+byte          loggingMode           = 2;    // 1 = daily, 2 = rolling
 
 // Daily alarm
 byte          loggingStartTime      = 19;   // Logging start hour (UTC)
 byte          loggingStopTime       = 22;   // Logging end hour (UTC)
 
 // Rolling alarm
-byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
+byte          loggingAlarmMinutes   = 30;    // Rolling minutes alarm
 byte          loggingAlarmHours     = 0;    // Rolling hours alarm
-byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
+byte          sleepAlarmMinutes     = 30;    // Rolling minutes alarm
 byte          sleepAlarmHours       = 0;    // Rolling hours alarm
 
 // Alarm modes
-byte          loggingAlarmMode      = 4;    // Logging alarm mode
-byte          sleepAlarmMode        = 4;    // Sleep alarm mode
-byte          initialAlarmMode      = 4;    // Initial alarm mode
+byte          loggingAlarmMode      = 5;    // Logging alarm mode
+byte          sleepAlarmMode        = 5;    // Sleep alarm mode
+byte          initialAlarmMode      = 6;    // Initial alarm mode
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -99,16 +100,17 @@ volatile int  wdtCounterMax       = 0;            // Counter for max watchdog ti
 bool          gnssConfigFlag      = true;         // Flag to indicate whether to configure the u-blox module
 bool          rtcSyncFlag         = false;        // Flag to indicate if RTC has been synced with GNSS
 char          logFileName[30]     = "";           // Log file name
-char          debugFileName[10]   = "GVMS_1_debug.csv";  // Debug log file name
+char          debugFileName[20]   = "gvt_0_debug.csv";  // Debug log file name
 unsigned int  debugCounter        = 0;            // Counter to track number of recorded debug messages
 unsigned int  gnssTimeout         = 5;            // Timeout for GNSS signal acquisition (minutes)
 unsigned int  maxBufferBytes      = 0;            // Maximum value of file buffer
 unsigned long previousMillis      = 0;            // Global millis() timer
 unsigned long bytesWritten        = 0;            // Counter for tracking bytes written to microSD
-unsigned long syncFailCounter     = 0;
-unsigned long writeFailCounter    = 0;
-unsigned long closeFailCounter    = 0;
+unsigned long syncFailCounter     = 0;            // microSD logfile synchronize failure counter
+unsigned long writeFailCounter    = 0;            // microSD logfile write failure counter
+unsigned long closeFailCounter    = 0;            // microSD logfile close failure counter
 long          rtcDrift            = 0;            // Counter for drift of RTC
+float         voltage             = 0.0;          // Battery voltage
 
 // ----------------------------------------------------------------------------
 // Unions/structures
@@ -129,7 +131,7 @@ struct struct_timer
   unsigned long wdt;
   unsigned long rtc;
   unsigned long microSd;
-  unsigned long battery;
+  unsigned long voltage;
   unsigned long sensors;
   unsigned long gnss;
   unsigned long syncRtc;
@@ -142,6 +144,9 @@ struct struct_timer
 // ----------------------------------------------------------------------------
 void setup()
 {
+  // Set ADC to 14-bits
+  analogReadResolution(14);
+  
   // Pin assignments
   pinMode(PIN_QWIIC_POWER, OUTPUT);
   pinMode(PIN_PWC_POWER, OUTPUT);
@@ -158,15 +163,17 @@ void setup()
 #if DEBUG
   Serial.begin(115200);   // Open Serial port
   //while (!Serial);        // Wait for user to open Serial Monitor
-  blinkLed(2, 1000);      // Delay to allow user to open Serial Monitor
+  blinkLed(4, 1000);      // Delay to allow user to open Serial Monitor
 #endif
 
   printLine();
-  DEBUG_PRINTLN("Cryologger - Glacier Velocity Measurement System 1");
+  DEBUG_PRINTLN("Cryologger - Glacier Velocity Measurement Test Unit");
   printLine();
 
   printDateTime();      // Print RTC's current date and time
-
+  readVoltage();        // Read battery voltage
+  //DEBUG_PRINT("Battery voltage: "); DEBUG_PRINTLN(voltage);
+  
   // Print logging configuration
   printLoggingSettings();
 
@@ -200,6 +207,8 @@ void loop()
     setLoggingAlarm();    // Set logging alarm
     getLogFileName();     // Get timestamped log file name
 
+    readVoltage();
+
     // Configure devices
     qwiicPowerOn();       // Enable power to Qwiic connector
     peripheralPowerOn();  // Enable power to peripherals
@@ -212,7 +221,7 @@ void loop()
     logDebug();           // Log system debug information
     setSleepAlarm();      // Set sleep alarm
 
-    printTimers();
+    printTimers();        // Log timers to debug file
   }
 
   // Check for watchdog interrupt

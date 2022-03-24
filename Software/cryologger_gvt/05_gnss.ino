@@ -51,7 +51,7 @@ void configureGnss()
     /*
       // Configure communciation interfaces
       bool setValueSuccess = true;
-      //setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);  // Disable I2C
+      setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);  // Enable I2C
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);    // Disable SPI
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 0);  // Disable UART1
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);  // Disable UART2
@@ -83,7 +83,6 @@ void configureGnss()
   gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
   gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
   gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
-
   gnss.setAutoPVT(true);                            // Enable automatic NAV-PVT messages
   gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM-SFRBX messages
   gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM-RAWX messages
@@ -100,7 +99,7 @@ void syncRtc()
   // Start loop timer
   unsigned long loopStartTime = millis();
 
-  // Check u-blox GNSS initialized successfully
+  // Check if u-blox GNSS initialized successfully
   if (online.gnss)
   {
     // Clear flag
@@ -134,7 +133,7 @@ void syncRtc()
         DEBUG_PRINTLN(gnssBuffer);
 #endif
 
-        // Check if date and time are valid and sync RTC with GNSS
+        // Check if date and time are valid and synchronize RTC with GNSS
         if (fixType == 3 && dateValidFlag && timeValidFlag)
         {
           unsigned long rtcEpoch = rtc.getEpoch();        // Get RTC epoch time
@@ -157,9 +156,8 @@ void syncRtc()
   }
   else
   {
-    DEBUG_PRINTLN("Warning: microSD or GNSS offline!");
-    // Clear flag
-    rtcSyncFlag = false;
+    DEBUG_PRINTLN("Warning: GNSS offline!");
+    rtcSyncFlag = false; // Clear flag
   }
 
   // Stop the loop timer
@@ -169,7 +167,7 @@ void syncRtc()
 // Create timestamped log file name
 void getLogFileName()
 {
-  sprintf(logFileName, "GVMS1_20%02d%02d%02d_%02d%02d%02d.ubx",
+  sprintf(logFileName, "GVT_0_20%02d%02d%02d_%02d%02d%02d.ubx",
           rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 }

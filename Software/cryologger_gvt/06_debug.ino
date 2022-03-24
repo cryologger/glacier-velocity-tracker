@@ -16,8 +16,8 @@ void createDebugFile()
   }
 
   // Write header to file
-  debugFile.println("datetime,online_microSd,online_gnss,online_logGnss,online_logDebug,"
-                    "timer_microsd,timer_gnss,timer_syncRtc,timer_logGnss,timer_logDebug,"
+  debugFile.println("datetime,battery,online_microSd,online_gnss,online_logGnss,online_logDebug,"
+                    "timer_battery,timer_microsd,timer_gnss,timer_syncRtc,timer_logGnss,timer_logDebug,"
                     "rtcSyncFlag,rtcDrift,bytesWritten,maxBufferBytes,wdtCounterMax,"
                     "writeFailCounter,syncFailCounter,closeFailCounter,debugCounter");
 
@@ -67,10 +67,12 @@ void logDebug()
 
   // Log debugging information
   debugFile.print(dateTime);            debugFile.print(",");
+  debugFile.print(voltage);             debugFile.print(",");
   debugFile.print(online.microSd);      debugFile.print(",");
   debugFile.print(online.gnss);         debugFile.print(",");
   debugFile.print(online.logGnss);      debugFile.print(",");
   debugFile.print(online.logDebug);     debugFile.print(",");
+  debugFile.print(timer.voltage);       debugFile.print(",");
   debugFile.print(timer.microSd);       debugFile.print(",");
   debugFile.print(timer.gnss);          debugFile.print(",");
   debugFile.print(timer.syncRtc);       debugFile.print(",");
@@ -102,6 +104,37 @@ void logDebug()
     DEBUG_PRINTLN("Warning: Failed to close debug file.");
     closeFailCounter++; // Count number of failed file closes
   }
+
+  /*
+  DEBUG_PRINTLN("datetime,battery,online_microSd,online_gnss,online_logGnss,online_logDebug,"
+                    "timer_battery,timer_microsd,timer_gnss,timer_syncRtc,timer_logGnss,timer_logDebug,"
+                    "rtcSyncFlag,rtcDrift,bytesWritten,maxBufferBytes,wdtCounterMax,"
+                    "writeFailCounter,syncFailCounter,closeFailCounter,debugCounter");
+  */
+                   
+  // Print debugging information
+  DEBUG_PRINT(dateTime);          DEBUG_PRINT(",");
+  DEBUG_PRINT(voltage);           DEBUG_PRINT(",");
+  DEBUG_PRINT(online.microSd);    DEBUG_PRINT(",");
+  DEBUG_PRINT(online.gnss);       DEBUG_PRINT(",");
+  DEBUG_PRINT(online.logGnss);    DEBUG_PRINT(",");
+  DEBUG_PRINT(online.logDebug);   DEBUG_PRINT(",");
+  DEBUG_PRINT(timer.voltage);     DEBUG_PRINT(",");
+  DEBUG_PRINT(timer.microSd);     DEBUG_PRINT(",");
+  DEBUG_PRINT(timer.gnss);        DEBUG_PRINT(",");
+  DEBUG_PRINT(timer.syncRtc);     DEBUG_PRINT(",");
+  DEBUG_PRINT(timer.logGnss);     DEBUG_PRINT(",");
+  DEBUG_PRINT(timer.logDebug);    DEBUG_PRINT(",");
+  DEBUG_PRINT(rtcSyncFlag);       DEBUG_PRINT(",");
+  DEBUG_PRINT(rtcDrift);          DEBUG_PRINT(",");
+  DEBUG_PRINT(bytesWritten);      DEBUG_PRINT(",");
+  DEBUG_PRINT(maxBufferBytes);    DEBUG_PRINT(",");
+  DEBUG_PRINT(wdtCounterMax);     DEBUG_PRINT(",");
+  DEBUG_PRINT(writeFailCounter);  DEBUG_PRINT(",");
+  DEBUG_PRINT(syncFailCounter);   DEBUG_PRINT(",");
+  DEBUG_PRINT(closeFailCounter);  DEBUG_PRINT(",");
+  DEBUG_PRINTLN(debugCounter);
+  
   // Stop the loop timer
   timer.logDebug = millis() - loopStartTime;
 }
