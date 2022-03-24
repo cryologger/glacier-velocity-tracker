@@ -1,10 +1,17 @@
-void readBattery()
+void readVoltage()
 {
   // Start loop timer
-  unsigned long loopStartTime = millis();
+  unsigned long loopStartTime = micros();
+
+  voltage = analogRead(A0); // Read voltage across a 150/100kOhm op-amp scaling circuit and 10/1 MOhm resistor divider
+  DEBUG_PRINT("ADC: "); DEBUG_PRINTLN(voltage);
+  voltage /= 456.20; // Apply ADC linear gain
+  voltage += -0.1275; // Apply ADC linear offset
+  
+  DEBUG_PRINT("Battery voltage: "); DEBUG_PRINTLN(voltage);
 
   // Stop the loop timer
-  timer.battery = millis() - loopStartTime;
+  timer.voltage = micros() - loopStartTime;
 }
 
 // Enter deep sleep
@@ -30,10 +37,10 @@ void goToSleep()
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART0);
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART1);
 
-  // Disable all pads except G1 (33), G2 (34) and LED_BUILTIN (19)
+  // Disable all pads except G1 (33), G2 (34), A0 and LED_BUILTIN (19)
   for (int x = 0; x < 50; x++)
   {
-    if ((x != 33) && (x != 34) && (x != 19))
+    if ((x != 33) && (x != 34) && (x != A0) && (x != 19))
     {
       am_hal_gpio_pinconfig(x, g_AM_HAL_GPIO_DISABLE);
     }

@@ -71,7 +71,7 @@ void printTimers()
   DEBUG_PRINT("readWdt: ");     printTab(1);  DEBUG_PRINTLN(timer.wdt);
   DEBUG_PRINT("readRtc: ");     printTab(1);  DEBUG_PRINTLN(timer.rtc);
   DEBUG_PRINT("microSD: ");     printTab(1);  DEBUG_PRINTLN(timer.microSd);
-  DEBUG_PRINT("battery: ");     printTab(1);  DEBUG_PRINTLN(timer.battery);
+  DEBUG_PRINT("voltage: ");     printTab(1);  DEBUG_PRINTLN(timer.voltage);
   DEBUG_PRINT("gnss: ");        printTab(2);  DEBUG_PRINTLN(timer.gnss);
   DEBUG_PRINT("syncRtc: ");     printTab(1);  DEBUG_PRINTLN(timer.syncRtc);
   DEBUG_PRINT("logDebug: ");    printTab(1);  DEBUG_PRINTLN(timer.logDebug);
