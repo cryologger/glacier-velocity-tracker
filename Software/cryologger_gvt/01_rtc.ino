@@ -12,7 +12,7 @@ void setInitialAlarm()
   // 7: Alarm match hundredths                                      (every second)
 
   // Manually set the RTC date and time
-  //rtc.setTime(12, 59, 50, 0, 1, 11, 21); // hour, minutes, seconds, hundredths, day, month, year
+  rtc.setTime(23, 57, 50, 0, 27, 3, 22); // hour, minutes, seconds, hundredths, day, month, year
 
   // Get time before starting rolling alarm
   //rtc.getTime();
@@ -30,11 +30,18 @@ void setInitialAlarm()
   rtc.attachInterrupt();
 
   // Clear the RTC alarm interrupt
-  //rtc.clearInterrupt();
-  am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
+  //rtc.clearInterrupt(); // Apollo3 Core v2.x
+  am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM); // Apollo3 Core v1.x
 
-  // Clear alarm flag
-  alarmFlag = false;
+  // Set or clear alarm flag depending on logging mode
+  if (loggingMode == 3)
+  {
+    alarmFlag = true; // Set flag
+  }
+  else
+  {
+    alarmFlag = false; // Clear flag
+  }
 }
 
 // Read the real-time clock
@@ -63,33 +70,49 @@ void setSleepAlarm()
   if (loggingMode == 1)
   {
     DEBUG_PRINTLN(F("Info: Setting daily RTC alarm"));
+
     // Set daily alarm
     rtc.setAlarm(loggingStartTime, 0, 0, 0, 0, 0);
 
+    // Set RTC alarm mode
+    rtc.setAlarmMode(sleepAlarmMode); // Alarm match on hundredths, seconds, minutes, hours
+
+    // Clear alarm flag
+    alarmFlag = false;
   }
   else if (loggingMode == 2)
   {
     DEBUG_PRINTLN(F("Info: Setting rolling RTC alarm"));
     // Set rolling RTC alarm
     rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
+
+    // Set RTC alarm mode
+    rtc.setAlarmMode(sleepAlarmMode); // Alarm match on hundredths, seconds, minutes, hours
+
+    // Clear alarm flag
+    alarmFlag = false;
   }
-
-  // Set RTC alarm mode
-  rtc.setAlarmMode(sleepAlarmMode); // Alarm match on hundredths, seconds, minutes, hours
-
-  // Clear alarm flag
-  alarmFlag = false;
-
+  else if (loggingMode == 3)
+  {
+    alarmFlag = true;
+    return; // Skip setting alarm
+  }
+  else // What if none are set?
+  {
+    alarmFlag = true;
+    return; // Skip setting alarm
+  }
+  
   // Print the next RTC alarm date and time
-  DEBUG_PRINT("Info: Current time "); printDateTime();
+  DEBUG_PRINT("Info: Current time "); getDateTime();
   DEBUG_PRINT("Info: Sleeping until "); printAlarm();
 }
 
 void setLoggingAlarm()
 {
   // Clear the RTC alarm interrupt
-  //rtc.clearInterrupt();
-  am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
+  //rtc.clearInterrupt(); // Apollo3 Core v2.x
+  am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM); // Apollo3 Core v1.x
 
   // Check for logging mode
   if (loggingMode == 1)
@@ -97,30 +120,54 @@ void setLoggingAlarm()
     // Set daily alarm
     rtc.setAlarm(loggingStopTime, 0, 0, 0, 0, 0);
 
+    // Set RTC alarm mode
+    rtc.setAlarmMode(loggingAlarmMode); // Alarm match on hundredths, seconds,  minutes, hours
+
+    // Clear alarm flag
+    alarmFlag = false;
+
   }
   else if (loggingMode == 2)
   {
     // Set rolling alarm
     rtc.setAlarm((rtc.hour + loggingAlarmHours) % 24, (rtc.minute + loggingAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
+    // Set RTC alarm mode
+    rtc.setAlarmMode(loggingAlarmMode); // Alarm match on hundredths, seconds,  minutes
+
+    // Clear alarm flag
+    alarmFlag = false;
+
+  }
+  else if (loggingMode == 3)
+  {
+    // Set daily RTC alarm
+    rtc.setAlarm(0, 0, 0, 0, 0, 0); // hours, minutes, seconds, microseconds, day, month
+
+    // Set RTC alarm mode
+    rtc.setAlarmMode(loggingAlarmMode); // Alarm match at 00:00:00
+
+    // Clear alarm flag
+    alarmFlag = false;
   }
 
-  // Set RTC alarm mode
-  rtc.setAlarmMode(loggingAlarmMode); // Alarm match on hundredths, seconds,  minutes, hours
-
-  // Clear alarm flag
-  alarmFlag = false;
-
   // Print the next RTC alarm date and time
-  //DEBUG_PRINT("Info: Current time "); printDateTime();
   DEBUG_PRINT("Info: Logging until "); printAlarm();
+}
+
+// Print the RTC's date and time
+void getDateTime()
+{
+  rtc.getTime(); // Get the RTC's date and time
+  sprintf(dateTimeBuffer, "20%02d-%02d-%02d %02d:%02d:%02d",
+          rtc.year, rtc.month, rtc.dayOfMonth,
+          rtc.hour, rtc.minute, rtc.seconds, rtc.hundredths);
 }
 
 // Print the RTC's date and time
 void printDateTime()
 {
   rtc.getTime(); // Get the RTC's date and time
-  char dateTimeBuffer[25];
   sprintf(dateTimeBuffer, "20%02d-%02d-%02d %02d:%02d:%02d",
           rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds, rtc.hundredths);
