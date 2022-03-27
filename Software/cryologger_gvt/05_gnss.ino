@@ -4,91 +4,113 @@ void configureGnss()
   // Start loop timer
   unsigned long loopStartTime = millis();
 
-  // Uncomment  line to enable GNSS debug messages on Serial
-  //gnss.enableDebugging();
-
-  // Disable the "7F" check in checkUbloxI2C as RAWX data can legitimately contain 0x7F
-  gnss.disableUBX7Fcheck();
-
-  // Allocate sufficient RAM to store RAWX messages (>2 KB)
-  gnss.setFileBufferSize(fileBufferSize); // Must be called before gnss.begin()
-
-  // Initialize u-blox GNSS
-  if (!gnss.begin(Wire))
+  // Check if u-blox has been initialized
+  if (!online.gnss)
   {
-    DEBUG_PRINTLN("Warning: u-blox failed to initialize. Reattempting...");
+    // Disable internal I2C pull-ups to help reduce bus errors
+    //Wire.setPullups(0);
 
-    // Delay between initialization attempts
-    myDelay(2000);
+    // Uncomment  line to enable GNSS debug messages on Serial
+    //gnss.enableDebugging();
 
+    // Disable the "7F" check in checkUbloxI2C as RAWX data can legitimately contain 0x7F
+    gnss.disableUBX7Fcheck();
+
+    // Allocate sufficient RAM to store RAWX messages (>2 KB)
+    gnss.setFileBufferSize(fileBufferSize); // Must be called before gnss.begin()
+
+    // Display OLED message
+    displayInitialize("GNSS");
+
+    // Initialize u-blox GNSS
     if (!gnss.begin(Wire))
     {
-      DEBUG_PRINTLN("Warning: u-blox failed to initialize! Please check wiring.");
-      online.gnss = false;
-      logDebug(); // Log system debug information
-      while (1)
+      DEBUG_PRINTLN("Warning: u-blox failed to initialize. Reattempting...");
+
+      // Delay between initialization attempts
+      myDelay(2000);
+
+      if (!gnss.begin(Wire))
       {
-        // Force watchdog timer to reset system
-        blinkLed(3, 250);
-        delay(2000);
+        DEBUG_PRINTLN("Warning: u-blox failed to initialize! Please check wiring.");
+        online.gnss = false;
+        logDebug(); // Log system debug information
+
+        // Display message to OLED
+        displayFailure();
+
+        while (1)
+        {
+          // Force WDT to reset system
+          blinkLed(3, 250);
+          myDelay(2000);
+        }
+      }
+      else
+      {
+        online.gnss = true;
+        DEBUG_PRINTLN("Info: u-blox initialized.");
+        // Display OLED message
+        displaySuccess();
       }
     }
     else
     {
-      DEBUG_PRINTLN("Info: u-blox initialized.");
       online.gnss = true;
+      DEBUG_PRINTLN("Info: u-blox initialized.");
+      // Display OLED message
+      displaySuccess();
     }
-  }
-  else
-  {
-    DEBUG_PRINTLN("Info: u-blox initialized.");
-    online.gnss = true;
-  }
 
-  // Configure communication interfaces and satellite signals only if program is running for the first time
-  if (gnssConfigFlag)
-  {
-    /*
+    // Configure communication interfaces and satellite signals only if program is running for the first time
+    if (gnssConfigFlag)
+    {
+
       // Configure communciation interfaces
       bool setValueSuccess = true;
-      setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);  // Enable I2C
+      setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);    // Enable I2C
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);    // Disable SPI
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 0);  // Disable UART1
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);  // Disable UART2
       setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_USB_ENABLED, 0);   // Disable USB
       if (!setValueSuccess)
       {
-      DEBUG_PRINTLN("Warning: Communication interfaces not configured!");
+        DEBUG_PRINTLN("Warning: Communication interfaces not configured!");
       }
-    */
-    // Configure satellite signals
-    bool setValueSuccess = true;
-    setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, 1);   // Enable GPS
-    setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GLO_ENA, 1);   // Enable GLONASS
-    setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 0);   // Disable Galileo
-    setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, 0);   // Disable BeiDou
-    setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0); // Disable QZSS
-    myDelay(2000);
-    if (!setValueSuccess)
-    {
-      DEBUG_PRINTLN("Warning: Satellite signals not configured!");
+
+      // Configure satellite signals
+      setValueSuccess = true;
+      setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, 1);   // Enable GPS
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GLO_ENA, 1);   // Enable GLONASS
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 0);   // Disable Galileo
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, 0);   // Disable BeiDou
+      setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0); // Disable QZSS
+      myDelay(2000);
+
+      if (!setValueSuccess)
+      {
+        DEBUG_PRINTLN("Warning: Satellite signals not configured!");
+      }
+      gnssConfigFlag = false; // Clear flag
+
+      // Print current GNSS settings
+      printGnssSettings();
     }
-    gnssConfigFlag = false; // Clear flag
 
-    // Print current GNSS settings
-    printGnssSettings();
+    // Configure u-blox GNSS
+    gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
+    gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
+    gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
+    gnss.setAutoPVT(true);                            // Enable automatic NAV-PVT messages
+    gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM-SFRBX messages
+    gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM-RAWX messages
+    gnss.logRXMSFRBX();                               // Enable RXM-SFRBX data logging
+    gnss.logRXMRAWX();                                // Enable RXM-RAWX data logging
   }
-
-  // Configure u-blox GNSS
-  gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
-  gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
-  gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
-  gnss.setAutoPVT(true);                            // Enable automatic NAV-PVT messages
-  gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM-SFRBX messages
-  gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM-RAWX messages
-  gnss.logRXMSFRBX();                               // Enable RXM-SFRBX data logging
-  gnss.logRXMRAWX();                                // Enable RXM-RAWX data logging
-
+  else
+  {
+    return;
+  }
   // Stop the loop timer
   timer.gnss = millis() - loopStartTime;
 }
@@ -105,12 +127,14 @@ void syncRtc()
     // Clear flag
     rtcSyncFlag = false;
 
-    DEBUG_PRINTLN("Info: Attempting to synchronize RTC with GNSS...");
+    DEBUG_PRINTLN("Info: Attempting to sync RTC with GNSS...");
+    // Display OLED message(s)
+    displayRtcSync();
 
     // Attempt to acquire a valid GNSS position fix for up to 5 minutes
-    while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 60UL * 1000UL)
+    while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 10UL * 1000UL)
     {
-      petDog(); // Reset watchdog timer
+      petDog(); // Reset WDT
 
       // Check for UBX-NAV-PVT messages
       if (gnss.getPVT())
@@ -142,16 +166,30 @@ void syncRtc()
           rtcDrift = gnssEpoch - rtcEpoch;                // Calculate RTC drift
           rtcSyncFlag = true;                             // Set flag
 
+          // Update logfile timestamp if more than 30 seconds of drift
+          if (abs(rtcDrift) > 30)
+          {
+            DEBUG_PRINTLN("Info: Updating logfile timestamp");
+            rtc.getTime(); // Get the RTC's date and time
+            getLogFileName(); // Update logfile timestamp
+          }
+
           DEBUG_PRINT("Info: RTC drift: "); DEBUG_PRINTLN(rtcDrift);
           DEBUG_PRINT("Info: RTC time synced to "); printDateTime();
-          blinkLed(5, 1000);
+
+          // Display OLED message(s)
+          displaySuccess();
+          displayRtcOffset(rtcDrift);
+          //blinkLed(5, 1000);
         }
       }
     }
     if (!rtcSyncFlag)
     {
       DEBUG_PRINTLN("Warning: Unable to sync RTC!");
-      blinkLed(10, 500);
+      // Display OLED message(s)
+      displayFailure();
+      //blinkLed(10, 500);
     }
   }
   else
@@ -178,6 +216,11 @@ void logGnss()
   // Start loop timer
   unsigned long loopStartTime = millis();
 
+  bool screen = 0;
+
+  // Record logging start time
+  logStartTime = rtc.getEpoch();
+
   // Check if microSD and u-blox GNSS initialized successfully
   if (online.microSd && online.gnss)
   {
@@ -192,21 +235,20 @@ void logGnss()
     }
     else
     {
-      DEBUG_PRINT("Info: Created log file "); DEBUG_PRINTLN(logFileName);
       online.logGnss = true;
+      DEBUG_PRINT("Info: Created log file "); DEBUG_PRINTLN(logFileName);
     }
 
     // Update file create timestamp
     updateFileCreate(&logFile);
 
     // Reset counters
-    bytesWritten      = 0;
-    writeFailCounter  = 0;
-    syncFailCounter   = 0;
-    closeFailCounter  = 0;
+    bytesWritten, writeFailCounter, syncFailCounter, closeFailCounter = 0;
 
     gnss.clearFileBuffer();         // Clear file buffer
     gnss.clearMaxFileBufferAvail(); // Reset max file buffer size
+
+    DEBUG_PRINTLN("Info: Starting logging...");
 
     // Log data until logging alarm triggers
     while (!alarmFlag)
@@ -220,7 +262,7 @@ void logGnss()
       // Check if sdWriteSize bytes are waiting in the buffer
       while (gnss.fileBufferAvailable() >= sdWriteSize)
       {
-        // Reset watchdog timer
+        // Reset WDT
         petDog();
 
         // Turn on LED during SD writes
@@ -264,13 +306,25 @@ void logGnss()
 
         // Get max file buffer size
         maxBufferBytes = gnss.getMaxFileBufferAvail();
-
-        DEBUG_PRINT("Max file buffer: "); DEBUG_PRINTLN(maxBufferBytes);
+        DEBUG_PRINT("Max buffer: "); DEBUG_PRINTLN(maxBufferBytes);
 
         // Warn if fileBufferSize was more than 80% full
         if (maxBufferBytes > ((fileBufferSize / 5) * 4))
         {
           DEBUG_PRINTLN("Warning: File buffer >80 % full. Data loss may have occurrred.");
+        }
+
+        // Display information to OLED display
+        if (!screen)
+        {
+          screen = true;
+          displayScreen1();
+        }
+        else
+        {
+          screen = false;
+          //displayOff();
+          displayScreen2();
         }
 
         previousMillis = millis(); // Update previousMillis
@@ -282,7 +336,7 @@ void logGnss()
 
     while (remainingBytes > 0)
     {
-      // Reset watchdog timer
+      // Reset WDT
       petDog();
 
       // Turn on LED during SD writes
@@ -330,6 +384,9 @@ void logGnss()
       DEBUG_PRINTLN("Warning: Failed to close log file!");
       closeFailCounter++; // Count number of failed file closes
     }
+
+    // Enable internal I2C pull-ups
+    //Wire.setPullups(1);
 
     // Free RAM allocated for file storage and PVT processing
     //gnss.end();

@@ -1,22 +1,32 @@
-void readVoltage()
+float readVoltage()
 {
   // Start loop timer
   unsigned long loopStartTime = micros();
 
-  voltage = analogRead(A0); // Read voltage across a 150/100kOhm op-amp scaling circuit and 10/1 MOhm resistor divider
-  DEBUG_PRINT("ADC: "); DEBUG_PRINTLN(voltage);
-  voltage /= 456.20; // Apply ADC linear gain
+  // Measure voltage across 150/100 kOhm op-amp scaling circuit and 10/1 MOhm resistor divider
+  int reading = analogRead(A0);
+  float voltage = reading / 453.23; // Apply ADC linear gain
   voltage += -0.1275; // Apply ADC linear offset
-  
-  DEBUG_PRINT("Battery voltage: "); DEBUG_PRINTLN(voltage);
+  //DEBUG_PRINT("ADC: "); DEBUG_PRINTLN(reading);
+  //DEBUG_PRINT("Voltage: "); DEBUG_PRINTLN(voltage);
+  return voltage;
 
-  // Stop the loop timer
+  // Stop loop timer
   timer.voltage = micros() - loopStartTime;
 }
 
 // Enter deep sleep
 void goToSleep()
 {
+  // Skip deep sleep if logging 24 hours/day
+  if (loggingMode == 3)
+  {
+    return;
+  }
+
+  // Display OLED message(s)
+  displayDeepSleep();
+
 #if DEBUG
   Serial.end();         // Close Serial port
 #endif
@@ -37,7 +47,7 @@ void goToSleep()
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART0);
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART1);
 
-  // Disable all pads except G1 (33), G2 (34), A0 and LED_BUILTIN (19)
+  // Disable all pads except G1 (33), G2 (34), A0 (??) and LED_BUILTIN (19)
   for (int x = 0; x < 50; x++)
   {
     if ((x != 33) && (x != 34) && (x != A0) && (x != 19))
@@ -55,6 +65,7 @@ void goToSleep()
   // Clear online/offline flags
   online.gnss = false;
   online.microSd = false;
+  online.oled = false;
   online.logGnss = false;
   online.logDebug = false;
 
@@ -86,7 +97,7 @@ void wakeUp()
 
   ap3_adc_setup();        // Enable ADC
   Wire.begin();           // Enable I2C
-  Wire.setPullups(0);     // Disable internal I2C pull-ups to help reduce bus errors
+
   Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
   SPI.begin();            // Enable SPI
 #if DEBUG
@@ -110,7 +121,7 @@ void qwiicPowerOff()
 // Enable power to microSD and peripherals
 void peripheralPowerOn()
 {
-  digitalWrite(PIN_PWC_POWER, HIGH);
+  digitalWrite(PIN_MICROSD_POWER, HIGH);
   myDelay(250); // Non-blocking delay to allow Qwiic devices time to power up
 }
 
@@ -118,7 +129,7 @@ void peripheralPowerOn()
 void peripheralPowerOff()
 {
   myDelay(250); // Non-blocking delay
-  digitalWrite(PIN_PWC_POWER, LOW);
+  digitalWrite(PIN_MICROSD_POWER, LOW);
 }
 
 // Non-blocking blink LED (https://forum.arduino.cc/index.php?topic=503368.0)
@@ -146,7 +157,7 @@ void myDelay(unsigned long ms)
   unsigned long start = millis();         // Start: timestamp
   for (;;)
   {
-    petDog();                             // Reset watchdog timer
+    petDog();                             // Reset WDT
     unsigned long now = millis();         // Now: timestamp
     unsigned long elapsed = now - start;  // Elapsed: duration
     if (elapsed >= ms)                    // Comparing durations: OK
