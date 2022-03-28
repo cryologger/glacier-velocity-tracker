@@ -29,7 +29,8 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 | Carrier Board | SparkFun MicroMod Data Logging Carrier Board | $19.95 | 
 | GNSS Receiver | SparkFun GPS-RTK-SMA Breakout - ZED-F9P | $219.95 | 
 | GNSS Antenna | SparkFun GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106 | $124.95 | 
-| GNSS antenna cable |	SparkFun Interface Cable - SMA Female to SMA Male (25cm) | $4.95 | 
+| GNSS antenna cable |	SparkFun Interface Cable - SMA Female to SMA Male (25cm) | $5.50 |
+| GNSS antenna cable |	SparkFun Interface Cable - SMA Male to TNC Male (300mm) | $10.95 | 
 | Voltage Regulator | Pololu 5V, 600mA Step-Down Voltage Regulator D36V6F5 | $4.95 |
 | microSD Card| SanDisk MAX Endurance 64 GB microSD | $20.00 | 
 | Resistor |	1 Mohms 1% MBB02070C1004FRP00 | $0.25 |
