@@ -7,8 +7,8 @@ void configureGnss()
   // Check if u-blox has been initialized
   if (!online.gnss)
   {
-    // Disable internal I2C pull-ups to help reduce bus errors
-    //Wire.setPullups(0);
+    // Disable internal I2C pull-ups
+    disablePullups();
 
     // Uncomment  line to enable GNSS debug messages on Serial
     //gnss.enableDebugging();
@@ -124,6 +124,9 @@ void syncRtc()
   // Check if u-blox GNSS initialized successfully
   if (online.gnss)
   {
+    // Disable internal I2C pull-ups
+    disablePullups();
+
     // Clear flag
     rtcSyncFlag = false;
 
@@ -224,6 +227,9 @@ void logGnss()
   // Check if microSD and u-blox GNSS initialized successfully
   if (online.microSd && online.gnss)
   {
+    // Disable internal I2C pull-ups
+    disablePullups();
+
     // Create a new log file and open for writing
     // O_CREAT  - Create the file if it does not exist
     // O_APPEND - Seek to the end of the file prior to each write
@@ -318,13 +324,14 @@ void logGnss()
         if (!screen)
         {
           screen = true;
+          //displayOn();
           displayScreen1();
         }
         else
         {
           screen = false;
-          //displayOff();
           displayScreen2();
+          //displayOff();
         }
 
         previousMillis = millis(); // Update previousMillis

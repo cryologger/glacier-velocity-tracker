@@ -15,6 +15,18 @@ float readVoltage()
   timer.voltage = micros() - loopStartTime;
 }
 
+// Enable internal I2C pull-ups to help communicate with I2C devices
+void enablePullups()
+{
+  Wire.setPullups(1); 
+}
+
+// Disable internal I2C pull-ups to help reduce bus errors
+void disablePullups()
+{
+  Wire.setPullups(0);       
+}
+
 // Enter deep sleep
 void goToSleep()
 {
@@ -97,12 +109,13 @@ void wakeUp()
 
   ap3_adc_setup();        // Enable ADC
   Wire.begin();           // Enable I2C
-
   Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
   SPI.begin();            // Enable SPI
+
 #if DEBUG
   Serial.begin(115200);   // Open Serial port
 #endif
+
 }
 
 // Enable power to Qwiic connector

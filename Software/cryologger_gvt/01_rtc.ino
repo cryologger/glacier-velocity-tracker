@@ -12,7 +12,7 @@ void setInitialAlarm()
   // 7: Alarm match hundredths                                      (every second)
 
   // Manually set the RTC date and time
-  rtc.setTime(23, 57, 50, 0, 27, 3, 22); // hour, minutes, seconds, hundredths, day, month, year
+  //rtc.setTime(23, 57, 50, 0, 27, 3, 22); // hour, minutes, seconds, hundredths, day, month, year
 
   // Get time before starting rolling alarm
   //rtc.getTime();

@@ -1,6 +1,6 @@
 /*
     Title:    Cryologger - Glacier Velocity Tracker (GVT) v2.0.4
-    Date:     March 27, 2022
+    Date:     March 28, 2022
     Author:   Adam Garbo
 
     Components:
@@ -14,10 +14,9 @@
     - SdFat v2.1.2
 
     Comments:
-    - Apollo3 Core v2.x is currently not recommended due to the various
-    instabilities and power consumption inefficiencies introduced by this version.
     - Code is currently configured for short-term deployments during the
     2022 Arctic Bay field season.
+    - The OLED display code is currently experimental
 */
 
 // ----------------------------------------------------------------------------
@@ -36,7 +35,7 @@
 // -----------------------------------------------------------------------------
 #define DEBUG       true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS  true  // Output GNSS information to Serial Monitor
-#define OLED        true  // Output messages to OLED display
+#define OLED        false  // Output messages to OLED display
 
 #if DEBUG
 #define DEBUG_PRINT(x)            Serial.print(x)
@@ -79,21 +78,21 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // 1: Daily logging period (e.g., log for 3 hours each day between 12:00-15:00)
 // 2: Rolling logging periods (e.g., log for 2 hours sleep for 3, repeat)
 // 3: 24-hours/day logging with new logfiles each day at 00:00
-byte          loggingMode           = 3;    // 1: daily, 2: rolling, 3: 24-hour
+byte          loggingMode           = 2;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
 byte          loggingStartTime      = 19;   // Logging start hour (UTC)
 byte          loggingStopTime       = 22;   // Logging end hour (UTC)
 
 // Rolling alarm
-byte          loggingAlarmMinutes   = 30;   // Rolling minutes alarm
+byte          loggingAlarmMinutes   = 2;   // Rolling minutes alarm
 byte          loggingAlarmHours     = 0;    // Rolling hours alarm
 byte          sleepAlarmMinutes     = 1;    // Rolling minutes alarm
 byte          sleepAlarmHours       = 0;    // Rolling hours alarm
 
 // Manual alarm modes
-byte          loggingAlarmMode      = 4;    // Logging alarm mode
-byte          sleepAlarmMode        = 4;    // Sleep alarm mode
+byte          loggingAlarmMode      = 5;    // Logging alarm mode
+byte          sleepAlarmMode        = 5;    // Sleep alarm mode
 byte          initialAlarmMode      = 6;    // Initial alarm mode
 
 // ----------------------------------------------------------------------------
@@ -110,7 +109,7 @@ bool          rtcSyncFlag         = false;        // Flag to indicate if RTC has
 char          logFileName[30]     = "";           // Log file name
 char          debugFileName[20]   = "gvt_0_debug.csv";  // Debug log file name
 unsigned int  debugCounter        = 0;            // Counter to track number of recorded debug messages
-unsigned int  gnssTimeout         = 30;           // Timeout for GNSS signal acquisition (minutes)
+unsigned int  gnssTimeout         = 1;           // Timeout for GNSS signal acquisition (minutes)
 unsigned int  maxBufferBytes      = 0;            // Maximum value of file buffer
 unsigned long previousMillis      = 0;            // Global millis() timer
 unsigned long bytesWritten        = 0;            // Counter for tracking bytes written to microSD
@@ -164,11 +163,9 @@ void setup()
   peripheralPowerOn();      // Enable power to peripherials
 
   Wire.begin();             // Initalize I2C
-  //Wire.setPullups(0);       // Disable internal I2C pull-ups to help reduce bus errors
   Wire.setClock(400000);    // Set I2C clock speed to 400 kHz
   SPI.begin();              // Initialize SPI
   analogReadResolution(14); // Set ADC resolution to 14-bits
-
 
 #if DEBUG
   Serial.begin(115200);   // Open Serial port
@@ -182,13 +179,13 @@ void setup()
   printLine();
   DEBUG_PRINTLN("Cryologger - Glacier Velocity Test Unit");
   printLine();
-  
+
   printDateTime(); // Print RTC's current date and time
   DEBUG_PRINT("Voltage: "); DEBUG_PRINTLN(readVoltage()); // Print battery voltage
 
   // Display OLED message(s)
   displayWelcome();
-  
+
   // Print logging configuration
   printLoggingSettings();
 
@@ -222,12 +219,17 @@ void loop()
     setLoggingAlarm();    // Set logging alarm
     getLogFileName();     // Get timestamped log file name
 
-    readVoltage();
+    readVoltage();        // Read battery voltage
+    if(1)
+    {
+      // To do: Add if statement to send system back to deep sleep if 
+      // voltage is too low.
+    }
 
     // Configure devices
     qwiicPowerOn();       // Enable power to Qwiic connector
     peripheralPowerOn();  // Enable power to peripherals
-    configureOled();      // Configure OLED display
+    resetOled();          // Configure OLED display
     configureSd();        // Configure microSD
     configureGnss();      // Configure u-blox GNSS
     syncRtc();            // Synchronize RTC
