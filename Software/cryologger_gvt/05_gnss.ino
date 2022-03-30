@@ -39,11 +39,17 @@ void configureGnss()
         // Display message to OLED
         displayFailure();
 
+        // Disable power to Qwiic connector
+        qwiicPowerOff();
+
+        // Disable power to peripherals
+        peripheralPowerOff();
+
         while (1)
         {
           // Force WDT to reset system
           blinkLed(3, 250);
-          myDelay(2000);
+          delay(2000);
         }
       }
       else
@@ -109,6 +115,7 @@ void configureGnss()
   }
   else
   {
+    DEBUG_PRINTLN("Info: GNSS already initialized.");
     return;
   }
   // Stop the loop timer
@@ -130,7 +137,10 @@ void syncRtc()
     // Clear flag
     rtcSyncFlag = false;
 
+    rtcDrift = 0;
+
     DEBUG_PRINTLN("Info: Attempting to sync RTC with GNSS...");
+    
     // Display OLED message(s)
     displayRtcSync();
 
@@ -183,7 +193,7 @@ void syncRtc()
           // Display OLED message(s)
           displaySuccess();
           displayRtcOffset(rtcDrift);
-          //blinkLed(5, 1000);
+          //blinkLed(4, 1000);
         }
       }
     }
@@ -219,7 +229,8 @@ void logGnss()
   // Start loop timer
   unsigned long loopStartTime = millis();
 
-  bool screen = 0;
+  int displayDebug = 0;
+  bool displayToggle = false;
 
   // Record logging start time
   logStartTime = rtc.getEpoch();
@@ -249,7 +260,10 @@ void logGnss()
     updateFileCreate(&logFile);
 
     // Reset counters
-    bytesWritten, writeFailCounter, syncFailCounter, closeFailCounter = 0;
+    bytesWritten = 0;
+    writeFailCounter = 0;
+    syncFailCounter = 0;
+    closeFailCounter = 0;
 
     gnss.clearFileBuffer();         // Clear file buffer
     gnss.clearMaxFileBufferAvail(); // Reset max file buffer size
@@ -320,19 +334,20 @@ void logGnss()
           DEBUG_PRINTLN("Warning: File buffer >80 % full. Data loss may have occurrred.");
         }
 
-        // Display information to OLED display
-        if (!screen)
+        // Display logging information to OLED display for initial x duration
+        //if (displayDebug < 10)
+        //{
+        if (!displayToggle)
         {
-          screen = true;
-          //displayOn();
+          displayToggle = !displayToggle;
           displayScreen1();
         }
         else
         {
-          screen = false;
+          displayToggle = !displayToggle;
           displayScreen2();
-          //displayOff();
         }
+        //}
 
         previousMillis = millis(); // Update previousMillis
       }
@@ -391,16 +406,11 @@ void logGnss()
       DEBUG_PRINTLN("Warning: Failed to close log file!");
       closeFailCounter++; // Count number of failed file closes
     }
-
-    // Enable internal I2C pull-ups
-    //Wire.setPullups(1);
-
-    // Free RAM allocated for file storage and PVT processing
-    //gnss.end();
   }
   else
   {
     online.logGnss = false;
+    DEBUG_PRINTLN("Warning: u-blox ofline!");
   }
 
   // Stop the loop timer

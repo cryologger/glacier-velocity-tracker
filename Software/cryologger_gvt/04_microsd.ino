@@ -26,13 +26,18 @@ void configureSd()
         DEBUG_PRINTLN("Warning: microSD failed to initialize.");
         online.microSd = false;
 
+        // Disable power to Qwiic connector
+        qwiicPowerOff();
+
+        // Disable power to peripherals
+        peripheralPowerOff();
+        
         while (1)
         {
           // Force WDT to reset system
           blinkLed(2, 250);
-          myDelay(2000);
+          delay(2000);
         }
-
       }
       else
       {
@@ -52,6 +57,7 @@ void configureSd()
   }
   else
   {
+    DEBUG_PRINTLN("Info: microSD already initialized.");
     return;
   }
   // Stop the loop timer
