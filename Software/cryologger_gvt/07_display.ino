@@ -122,7 +122,6 @@ void displayRtcOffset(long drift)
     oled.print(drift);
     oled.display();
     disablePullups();
-    myDelay(4000);
   }
 }
 
@@ -180,7 +179,7 @@ void displayDeepSleep()
     oled.text(0, 0, "Entering deep sleep...");
     oled.display();
     disablePullups();
-    myDelay(2000);
+    myDelay(4000);
   }
 }
 
