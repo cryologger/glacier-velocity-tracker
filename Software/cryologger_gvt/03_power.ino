@@ -4,7 +4,7 @@ float readVoltage()
   unsigned long loopStartTime = micros();
 
   // Measure voltage across 150/100 kOhm op-amp scaling circuit and 10/1 MOhm resistor divider
-  int reading = analogRead(A0);
+  reading = analogRead(A0);
   float voltage = reading / 453.23; // Apply ADC linear gain
   voltage += -0.1275; // Apply ADC linear offset
   //DEBUG_PRINT("ADC: "); DEBUG_PRINTLN(reading);
@@ -18,13 +18,13 @@ float readVoltage()
 // Enable internal I2C pull-ups to help communicate with I2C devices
 void enablePullups()
 {
-  Wire.setPullups(1); 
+  Wire.setPullups(1);
 }
 
 // Disable internal I2C pull-ups to help reduce bus errors
 void disablePullups()
 {
-  Wire.setPullups(0);       
+  Wire.setPullups(0);
 }
 
 // Enter deep sleep
@@ -42,6 +42,7 @@ void goToSleep()
 #if DEBUG
   Serial.end();         // Close Serial port
 #endif
+  disablePullups();     // Disable internal pull-ups to reduce leakage
   Wire.end();           // Disable I2C
   SPI.end();            // Disable SPI
   power_adc_disable();  // Disable ADC
