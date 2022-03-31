@@ -75,19 +75,19 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // ----------------------------------------------------------------------------
 
 // Logging modes
-// 1: Daily logging period (e.g., log for 3 hours each day between 12:00-15:00)
-// 2: Rolling logging periods (e.g., log for 2 hours sleep for 3, repeat)
-// 3: 24-hours/day logging with new logfiles each day at 00:00
-byte          loggingMode           = 2;    // 1: daily, 2: rolling, 3: 24-hour
+// 1: Daily logging (e.g., 3 hours each day between 12:00-15:00)
+// 2: Rolling logging (e.g., 2 hours logging, 2 hours sleep for 3, repeat)
+// 3: Continuous logging (e.g., new logfiles created each day at 00:00)
+byte          loggingMode           = 3;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
 byte          loggingStartTime      = 19;   // Logging start hour (UTC)
 byte          loggingStopTime       = 22;   // Logging end hour (UTC)
 
 // Rolling alarm
-byte          loggingAlarmMinutes   = 2;   // Rolling minutes alarm
-byte          loggingAlarmHours     = 0;    // Rolling hours alarm
-byte          sleepAlarmMinutes     = 1;    // Rolling minutes alarm
+byte          loggingAlarmMinutes   = 0;   // Rolling minutes alarm
+byte          loggingAlarmHours     = 1;    // Rolling hours alarm
+byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
 byte          sleepAlarmHours       = 0;    // Rolling hours alarm
 
 // Manual alarm modes
@@ -117,10 +117,11 @@ unsigned long syncFailCounter     = 0;            // microSD logfile synchronize
 unsigned long writeFailCounter    = 0;            // microSD logfile write failure counter
 unsigned long closeFailCounter    = 0;            // microSD logfile close failure counter
 long          rtcDrift            = 0;            // Counter for drift of RTC
-//float         voltage             = 0.0;          // Battery voltage
 char          dateTimeBuffer[25];
 unsigned long logStartTime;
-int reading;
+int           reading;
+
+
 // ----------------------------------------------------------------------------
 // Unions/structures
 // ----------------------------------------------------------------------------
@@ -218,9 +219,9 @@ void loop()
     readRtc();            // Get the RTC's alarm date and time
     setLoggingAlarm();    // Set logging alarm
     getLogFileName();     // Get timestamped log file name
-
-    readVoltage();        // Read battery voltage
-    if(1)
+    
+    // Read battery voltage
+    if(readVoltage() < 10.0)
     {
       // To do: Add if statement to send system back to deep sleep if 
       // voltage is too low.
@@ -262,7 +263,6 @@ void loop()
 extern "C" void am_rtc_isr(void)
 {
   // Clear the RTC alarm interrupt
-  //rtc.clearInterrupt();
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
 
   // Set alarm flag
