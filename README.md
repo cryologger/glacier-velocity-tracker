@@ -43,7 +43,7 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 | Resistor |	1 Mohms 1% MBB02070C1004FRP00 | $0.25 |
 | Resistor |	10Mohm 1% 50ppm MBB02070C1005FRP00 | $0.25 |
 | Capacitor | 0.1 uF K104K15X7RF53L2 | $0.25 | 
-| Electronics Enclosure | Hammond Manufacturing 1554JL2GYCL | $14.99 | 
+| Electronics Enclosure | Hammond Manufacturing 1554HL2GYCL | $17.51 | 
 | Solar Panel | Ameresco Solar 20 Watt Solar Panel 20J | $99.00 |
 | Solar Panel Bracket | Ameresco Solar HPM18-30 Solar Panel Pole Mount (optional) | $39.00 |
 | Charge Controller | Genasun GV-5 65W 5A Solar charge controller with MPPT  | $68.00 |
