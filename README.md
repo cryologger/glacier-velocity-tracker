@@ -109,7 +109,7 @@ Servicing of systems deployed on Devon Island and  Lowell Glacier  are planned f
 * **/Archive** - Previous design iterations.
 
 ## License Information
-This project is released under the MIT License (http://opensource.org/licenses/MIT).
+This project is released under the GNU General Public License v3.0 (https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 Cheers,
 
