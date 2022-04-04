@@ -5,8 +5,8 @@ float readVoltage()
 
   // Measure voltage across 150/100 kOhm op-amp scaling circuit and 10/1 MOhm resistor divider
   reading = analogRead(A0);
-  float voltage = reading / 453.23; // Apply ADC linear gain
-  voltage += -0.1275; // Apply ADC linear offset
+  float voltage = reading / 452.89; // Apply ADC linear gain
+  voltage += -0.13; // Apply ADC linear offset
   //DEBUG_PRINT("ADC: "); DEBUG_PRINTLN(reading);
   //DEBUG_PRINT("Voltage: "); DEBUG_PRINTLN(voltage);
   return voltage;
