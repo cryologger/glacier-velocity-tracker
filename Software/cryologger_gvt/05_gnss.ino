@@ -140,12 +140,12 @@ void syncRtc()
     rtcDrift = 0;
 
     DEBUG_PRINTLN("Info: Attempting to sync RTC with GNSS...");
-    
+
     // Display OLED message(s)
     displayRtcSync();
 
     // Attempt to acquire a valid GNSS position fix for up to 5 minutes
-    while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 10UL * 1000UL)
+    while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 60UL * 1000UL)
     {
       petDog(); // Reset WDT
 
@@ -193,7 +193,7 @@ void syncRtc()
           // Display OLED message(s)
           displaySuccess();
           displayRtcOffset(rtcDrift);
-          //blinkLed(4, 1000);
+          blinkLed(4, 1000);
         }
       }
     }
@@ -229,7 +229,8 @@ void logGnss()
   // Start loop timer
   unsigned long loopStartTime = millis();
 
-  int displayDebug = 0;
+  bool displayDebug = true;
+  byte displayCounter = 0;
   bool displayToggle = false;
 
   // Record logging start time
@@ -312,7 +313,7 @@ void logGnss()
       }
 
       // Periodically print number of bytes written
-      if (millis() - previousMillis > 5000)
+      if (millis() - previousMillis > 10000)
       {
         // Sync the log file
         if (!logFile.sync())
@@ -334,21 +335,30 @@ void logGnss()
           DEBUG_PRINTLN("Warning: File buffer >80 % full. Data loss may have occurrred.");
         }
 
-        // Display logging information to OLED display for initial x duration
-        //if (displayDebug < 10)
-        //{
-        if (!displayToggle)
+        // Display logging information to OLED display 
+        if (displayDebug)
         {
-          displayToggle = !displayToggle;
-          displayScreen1();
+          // After a specified number of cycles put OLED to sleep (1.2 uA)
+          if (displayCounter <= 10)
+          {
+            displayCounter++;
+            if (!displayToggle)
+            {
+              displayScreen1(); // Display information panel 1
+              displayToggle = !displayToggle;
+            }
+            else
+            {
+              displayScreen2(); // Display information panel 2
+              displayToggle = !displayToggle;
+            }
+          }
+          else
+          {
+            oled.displayPower(0); // Put OLED display into sleep mode
+            displayDebug = false; // Clear flag
+          }
         }
-        else
-        {
-          displayToggle = !displayToggle;
-          displayScreen2();
-        }
-        //}
-
         previousMillis = millis(); // Update previousMillis
       }
     }

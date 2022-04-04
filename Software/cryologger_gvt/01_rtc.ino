@@ -17,9 +17,6 @@ void setInitialAlarm()
   // Set initial alarm
   rtc.setAlarm(loggingStartTime, 0, 0, 0, 0, 0);
 
-  // Set initial rolling alarm
-  //rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, 0, 0);
-
   // Set the alarm mode
   rtc.setAlarmMode(initialAlarmMode);
 
@@ -41,7 +38,7 @@ void setInitialAlarm()
   }
 }
 
-// Read the real-time clock
+// Read the RTC
 void readRtc()
 {
   // Start the loop timer
@@ -93,17 +90,18 @@ void setSleepAlarm()
     DEBUG_PRINTLN(F("Info: Continuous logging enabled"));
     return; // Skip setting alarm
   }
-  else // What if none are set?
+  else 
   {
-    alarmFlag = true;
+    alarmFlag = true; // Default if no logging mode set
     return; // Skip setting alarm
   }
 
   // Print the next RTC alarm date and time
-  DEBUG_PRINT("Info: Current time "); getDateTime();
+  DEBUG_PRINT("Info: Current time "); printDateTime();
   DEBUG_PRINT("Info: Sleeping until "); printAlarm();
 }
 
+// Set logging duration alarm
 void setLoggingAlarm()
 {
   // Clear the RTC alarm interrupt
@@ -112,47 +110,37 @@ void setLoggingAlarm()
   // Check for logging mode
   if (loggingMode == 1)
   {
-    // Set daily alarm
+    // Set daily RTC alarm
     rtc.setAlarm(loggingStopTime, 0, 0, 0, 0, 0);
 
     // Set RTC alarm mode
     rtc.setAlarmMode(loggingAlarmMode); // Alarm match on hundredths, seconds,  minutes, hours
-
-    // Clear alarm flag
-    alarmFlag = false;
-
   }
   else if (loggingMode == 2)
   {
-    // Set rolling alarm
+    // Set rolling RTC alarm
     rtc.setAlarm((rtc.hour + loggingAlarmHours) % 24, (rtc.minute + loggingAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
     // Set RTC alarm mode
-    rtc.setAlarmMode(loggingAlarmMode); // Alarm match on hundredths, seconds,  minutes
-
-    // Clear alarm flag
-    alarmFlag = false;
-
+    rtc.setAlarmMode(loggingAlarmMode);
   }
   else if (loggingMode == 3)
   {
-    // Set daily RTC alarm
+    // Set continuous RTC alarm
     rtc.setAlarm(0, 0, 0, 0, 0, 0); // hours, minutes, seconds, microseconds, day, month
 
-    //rtc.setAlarm((rtc.hour + loggingAlarmHours) % 24, (rtc.minute + loggingAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
-
     // Set RTC alarm mode
-    rtc.setAlarmMode(loggingAlarmMode); // Alarm match hundredths, seconds, minute, hours (00:00:00 UTC)
-
-    // Clear alarm flag
-    alarmFlag = false;
+    rtc.setAlarmMode(4); // Alarm match hundredths, seconds, minute, hours (00:00:00 UTC)
   }
+
+  // Clear alarm flag
+  alarmFlag = false;
 
   // Print the next RTC alarm date and time
   DEBUG_PRINT("Info: Logging until "); printAlarm();
 }
 
-// Print the RTC's date and time
+// Get the RTC's date and time and store it in a buffer
 void getDateTime()
 {
   rtc.getTime(); // Get the RTC's date and time

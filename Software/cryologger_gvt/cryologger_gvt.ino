@@ -1,6 +1,6 @@
 /*
     Title:    Cryologger - Glacier Velocity Tracker (GVT) v2.0.4
-    Date:     March 28, 2022
+    Date:     April 2, 2022
     Author:   Adam Garbo
 
     Components:
@@ -85,9 +85,9 @@ byte          loggingStartTime      = 19;   // Logging start hour (UTC)
 byte          loggingStopTime       = 22;   // Logging end hour (UTC)
 
 // Rolling alarm
-byte          loggingAlarmMinutes   = 0;   // Rolling minutes alarm
-byte          loggingAlarmHours     = 1;    // Rolling hours alarm
-byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
+byte          loggingAlarmMinutes   = 30;   // Rolling minutes alarm
+byte          loggingAlarmHours     = 0;    // Rolling hours alarm
+byte          sleepAlarmMinutes     = 30;    // Rolling minutes alarm
 byte          sleepAlarmHours       = 0;    // Rolling hours alarm
 
 // Manual alarm modes
@@ -108,18 +108,18 @@ bool          gnssConfigFlag      = true;         // Flag to indicate whether to
 bool          rtcSyncFlag         = false;        // Flag to indicate if RTC has been synced with GNSS
 char          logFileName[30]     = "";           // Log file name
 char          debugFileName[20]   = "gvt_0_debug.csv";  // Debug log file name
+char          dateTimeBuffer[25];                 // Global buffer to store datetime information
 unsigned int  debugCounter        = 0;            // Counter to track number of recorded debug messages
-unsigned int  gnssTimeout         = 1;           // Timeout for GNSS signal acquisition (minutes)
+unsigned int  gnssTimeout         = 5;            // Timeout for GNSS signal acquisition (minutes)
 unsigned int  maxBufferBytes      = 0;            // Maximum value of file buffer
 unsigned long previousMillis      = 0;            // Global millis() timer
 unsigned long bytesWritten        = 0;            // Counter for tracking bytes written to microSD
 unsigned long syncFailCounter     = 0;            // microSD logfile synchronize failure counter
 unsigned long writeFailCounter    = 0;            // microSD logfile write failure counter
 unsigned long closeFailCounter    = 0;            // microSD logfile close failure counter
+unsigned long logStartTime        = 0;            // Global counter to track elapsed logging duration
 long          rtcDrift            = 0;            // Counter for drift of RTC
-char          dateTimeBuffer[25];
-unsigned long logStartTime;
-int           reading;
+int           reading             = 0;            // Battery voltage analog reading
 
 
 // ----------------------------------------------------------------------------
