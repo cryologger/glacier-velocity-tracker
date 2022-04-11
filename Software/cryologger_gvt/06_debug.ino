@@ -67,7 +67,7 @@ void logDebug()
 
   // Log debugging information
   debugFile.print(dateTime);            debugFile.print(",");
-  debugFile.print(voltage);             debugFile.print(",");
+  debugFile.print(readVoltage());       debugFile.print(",");
   debugFile.print(online.microSd);      debugFile.print(",");
   debugFile.print(online.gnss);         debugFile.print(",");
   debugFile.print(online.logGnss);      debugFile.print(",");
@@ -114,7 +114,7 @@ void logDebug()
                    
   // Print debugging information
   DEBUG_PRINT(dateTime);          DEBUG_PRINT(",");
-  DEBUG_PRINT(voltage);           DEBUG_PRINT(",");
+  DEBUG_PRINT(readVoltage());     DEBUG_PRINT(",");
   DEBUG_PRINT(online.microSd);    DEBUG_PRINT(",");
   DEBUG_PRINT(online.gnss);       DEBUG_PRINT(",");
   DEBUG_PRINT(online.logGnss);    DEBUG_PRINT(",");
