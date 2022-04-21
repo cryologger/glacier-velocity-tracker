@@ -100,8 +100,6 @@ A total of five deployments were made in the summer of 2021. Two on the Lowell G
 ## 4.0 Results
 Servicing of systems deployed on Devon Island and  Lowell Glacier  are planned for spring and summer 2022, respectively.
 
-## Changelog
-
 ## Repository Contents
 * **/Software** - Contains the Arduino code.
 
@@ -109,7 +107,7 @@ Servicing of systems deployed on Devon Island and  Lowell Glacier  are planned f
 
 * **/Bill of Materials** - Information on components and their associated costs.
 
-* **/Archive** - Previous design iterations.
+* **/Archive** - Previous design versions.
 
 ## License Information
 This project is released under the GNU General Public License v3.0 (https://www.gnu.org/licenses/gpl-3.0.en.html)
