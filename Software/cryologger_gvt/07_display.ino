@@ -34,7 +34,7 @@ void displayWelcome()
   {
     enablePullups(); // Enable internal I2C pull-ups
     oled.erase();
-    oled.text(0, 0, "Cryologger GVT");
+    oled.text(0, 0, "Cryologger GVT #0");
     oled.text(0, 10, dateTimeBuffer);
     oled.setCursor(0, 20);
     oled.print("Voltage:");

@@ -71,21 +71,21 @@ void configureGnss()
     // Configure communication interfaces and satellite signals only if program is running for the first time
     if (gnssConfigFlag)
     {
-
+      /*
       // Configure communciation interfaces
       bool setValueSuccess = true;
       setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);    // Enable I2C
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);    // Disable SPI
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 0);  // Disable UART1
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);  // Disable UART2
-      setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_USB_ENABLED, 0);   // Disable USB
+      setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_USB_ENABLED, 1);   // Disable USB
       if (!setValueSuccess)
       {
         DEBUG_PRINTLN("Warning: Communication interfaces not configured!");
       }
-
+      */
       // Configure satellite signals
-      setValueSuccess = true;
+      bool setValueSuccess = true;
       setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, 1);   // Enable GPS
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GLO_ENA, 1);   // Enable GLONASS
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 0);   // Disable Galileo
@@ -335,7 +335,7 @@ void logGnss()
           DEBUG_PRINTLN("Warning: File buffer >80 % full. Data loss may have occurrred.");
         }
 
-        // Display logging information to OLED display 
+        // Display logging information to OLED display
         if (displayDebug)
         {
           // After a specified number of cycles put OLED to sleep (1.2 uA)

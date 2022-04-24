@@ -1,6 +1,6 @@
 /*
-    Title:    Cryologger - Glacier Velocity Tracker (GVT) v2.0.4
-    Date:     April 2, 2022
+    Title:    Cryologger - Glacier Velocity Tracker (GVT) v2.1.0
+    Date:     April 24, 2022
     Author:   Adam Garbo
 
     Components:
@@ -11,12 +11,12 @@
     Dependencies:
     - Apollo3 Core v1.2.3
     - SparkFun u-blox GNSS Arduino Library v2.2.7
+    - SparkFun Qwiic OLED Arduino Library v1.0.5
     - SdFat v2.1.2
 
     Comments:
-    - Code is currently configured for short-term deployments during the
-    2022 Arctic Bay field season.
-    - The OLED display code is currently experimental
+    - Code is currently configured for continuous short-term measurements 
+    of sea ice motion to be deployed during the 2022 Arctic Bay field season.
 */
 
 // ----------------------------------------------------------------------------
@@ -160,8 +160,11 @@ void setup()
   pinMode(PIN_MICROSD_POWER, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
-  qwiicPowerOn();           // Enable power to Qwiic connector
-  peripheralPowerOn();      // Enable power to peripherials
+  // Enable power to Qwiic connector
+  qwiicPowerOn();
+
+  // Enable power to peripherials
+  peripheralPowerOn();
 
   Wire.begin();             // Initalize I2C
   Wire.setClock(400000);    // Set I2C clock speed to 400 kHz
@@ -178,7 +181,7 @@ void setup()
   configureOled();
 
   printLine();
-  DEBUG_PRINTLN("Cryologger - Glacier Velocity Test Unit");
+  DEBUG_PRINTLN("Cryologger Glacier Velocity Tracker - Test Unit");
   printLine();
 
   printDateTime(); // Print RTC's current date and time
@@ -192,7 +195,7 @@ void setup()
 
   // Configure devices
   configureWdt();         // Configure and start Watchdog Timer (WDT)
-  configureGnss();        // Configure u-blox GNSS
+  configureGnss();        // Configure u-blox GNSS receiver
   syncRtc();              // Acquire GNSS fix and sync RTC with GNSS
   configureSd();          // Configure microSD
   createDebugFile();      // Create debug log file
@@ -219,12 +222,15 @@ void loop()
     readRtc();            // Get the RTC's alarm date and time
     setLoggingAlarm();    // Set logging alarm
     getLogFileName();     // Get timestamped log file name
-    
+
     // Read battery voltage
-    if(readVoltage() < 10.0)
+    if (readVoltage() < 10.0)
     {
-      // To do: Add if statement to send system back to deep sleep if 
+      // To do: Add if statement to send system back to deep sleep if
       // voltage is too low.
+
+      // Enter deep sleep
+      //goToSleep();
     }
 
     // Configure devices
