@@ -36,19 +36,22 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 | Carrier Board | SparkFun MicroMod Data Logging Carrier Board | $19.95 | 
 | GNSS Receiver | SparkFun GPS-RTK-SMA Breakout - ZED-F9P | $219.95 | 
 | GNSS Antenna | SparkFun GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106 | $124.95 | 
-| GNSS antenna cable |	SparkFun Interface Cable - SMA Female to SMA Male (25cm) | $5.50 |
-| GNSS antenna cable |	SparkFun Interface Cable - SMA Male to TNC Male (300mm) | $10.95 | 
+| GNSS Antenna Cable |	SparkFun Interface Cable - SMA Female to SMA Male (25cm) | $5.50 |
+| GNSS Antenna Cable |	SparkFun Interface Cable - SMA Male to TNC Male (300mm) | $10.95 | 
 | Voltage Regulator | Pololu 5V, 600mA Step-Down Voltage Regulator D36V6F5 | $4.95 |
 | microSD Card| SanDisk MAX Endurance 64 GB microSD | $20.00 | 
 | Resistor |	1 Mohms 1% MBB02070C1004FRP00 | $0.25 |
 | Resistor |	10Mohm 1% 50ppm MBB02070C1005FRP00 | $0.25 |
 | Capacitor | 0.1 uF K104K15X7RF53L2 | $0.25 | 
+| Power Connector	| Phoenix Contact MSTB 2,5/ 2-ST-5,08 - 1757019 | $0.71 | 
+| Power Connector	| Phoenix Contact MSTBA 2,5/ 2-G-5,08 - 1757242 | $2.21 | 
 | Electronics Enclosure | Hammond Manufacturing 1554HL2GYCL | $17.51 | 
 | Solar Panel | Ameresco Solar 20 Watt Solar Panel 20J | $99.00 |
 | Solar Panel Bracket | Ameresco Solar HPM18-30 Solar Panel Pole Mount (optional) | $39.00 |
 | Charge Controller | Genasun GV-5 65W 5A Solar charge controller with MPPT  | $68.00 |
 | Battery | Deka SOLAR Gel 48 Ah 8G40C | $150.00 |
 | Enclosure | L-Com 14x12x7 Inch Weatherproof NEMA Enclosure | $118.00 |
+| Enclosure Panel | L-Com Blank Aluminum Mounting Plate | $30.00 |
 | Pole Mount | L-Com Enclosure Pole Mounting Kit | $53.30 |
 | Tripod | Onset HOBO Weather Station m 3m Tripod |  $200.00 | 
 
@@ -98,8 +101,6 @@ A total of five deployments were made in the summer of 2021. Two on the Lowell G
 ## 4.0 Results
 Servicing of systems deployed on Devon Island and  Lowell Glacier  are planned for spring and summer 2022, respectively.
 
-## Changelog
-
 ## Repository Contents
 * **/Software** - Contains the Arduino code.
 
@@ -107,7 +108,7 @@ Servicing of systems deployed on Devon Island and  Lowell Glacier  are planned f
 
 * **/Bill of Materials** - Information on components and their associated costs.
 
-* **/Archive** - Previous design iterations.
+* **/Archive** - Previous design versions.
 
 ## License Information
 This project is released under the GNU General Public License v3.0 (https://www.gnu.org/licenses/gpl-3.0.en.html)
