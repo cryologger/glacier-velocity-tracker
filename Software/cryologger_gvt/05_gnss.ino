@@ -171,6 +171,7 @@ void syncRtc()
 #endif
 
         // Check if date and time are valid and synchronize RTC with GNSS
+        //if (fixType >= 2) // Debugging
         if (fixType == 3 && dateValidFlag && timeValidFlag)
         {
           unsigned long rtcEpoch = rtc.getEpoch();        // Get RTC epoch time

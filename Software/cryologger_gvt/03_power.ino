@@ -31,9 +31,15 @@ void disablePullups()
 void goToSleep()
 {
   // Skip deep sleep if logging 24 hours/day
-  if (loggingMode == 3)
+  if (loggingMode == 3 && !sleepFlag)
   {
     return;
+  }
+  else
+  {
+    alarmFlag = false; // Clear flag
+    //DEBUG_PRINTLN("Info: Entering deep sleep.");
+    //DEBUG_PRINT("Info: Sleeping until "); printAlarm();
   }
 
   // Display OLED message(s)
