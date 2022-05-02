@@ -24,17 +24,17 @@ The glacier velocity measurement system requires two external libraries. These c
 ### 1) SparkFun u-blox Arduino GNSS Library
 - Version: 2.2.7
 - GitHub: https://github.com/sparkfun/SparkFun_u-blox_GNSS_Arduino_Library
-- <img src="https://user-images.githubusercontent.com/22924092/166262645-62a74d75-e5e4-46d5-9339-b7fdb450908d.png" width="640">
+<img src="https://user-images.githubusercontent.com/22924092/166262645-62a74d75-e5e4-46d5-9339-b7fdb450908d.png" width="640">
 
 ### 2) SdFat
 - Version: 2.1.2
 - Github URL: https://github.com/greiman/SdFat
-- <img src="https://user-images.githubusercontent.com/22924092/166266664-f8baef8f-f3eb-4878-bb9f-8899a40303b9.png" width="640">
+<img src="https://user-images.githubusercontent.com/22924092/166266664-f8baef8f-f3eb-4878-bb9f-8899a40303b9.png" width="640">
 
 ### 3) SparkFun Qwiic OLED Arduino Library 
 - Version: 1.0.5
 - Github URL: https://github.com/sparkfun/SparkFun_Qwiic_OLED_Arduino_Library
-- <img src="https://user-images.githubusercontent.com/22924092/166266756-e3f9c71a-680d-405d-96a7-9ae7c2d7c7e5.png" width="640">
+<img src="https://user-images.githubusercontent.com/22924092/166266756-e3f9c71a-680d-405d-96a7-9ae7c2d7c7e5.png" width="640">
 
 ## Step 5: Select Harware & Configure Port Settings
 *  Navigate to Tools > Board > SparkFun Apollo 3
