@@ -1,6 +1,6 @@
 /*
     Title:    Cryologger - Glacier Velocity Tracker (GVT) v2.1.0
-    Date:     April 28, 2022
+    Date:     June 21, 2022
     Author:   Adam Garbo
 
     Components:
@@ -15,8 +15,8 @@
     - SdFat v2.1.2
 
     Comments:
-    - Code is currently configured for continuous short-term measurements
-    of sea ice motion to be deployed during the 2022 Arctic Bay field season.
+    - Code is currently configured for long-term measurements of glacier motion 
+    and is set to be deployed during the 2022 Ellesmere Island field season.
 */
 
 // ----------------------------------------------------------------------------
@@ -75,7 +75,7 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // ----------------------------------------------------------------------------
 
 // Logging modes
-// 1: Daily logging (e.g., 3 hours each day between 12:00-15:00)
+// 1: Daily logging (e.g., 3 hours each day between 19:00-22:00)
 // 2: Rolling logging (e.g., 2 hours logging, 2 hours sleep for 3, repeat)
 // 3: Continuous logging (e.g., new logfiles created each day at 00:00)
 byte          loggingMode           = 3;    // 1: daily, 2: rolling, 3: 24-hour
@@ -119,7 +119,6 @@ unsigned long syncFailCounter     = 0;            // microSD logfile synchronize
 unsigned long writeFailCounter    = 0;            // microSD logfile write failure counter
 unsigned long closeFailCounter    = 0;            // microSD logfile close failure counter
 unsigned long logStartTime        = 0;            // Global counter to track elapsed logging duration
-unsigned long scheduledSleep      = 1653177600;   // Unixtime for scheduled sleep on 2022-05-22 00:00:00
 long          rtcDrift            = 0;            // Counter for drift of RTC
 int           reading             = 0;            // Battery voltage analog reading
 
@@ -225,35 +224,20 @@ void loop()
     setLoggingAlarm();    // Set logging alarm
     getLogFileName();     // Get timestamped log file name
 
-    // Enter deep sleep if beyond a specific date
-    if (rtc.getEpoch() >= scheduledSleep)
-    {
-      DEBUG_PRINT("Info: Scheduled deep sleep reached "); DEBUG_PRINT(rtc.getEpoch() - scheduledSleep); DEBUG_PRINTLN(" seconds ago");
-      
-      // Set flag
-      sleepFlag = true;
-    }
-    else
-    {
-      DEBUG_PRINT("Info: Deep sleep scheduled in "); DEBUG_PRINT(scheduledSleep - rtc.getEpoch()); DEBUG_PRINTLN(" seconds");
-      
-      // Set flag
-      sleepFlag = false;
+    // Configure devices
+    qwiicPowerOn();       // Enable power to Qwiic connector
+    peripheralPowerOn();  // Enable power to peripherals
+    resetOled();          // Configure OLED display
+    configureSd();        // Configure microSD
+    configureGnss();      // Configure u-blox GNSS
+    syncRtc();            // Synchronize RTC
 
-      // Configure devices
-      qwiicPowerOn();       // Enable power to Qwiic connector
-      peripheralPowerOn();  // Enable power to peripherals
-      resetOled();          // Configure OLED display
-      configureSd();        // Configure microSD
-      configureGnss();      // Configure u-blox GNSS
-      syncRtc();            // Synchronize RTC
+    // Log data
+    logGnss();            // Log u-blox GNSS data
+    logDebug();           // Log system debug information
+    setSleepAlarm();      // Set sleep alarm
+    printTimers();        // Log timers to debug file
 
-      // Log data
-      logGnss();            // Log u-blox GNSS data
-      logDebug();           // Log system debug information
-      setSleepAlarm();      // Set sleep alarm
-      printTimers();        // Log timers to debug file
-    }
   }
 
   // Check for watchdog interrupt
