@@ -90,7 +90,7 @@ void setSleepAlarm()
     DEBUG_PRINTLN(F("Info: Continuous logging enabled"));
     return; // Skip setting alarm
   }
-  else 
+  else
   {
     alarmFlag = true; // Default if no logging mode set
     return; // Skip setting alarm

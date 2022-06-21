@@ -1,6 +1,9 @@
 // Create debugging log file
 void createDebugFile()
 {
+  // Debug log file name
+  sprintf(debugFileName, "gvt_%d_debug.csv", CRYOLOGGER_ID);
+  
   // Create debug log file
   // O_CREAT - Create the file if it does not exist
   // O_APPEND - Seek to the end of the file prior to each write

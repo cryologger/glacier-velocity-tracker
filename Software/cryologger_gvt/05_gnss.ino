@@ -219,8 +219,8 @@ void syncRtc()
 // Create timestamped log file name
 void getLogFileName()
 {
-  sprintf(logFileName, "GVT_0_20%02d%02d%02d_%02d%02d%02d.ubx",
-          rtc.year, rtc.month, rtc.dayOfMonth,
+  sprintf(logFileName, "GVT_%d_20%02d%02d%02d_%02d%02d%02d.ubx",
+          CRYOLOGGER_ID, rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 }
 
@@ -337,7 +337,7 @@ void logGnss()
         }
 
         // Display logging information to OLED display
-        if (displayDebug)
+        if (online.oled && displayDebug)
         {
           // After a specified number of cycles put OLED to sleep (1.2 uA)
           if (displayCounter <= 10)
