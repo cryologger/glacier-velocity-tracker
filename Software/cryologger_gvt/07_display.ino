@@ -23,9 +23,11 @@ void configureOled()
 // Reset OLED display after sleep/power cycle
 void resetOled()
 {
+#if OLED
   online.oled = true;
   enablePullups();
   oled.reset(1);
+#endif
 }
 
 void displayWelcome()
