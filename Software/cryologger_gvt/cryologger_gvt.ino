@@ -1,6 +1,6 @@
 /*
     Title:    Cryologger - Glacier Velocity Tracker (GVT) v2.1.0
-    Date:     June 21, 2022
+    Date:     June 25, 2022
     Author:   Adam Garbo
 
     Components:
@@ -40,7 +40,7 @@
 // -----------------------------------------------------------------------------
 #define DEBUG       true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS  true  // Output GNSS information to Serial Monitor
-#define DEBUG_OLED  true  // Output messages to OLED display (not yet implemented)
+#define OLED        true  // Output messages to OLED display
 
 #if DEBUG
 #define DEBUG_PRINT(x)            Serial.print(x)
@@ -72,8 +72,8 @@ APM3_WDT          wdt;
 SdFs              sd;
 FsFile            logFile;
 FsFile            debugFile;
-//QwiicMicroOLED    oled;       // I2C address: 0x3C
-QwiicNarrowOLED   oled;       // I2C address: 0x3C
+QwiicMicroOLED    oled;       // I2C address: 0x3C
+//QwiicNarrowOLED   oled;       // I2C address: 0x3C
 SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 
 // ----------------------------------------------------------------------------
@@ -87,19 +87,19 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 byte          loggingMode           = 1;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
-byte          loggingStartTime      = 19;   // Logging start hour (UTC)
-byte          loggingStopTime       = 22;   // Logging end hour (UTC)
+byte          loggingStartTime      = 17;   // Logging start hour (UTC)
+byte          loggingStopTime       = 20;   // Logging end hour (UTC)
 
 // Rolling alarm
-byte          loggingAlarmMinutes   = 5;    // Rolling minutes alarm
-byte          loggingAlarmHours     = 0;    // Rolling hours alarm
-byte          sleepAlarmMinutes     = 5;    // Rolling minutes alarm
-byte          sleepAlarmHours       = 0;    // Rolling hours alarm
+byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
+byte          loggingAlarmHours     = 1;    // Rolling hours alarm
+byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
+byte          sleepAlarmHours       = 1;    // Rolling hours alarm
 
-// Manual alarm modes
-byte          loggingAlarmMode      = 5;    // Logging alarm mode
-byte          sleepAlarmMode        = 5;    // Sleep alarm mode
-byte          initialAlarmMode      = 6;    // Initial alarm mode
+// Manual alarm modes (for debugging only)
+byte          loggingAlarmMode      = 4;    // Logging alarm mode
+byte          sleepAlarmMode        = 4;    // Sleep alarm mode
+byte          initialAlarmMode      = 4;    // Initial alarm mode
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -189,7 +189,6 @@ void setup()
   printLine();
   DEBUG_PRINT("Cryologger Glacier Velocity Tracker #"); DEBUG_PRINTLN(CRYOLOGGER_ID);
   printLine();
-
   printDateTime(); // Print RTC's current date and time
   DEBUG_PRINT("Voltage: "); DEBUG_PRINTLN(readVoltage()); // Print battery voltage
 
@@ -242,7 +241,6 @@ void loop()
     logDebug();           // Log system debug information
     setSleepAlarm();      // Set sleep alarm
     printTimers();        // Log timers to debug file
-
   }
 
   // Check for watchdog interrupt

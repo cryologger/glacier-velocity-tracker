@@ -26,8 +26,8 @@ void printLoggingSettings()
   if (loggingMode == 1)
   {
     DEBUG_PRINTLN("Daily");
-    DEBUG_PRINT("Start: "); printTab(2);  DEBUG_PRINTLN(loggingStartTime);
-    DEBUG_PRINT("Stop: "); printTab(3);  DEBUG_PRINTLN(loggingStopTime);
+    DEBUG_PRINT("Start: "); printTab(4);  DEBUG_PRINTLN(loggingStartTime);
+    DEBUG_PRINT("Stop: "); printTab(4);  DEBUG_PRINTLN(loggingStopTime);
   }
   if (loggingMode == 2)
   {
@@ -68,8 +68,8 @@ void printGnssSettings()
   DEBUG_PRINT("UBLOX_CFG_SIGNAL_SBAS_ENA: ");      printTab(1);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_SIGNAL_SBAS_ENA));
   DEBUG_PRINT("UBLOX_CFG_I2C_ENABLED: ");          printTab(2);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_I2C_ENABLED));
   DEBUG_PRINT("UBLOX_CFG_SPI_ENABLED: ");          printTab(2);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_SPI_ENABLED));
-  DEBUG_PRINT("UBLOX_CFG_UART1_ENABLED: ");        printTab(2);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_UART1_ENABLED));
-  DEBUG_PRINT("UBLOX_CFG_UART2_ENABLED: ");        printTab(2);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_UART2_ENABLED));
+  DEBUG_PRINT("UBLOX_CFG_UART1_ENABLED: ");        printTab(1);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_UART1_ENABLED));
+  DEBUG_PRINT("UBLOX_CFG_UART2_ENABLED: ");        printTab(1);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_UART2_ENABLED));
   DEBUG_PRINT("UBLOX_CFG_USB_ENABLED: ");          printTab(2);  DEBUG_PRINTLN(gnss.getVal8(UBLOX_CFG_USB_ENABLED));
 
   printLine();
@@ -84,7 +84,7 @@ void printTimers()
   DEBUG_PRINT("readRtc: ");     printTab(1);  DEBUG_PRINTLN(timer.rtc);
   DEBUG_PRINT("microSD: ");     printTab(1);  DEBUG_PRINTLN(timer.microSd);
   DEBUG_PRINT("voltage: ");     printTab(1);  DEBUG_PRINTLN(timer.voltage);
-  DEBUG_PRINT("gnss: ");        printTab(1);  DEBUG_PRINTLN(timer.gnss);
+  DEBUG_PRINT("gnss: ");        printTab(2);  DEBUG_PRINTLN(timer.gnss);
   DEBUG_PRINT("syncRtc: ");     printTab(1);  DEBUG_PRINTLN(timer.syncRtc);
   DEBUG_PRINT("logDebug: ");    printTab(1);  DEBUG_PRINTLN(timer.logDebug);
   DEBUG_PRINT("logGnss: ");     printTab(1);  DEBUG_PRINTLN(timer.logGnss);
