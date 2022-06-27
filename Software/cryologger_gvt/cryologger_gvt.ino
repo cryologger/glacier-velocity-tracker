@@ -72,8 +72,8 @@ APM3_WDT          wdt;
 SdFs              sd;
 FsFile            logFile;
 FsFile            debugFile;
-QwiicMicroOLED    oled;       // I2C address: 0x3C
-//QwiicNarrowOLED   oled;       // I2C address: 0x3C
+//QwiicMicroOLED    oled;       // I2C address: 0x3C
+QwiicNarrowOLED   oled;       // I2C address: 0x3C
 SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 
 // ----------------------------------------------------------------------------
