@@ -1,6 +1,6 @@
 /*
-    Title:    Cryologger - Glacier Velocity Tracker (GVT) v2.0.4
-    Date:     April 2, 2022
+    Title:    Cryologger - Glacier Velocity Tracker (GVT) v2.1.0
+    Date:     June 27, 2022
     Author:   Adam Garbo
 
     Components:
@@ -11,12 +11,12 @@
     Dependencies:
     - Apollo3 Core v1.2.3
     - SparkFun u-blox GNSS Arduino Library v2.2.7
+    - SparkFun Qwiic OLED Arduino Library v1.0.5
     - SdFat v2.1.2
 
     Comments:
-    - Code is currently configured for short-term deployments during the
-    2022 Arctic Bay field season.
-    - The OLED display code is currently experimental
+    - Code is currently configured for long-term measurements of glacier motion
+    and is set to be deployed during the 2022 Ellesmere Island field season.
 */
 
 // ----------------------------------------------------------------------------
@@ -30,12 +30,17 @@
 #include <WDT.h>
 #include <Wire.h>
 
+// ----------------------------------------------------------------------------
+// Define unique identifier
+// ----------------------------------------------------------------------------
+#define CRYOLOGGER_ID 0
+
 // -----------------------------------------------------------------------------
 // Debugging macros
 // -----------------------------------------------------------------------------
 #define DEBUG       true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS  true  // Output GNSS information to Serial Monitor
-#define OLED        false  // Output messages to OLED display
+#define OLED        true  // Output messages to OLED display
 
 #if DEBUG
 #define DEBUG_PRINT(x)            Serial.print(x)
@@ -67,6 +72,7 @@ APM3_WDT          wdt;
 SdFs              sd;
 FsFile            logFile;
 FsFile            debugFile;
+//QwiicMicroOLED    oled;       // I2C address: 0x3C
 QwiicNarrowOLED   oled;       // I2C address: 0x3C
 SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 
@@ -75,25 +81,25 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // ----------------------------------------------------------------------------
 
 // Logging modes
-// 1: Daily logging (e.g., 3 hours each day between 12:00-15:00)
+// 1: Daily logging (e.g., 3 hours each day between 19:00-22:00)
 // 2: Rolling logging (e.g., 2 hours logging, 2 hours sleep for 3, repeat)
 // 3: Continuous logging (e.g., new logfiles created each day at 00:00)
 byte          loggingMode           = 3;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
-byte          loggingStartTime      = 19;   // Logging start hour (UTC)
-byte          loggingStopTime       = 22;   // Logging end hour (UTC)
+byte          loggingStartTime      = 17;   // Logging start hour (UTC)
+byte          loggingStopTime       = 20;   // Logging end hour (UTC)
 
 // Rolling alarm
-byte          loggingAlarmMinutes   = 30;   // Rolling minutes alarm
-byte          loggingAlarmHours     = 0;    // Rolling hours alarm
-byte          sleepAlarmMinutes     = 30;    // Rolling minutes alarm
-byte          sleepAlarmHours       = 0;    // Rolling hours alarm
+byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
+byte          loggingAlarmHours     = 1;    // Rolling hours alarm
+byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
+byte          sleepAlarmHours       = 1;    // Rolling hours alarm
 
-// Manual alarm modes
-byte          loggingAlarmMode      = 5;    // Logging alarm mode
-byte          sleepAlarmMode        = 5;    // Sleep alarm mode
-byte          initialAlarmMode      = 6;    // Initial alarm mode
+// Manual alarm modes (for debugging only)
+byte          loggingAlarmMode      = 4;    // Logging alarm mode
+byte          sleepAlarmMode        = 4;    // Sleep alarm mode
+byte          initialAlarmMode      = 4;    // Initial alarm mode
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -104,11 +110,12 @@ volatile bool alarmFlag           = false;        // Flag for alarm interrupt se
 volatile bool wdtFlag             = false;        // Flag for WDT interrupt service routine
 volatile int  wdtCounter          = 0;            // Counter for WDT interrupts
 volatile int  wdtCounterMax       = 0;            // Counter for max WDT interrupts
+bool          sleepFlag           = 0;            // Flag to place system into long-duration sleep mode
 bool          gnssConfigFlag      = true;         // Flag to indicate whether to configure the u-blox module
 bool          rtcSyncFlag         = false;        // Flag to indicate if RTC has been synced with GNSS
 char          logFileName[30]     = "";           // Log file name
-char          debugFileName[20]   = "gvt_0_debug.csv";  // Debug log file name
-char          dateTimeBuffer[25];                 // Global buffer to store datetime information
+char          debugFileName[20]   = "";           // Debug log file name
+char          dateTimeBuffer[25]  = "";           // Global buffer to store datetime information
 unsigned int  debugCounter        = 0;            // Counter to track number of recorded debug messages
 unsigned int  gnssTimeout         = 5;            // Timeout for GNSS signal acquisition (minutes)
 unsigned int  maxBufferBytes      = 0;            // Maximum value of file buffer
@@ -120,7 +127,6 @@ unsigned long closeFailCounter    = 0;            // microSD logfile close failu
 unsigned long logStartTime        = 0;            // Global counter to track elapsed logging duration
 long          rtcDrift            = 0;            // Counter for drift of RTC
 int           reading             = 0;            // Battery voltage analog reading
-
 
 // ----------------------------------------------------------------------------
 // Unions/structures
@@ -160,8 +166,11 @@ void setup()
   pinMode(PIN_MICROSD_POWER, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
-  qwiicPowerOn();           // Enable power to Qwiic connector
-  peripheralPowerOn();      // Enable power to peripherials
+  // Enable power to Qwiic connector
+  qwiicPowerOn();
+
+  // Enable power to peripherials
+  peripheralPowerOn();
 
   Wire.begin();             // Initalize I2C
   Wire.setClock(400000);    // Set I2C clock speed to 400 kHz
@@ -178,9 +187,8 @@ void setup()
   configureOled();
 
   printLine();
-  DEBUG_PRINTLN("Cryologger - Glacier Velocity Test Unit");
+  DEBUG_PRINT("Cryologger Glacier Velocity Tracker #"); DEBUG_PRINTLN(CRYOLOGGER_ID);
   printLine();
-
   printDateTime(); // Print RTC's current date and time
   DEBUG_PRINT("Voltage: "); DEBUG_PRINTLN(readVoltage()); // Print battery voltage
 
@@ -192,7 +200,7 @@ void setup()
 
   // Configure devices
   configureWdt();         // Configure and start Watchdog Timer (WDT)
-  configureGnss();        // Configure u-blox GNSS
+  configureGnss();        // Configure u-blox GNSS receiver
   syncRtc();              // Acquire GNSS fix and sync RTC with GNSS
   configureSd();          // Configure microSD
   createDebugFile();      // Create debug log file
@@ -219,13 +227,6 @@ void loop()
     readRtc();            // Get the RTC's alarm date and time
     setLoggingAlarm();    // Set logging alarm
     getLogFileName();     // Get timestamped log file name
-    
-    // Read battery voltage
-    if(readVoltage() < 10.0)
-    {
-      // To do: Add if statement to send system back to deep sleep if 
-      // voltage is too low.
-    }
 
     // Configure devices
     qwiicPowerOn();       // Enable power to Qwiic connector

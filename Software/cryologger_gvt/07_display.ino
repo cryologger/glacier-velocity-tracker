@@ -23,9 +23,11 @@ void configureOled()
 // Reset OLED display after sleep/power cycle
 void resetOled()
 {
+#if OLED
   online.oled = true;
   enablePullups();
-  oled.reset();
+  oled.reset(1);
+#endif
 }
 
 void displayWelcome()
@@ -34,7 +36,7 @@ void displayWelcome()
   {
     enablePullups(); // Enable internal I2C pull-ups
     oled.erase();
-    oled.text(0, 0, "Cryologger GVT");
+    oled.text(0, 0, "Cryologger GVT #1");
     oled.text(0, 10, dateTimeBuffer);
     oled.setCursor(0, 20);
     oled.print("Voltage:");

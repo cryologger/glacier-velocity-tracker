@@ -1,4 +1,4 @@
-# Cryologger - Glacier Velocity Measurement System Configuration
+# Cryologger - Glacier Velocity Tracker Configuration
 
 ## Step 1: Download Arduino IDE
 https://www.arduino.cc/en/software
@@ -22,14 +22,19 @@ The glacier velocity measurement system requires two external libraries. These c
 * Search for and install the following libraries:
 
 ### 1) SparkFun u-blox Arduino GNSS Library
-- Version: 2.0.9
+- Version: 2.2.7
 - GitHub: https://github.com/sparkfun/SparkFun_u-blox_GNSS_Arduino_Library
-<img src="https://user-images.githubusercontent.com/22924092/125138969-a4ab0e00-e0dd-11eb-9df3-e183d7cd2e73.png" width="640">
+<img src="https://user-images.githubusercontent.com/22924092/166262645-62a74d75-e5e4-46d5-9339-b7fdb450908d.png" width="640">
 
 ### 2) SdFat
-- Version: 2.0.7
+- Version: 2.1.2
 - Github URL: https://github.com/greiman/SdFat
-<img src="https://user-images.githubusercontent.com/22924092/125138913-83e2b880-e0dd-11eb-9d29-7a32b79902ea.png" width="640">
+<img src="https://user-images.githubusercontent.com/22924092/166266664-f8baef8f-f3eb-4878-bb9f-8899a40303b9.png" width="640">
+
+### 3) SparkFun Qwiic OLED Arduino Library 
+- Version: 1.0.5
+- Github URL: https://github.com/sparkfun/SparkFun_Qwiic_OLED_Arduino_Library
+<img src="https://user-images.githubusercontent.com/22924092/166266756-e3f9c71a-680d-405d-96a7-9ae7c2d7c7e5.png" width="640">
 
 ## Step 5: Select Harware & Configure Port Settings
 *  Navigate to Tools > Board > SparkFun Apollo 3
@@ -45,13 +50,13 @@ The glacier velocity measurement system requires two external libraries. These c
 
 ## Step 6: Download Glacier Velocity Measurement System Program
 Code for the Cryologger GVMS is made available on the following GitHubrepository:
-* https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System
-* Click on "Releases" and download the v2.0.3 .zip file:
+* https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Tracker
+* Click on "Releases" and download the v2.0.x .zip file:
 ![image](https://user-images.githubusercontent.com/22924092/125166162-5858e000-e168-11eb-8b9d-ef07eb5580bc.png)
 
 ## Step 7: Test Program Compiliation
-* Navigate to the /Software/cryologger_gvms folder of the downloaded repository
-* Double click on the `cryologger_gvms.ino` file
+* Navigate to the /Software/cryologger_gvt folder of the downloaded repository
+* Double click on the `cryologger_gvt.ino` file
 * Click on the checkmark in the upper left corner of the Arduino IDE program window
 * Watch debugging window for compilation errors
 <img src="https://user-images.githubusercontent.com/22924092/125166214-8dfdc900-e168-11eb-8a87-1f88e15ff32b.png" width="640">

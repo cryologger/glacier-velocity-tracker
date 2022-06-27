@@ -1,6 +1,9 @@
 // Create debugging log file
 void createDebugFile()
 {
+  // Debug log file name
+  sprintf(debugFileName, "gvt_%d_debug.csv", CRYOLOGGER_ID);
+  
   // Create debug log file
   // O_CREAT - Create the file if it does not exist
   // O_APPEND - Seek to the end of the file prior to each write
@@ -16,10 +19,10 @@ void createDebugFile()
   }
 
   // Write header to file
-  debugFile.println("datetime,battery,online_microSd,online_gnss,online_logGnss,online_logDebug,"
-                    "timer_battery,timer_microsd,timer_gnss,timer_syncRtc,timer_logGnss,timer_logDebug,"
-                    "rtcSyncFlag,rtcDrift,bytesWritten,maxBufferBytes,wdtCounterMax,"
-                    "writeFailCounter,syncFailCounter,closeFailCounter,debugCounter");
+  debugFile.println("datetime,battery,online_microsd,online_gnss,online_log_gnss,online_log_debug,"
+                    "timer_battery,timer_microsd,timer_gnss,timer_sync_rtc,timer_log_gnss,timer_log_debug,"
+                    "rtc_sync_flag,rtc_drift,bytes_written,max_buffer_bytes,wdt_counter_max,"
+                    "write_fail_counter,sync_fail_counter,close_fail_counter,debug_counter");
 
   // Sync the debug file
   if (!debugFile.sync())
@@ -104,13 +107,6 @@ void logDebug()
     DEBUG_PRINTLN("Warning: Failed to close debug file.");
     closeFailCounter++; // Count number of failed file closes
   }
-
-  /*
-  DEBUG_PRINTLN("datetime,battery,online_microSd,online_gnss,online_logGnss,online_logDebug,"
-                    "timer_battery,timer_microsd,timer_gnss,timer_syncRtc,timer_logGnss,timer_logDebug,"
-                    "rtcSyncFlag,rtcDrift,bytesWritten,maxBufferBytes,wdtCounterMax,"
-                    "writeFailCounter,syncFailCounter,closeFailCounter,debugCounter");
-  */
                    
   // Print debugging information
   DEBUG_PRINT(dateTime);          DEBUG_PRINT(",");

@@ -71,21 +71,21 @@ void configureGnss()
     // Configure communication interfaces and satellite signals only if program is running for the first time
     if (gnssConfigFlag)
     {
-
+      /*
       // Configure communciation interfaces
       bool setValueSuccess = true;
       setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);    // Enable I2C
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);    // Disable SPI
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 0);  // Disable UART1
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);  // Disable UART2
-      setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_USB_ENABLED, 0);   // Disable USB
+      setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_USB_ENABLED, 1);   // Disable USB
       if (!setValueSuccess)
       {
         DEBUG_PRINTLN("Warning: Communication interfaces not configured!");
       }
-
+      */
       // Configure satellite signals
-      setValueSuccess = true;
+      bool setValueSuccess = true;
       setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, 1);   // Enable GPS
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GLO_ENA, 1);   // Enable GLONASS
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 0);   // Disable Galileo
@@ -171,7 +171,8 @@ void syncRtc()
 #endif
 
         // Check if date and time are valid and synchronize RTC with GNSS
-        if (fixType == 3 && dateValidFlag && timeValidFlag)
+        //if (fixType >= 2) // Debugging
+        if (fixType >= 2 && dateValidFlag && timeValidFlag)
         {
           unsigned long rtcEpoch = rtc.getEpoch();        // Get RTC epoch time
           unsigned long gnssEpoch = gnss.getUnixEpoch();  // Get GNSS epoch time
@@ -218,8 +219,8 @@ void syncRtc()
 // Create timestamped log file name
 void getLogFileName()
 {
-  sprintf(logFileName, "GVT_0_20%02d%02d%02d_%02d%02d%02d.ubx",
-          rtc.year, rtc.month, rtc.dayOfMonth,
+  sprintf(logFileName, "GVT_%d_20%02d%02d%02d_%02d%02d%02d.ubx",
+          CRYOLOGGER_ID, rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 }
 
@@ -335,8 +336,8 @@ void logGnss()
           DEBUG_PRINTLN("Warning: File buffer >80 % full. Data loss may have occurrred.");
         }
 
-        // Display logging information to OLED display 
-        if (displayDebug)
+        // Display logging information to OLED display
+        if (online.oled && displayDebug)
         {
           // After a specified number of cycles put OLED to sleep (1.2 uA)
           if (displayCounter <= 10)
