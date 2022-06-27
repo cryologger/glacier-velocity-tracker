@@ -1,6 +1,6 @@
 /*
     Title:    Cryologger - Glacier Velocity Tracker (GVT) v2.1.0
-    Date:     June 25, 2022
+    Date:     June 27, 2022
     Author:   Adam Garbo
 
     Components:
@@ -84,7 +84,7 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // 1: Daily logging (e.g., 3 hours each day between 19:00-22:00)
 // 2: Rolling logging (e.g., 2 hours logging, 2 hours sleep for 3, repeat)
 // 3: Continuous logging (e.g., new logfiles created each day at 00:00)
-byte          loggingMode           = 1;    // 1: daily, 2: rolling, 3: 24-hour
+byte          loggingMode           = 3;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
 byte          loggingStartTime      = 17;   // Logging start hour (UTC)
