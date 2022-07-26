@@ -36,12 +36,12 @@ Once the Cryologger has been located from the air and the helicopter has landed,
 - [ ] Measure and record the voltage of the Deka 48 Ah battery.
 - [ ] Observe the Cryologger electronics enclosure for several seconds to determine if a blue LED blink pattern can be seen (i.e., once every 10 seconds).
 - [ ] Unscrew the 4 screws of the Cryologger enclosure.
-- [ ] Remove the 2-pin screw terminal connector to disconnect power.
+- [ ] Disconnect power by unplugging the 2-pin screw terminal connector.
 - [ ] Remove the 64 GB microSD card and replace it with the new 128 GB microSD card.
 - [ ] Reconnect power by plugging in the 2-pin screw terminal.
-- [ ] Watch LED blink patterns (Table 1.).
+- [ ] Observe LED blink patterns (Table 1).
 - [ ] If system is operating normally, replace the electronics enclosure cover and tighten the screws.
-- [ ] Close the enclosure.
+- [ ] Close the large enclosure.
 
 ## System Operation
 
@@ -49,7 +49,7 @@ When powered on, the system will attempt to establish a GNSS fix and sychronize 
 
 While the system is in deep sleep, the system will wake to check the program has not frozen every 10 seconds. The LED will blink briefly (100 ms) during this time.
 
-Please use the following table to determine the operation of the system.
+Please use the following table to determine the status of the operation of the system and possible troubleshooting steps to attempt.
 
 **Table 1.** LED blink patterns and associated description and troubleshooting guide.
 | Number | Interval (s)  |   Pattern   | Description                     | Troubleshooting Steps                                 |
