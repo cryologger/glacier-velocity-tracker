@@ -29,7 +29,7 @@
 * PC laptop loaded with Hoboware (https://www.onsetcomp.com/hoboware-free-download/) to run the USB base station
 
 ### Checklist
-Once the system has been located from the air and the helicopter has landed, use the following checklist to service the system:
+Once the Cryologger has been located from the air and the helicopter has landed, use the following checklist to service the system:
 - [ ] Take several photos of the system as it was found.
 - [ ] Inspect the general condition of the system, paying particular attention to the external cables (Arctic fox enjoy chewing through cables).
 - [ ] Open the enclosure and inspect the interior, noting the presence of any water or corrosion on metal surfaces (e.g., solar charge controller, battery terminals), and also take several photos of the interior.
@@ -65,8 +65,13 @@ Please use the following table to determine the operation of the system.
 
 
 ## Disassembly
-* If the system is determined to be non-functional, it can be recovered from the field. 
-* Tools required to disassemble the tripod and enclosure include:
-* 
+* If the system is determined to be non-functional, it can be recovered from the field. Please see the table below for the necessary tools. 
 
-
+**Table 2.** Tools required to disassemble the tripod and enclosure.
+| Tool                       | Equipment                              |   
+|:---------------------------|:---------------------------------------|
+| 1/2" socket/wrench         | Solar panel 1 3/4" u-bolt              |     
+| 1/2" socket/wrench         | Tripod 1-3/4" u-bolt                   |          
+| 7/16" socket/wrench        | Tripod 1-5/8" u-bolt                   |            
+| Phillips head screwdriver  | Cryologger electronics enclosure       |  
+| Flat head screwdriver      | Solar charge controller screw terminal |
