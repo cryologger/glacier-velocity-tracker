@@ -16,7 +16,7 @@ void configureSd()
       DEBUG_PRINTLN("Warning: microSD failed to initialize. Reattempting...");
 
       // Display OLED message
-      displayReattempt();
+      displayErrorMicrosd1();
 
       // Delay between initialization attempts
       myDelay(2000);
@@ -26,12 +26,15 @@ void configureSd()
         DEBUG_PRINTLN("Warning: microSD failed to initialize.");
         online.microSd = false;
 
+        // Display OLED messages(s)
+        displayErrorMicrosd2();
+
         // Disable power to Qwiic connector
         qwiicPowerOff();
 
         // Disable power to peripherals
         peripheralPowerOff();
-        
+
         while (1)
         {
           // Force WDT to reset system

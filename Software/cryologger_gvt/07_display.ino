@@ -13,7 +13,6 @@ void configureOled()
   else
   {
     online.oled = true;
-    DEBUG_PRINTLN("Info: OLED initialized");
   }
 
   // Disable internal I2C pull-ups
@@ -36,8 +35,11 @@ void displayWelcome()
   {
     enablePullups(); // Enable internal I2C pull-ups
     oled.erase();
-    oled.text(0, 0, "Cryologger GVT #1");
-    oled.text(0, 10, dateTimeBuffer);
+    oled.setCursor(0, 0);
+    oled.print("Cryologger GVT #");
+    oled.print(CRYOLOGGER_ID);
+    oled.setCursor(0, 10);
+    oled.print(dateTimeBuffer);
     oled.setCursor(0, 20);
     oled.print("Voltage:");
     oled.setCursor(54, 20);
@@ -67,6 +69,7 @@ void displaySuccess()
   if (online.oled)
   {
     enablePullups();
+    //oled.erase();
     oled.text(0, 10, "Success!");
     oled.display();
     disablePullups();
@@ -96,6 +99,36 @@ void displayReattempt()
   }
 }
 
+
+void displayLoggingMode()
+{
+  if (online.oled)
+  {
+    enablePullups();
+    oled.erase();
+    oled.text(0, 0, "Logging mode:");
+    if (loggingMode == 1)
+    {
+      oled.text(0, 10, "Daily");
+    }
+    else if (loggingMode == 2)
+    {
+      oled.text(0, 10, "Rolling");
+    }
+    else if (loggingMode == 3)
+    {
+      oled.text(0, 10, "Continuous");
+    }
+    else
+    {
+      oled.text(0, 10, "Not specified!");
+    }
+    oled.display();
+    disablePullups();
+    myDelay(4000);
+  }
+}
+
 void displayRtcSync()
 {
   if (online.oled)
@@ -108,6 +141,48 @@ void displayRtcSync()
   }
 }
 
+void displayRtcSyncStatus()
+{
+  if (online.oled)
+  {
+    enablePullups();
+    oled.erase();
+    oled.setCursor(0, 0);
+    oled.print("Acquring GNSS fix...");
+    oled.setCursor(0, 10);
+    oled.print("Sat: ");
+    oled.setCursor(36, 10);
+    oled.print(gnss.getSIV());
+    oled.setCursor(48, 10);
+    oled.print("Fix: ");
+    oled.setCursor(84, 10);
+    oled.print(gnss.getFixType());
+    oled.setCursor(0, 20);
+    oled.print("Date: ");
+    oled.setCursor(36, 20);
+    oled.print(gnss.getConfirmedDate());
+    oled.setCursor(48, 20);
+    oled.print("Time: ");
+    oled.setCursor(84, 20);
+    oled.print(gnss.getConfirmedTime());
+    oled.display();
+    disablePullups();
+  }
+}
+
+void displayRtcFailure()
+{
+  if (online.oled)
+  {
+    enablePullups();
+    //oled.erase();
+    oled.text(0, 0, "Warning: RTC sync failed!");
+    oled.display();
+    disablePullups();
+    myDelay(2000);
+  }
+}
+
 void displayRtcOffset(long drift)
 {
   if (online.oled)
@@ -115,16 +190,43 @@ void displayRtcOffset(long drift)
     // Get current date and time
     getDateTime();
 
+    enablePullups();
     oled.erase();
     oled.setCursor(0, 0);
     oled.print(dateTimeBuffer);
     oled.setCursor(0, 10);
-    oled.print("RTC drift: ");
-    oled.setCursor(66, 10);
+    oled.print("RTC drift (s): ");
+    oled.setCursor(0, 20);
     oled.print(drift);
     oled.display();
     disablePullups();
   }
+}
+
+
+
+void displayErrorMicrosd1()
+{
+  enablePullups();
+  oled.erase();
+  oled.text(0, 0, "Error: microSD");
+  oled.text(0, 10, "failed to initialize!");
+  oled.text(0, 20, "Reattempting...");
+  oled.display();
+  disablePullups();
+  myDelay(4000);
+}
+
+void displayErrorMicrosd2()
+{
+  enablePullups();
+  oled.erase();
+  oled.text(0, 0, "Error: microSD");
+  oled.text(0, 10, "second attempt failed!");
+  oled.text(0, 20, "Freezing!");
+  oled.display();
+  disablePullups();
+  myDelay(4000);
 }
 
 void displayScreen1()
@@ -161,8 +263,8 @@ void displayScreen2()
     oled.print("Voltage:");
     oled.setCursor(54, 10);
     oled.print(readVoltage(), 2);
-    oled.setCursor(90, 10);
-    oled.print(reading);
+    //oled.setCursor(90, 10);
+    //oled.print(reading);
     oled.setCursor(0, 20);
     oled.print("Duration:");
     oled.setCursor(60, 20);
