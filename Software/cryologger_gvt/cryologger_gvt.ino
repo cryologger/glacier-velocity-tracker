@@ -1,6 +1,6 @@
 /*
-    Title:    Cryologger - Glacier Velocity Tracker (GVT) v2.1.0
-    Date:     June 27, 2022
+    Title:    Cryologger - Ice Motion Tracker (GVT) v2.1.0
+    Date:     August 2, 2022
     Author:   Adam Garbo
 
     Components:
@@ -10,9 +10,9 @@
 
     Dependencies:
     - Apollo3 Core v1.2.3
-    - SparkFun u-blox GNSS Arduino Library v2.2.7
+    - SparkFun u-blox GNSS Arduino Library v2.2.12
     - SparkFun Qwiic OLED Arduino Library v1.0.5
-    - SdFat v2.1.2
+    - SdFat v2.2.0
 
     Comments:
     - Code is currently configured for long-term measurements of glacier motion
@@ -33,7 +33,7 @@
 // ----------------------------------------------------------------------------
 // Define unique identifier
 // ----------------------------------------------------------------------------
-#define CRYOLOGGER_ID 0
+#define CRYOLOGGER_ID 3
 
 // -----------------------------------------------------------------------------
 // Debugging macros
@@ -195,14 +195,15 @@ void setup()
   // Display OLED message(s)
   displayWelcome();
 
-  // Print logging configuration
+  // Display logging configuration
   printLoggingSettings();
+  displayLoggingMode();
 
   // Configure devices
   configureWdt();         // Configure and start Watchdog Timer (WDT)
+  configureSd();          // Configure microSD
   configureGnss();        // Configure u-blox GNSS receiver
   syncRtc();              // Acquire GNSS fix and sync RTC with GNSS
-  configureSd();          // Configure microSD
   createDebugFile();      // Create debug log file
   setInitialAlarm();      // Configure RTC and set initial alarm
 
