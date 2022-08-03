@@ -11,7 +11,7 @@ void configureGnss()
     disablePullups();
 
     // Uncomment  line to enable GNSS debug messages on Serial
-    //gnss.enableDebugging();
+    gnss.enableDebugging();
 
     // Disable the "7F" check in checkUbloxI2C as RAWX data can legitimately contain 0x7F
     gnss.disableUBX7Fcheck();
@@ -25,6 +25,9 @@ void configureGnss()
     // Initialize u-blox GNSS
     if (!gnss.begin(Wire))
     {
+      // Display message to OLED
+      displayFailure();
+
       DEBUG_PRINTLN("Warning: u-blox failed to initialize. Reattempting...");
 
       // Delay between initialization attempts
@@ -88,8 +91,9 @@ void configureGnss()
       bool setValueSuccess = true;
       setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, 1);   // Enable GPS
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GLO_ENA, 1);   // Enable GLONASS
-      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 0);   // Disable Galileo
-      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, 0);   // Disable BeiDou
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 1);   // Enable Galileo
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, 1);   // Enable BeiDou
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_SBAS_ENA, 0);   // Disable SBAS
       setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0); // Disable QZSS
       myDelay(2000);
 
@@ -106,7 +110,7 @@ void configureGnss()
     // Configure u-blox GNSS
     gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
     gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
-    gnss.setNavigationFrequency(1);                   // Produce one navigation solution per second
+    gnss.setNavigationFrequency(1);                  // Produce X navigation solution(s) per second
     gnss.setAutoPVT(true);                            // Enable automatic NAV-PVT messages
     gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM-SFRBX messages
     gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM-RAWX messages
@@ -136,7 +140,6 @@ void syncRtc()
 
     // Clear flag
     rtcSyncFlag = false;
-
     rtcDrift = 0;
 
     DEBUG_PRINTLN("Info: Attempting to sync RTC with GNSS...");
@@ -168,6 +171,8 @@ void syncRtc()
                 gnss.getPDOP(), gnss.getFixType(),
                 dateValidFlag, timeValidFlag);
         DEBUG_PRINTLN(gnssBuffer);
+
+        displayRtcSyncStatus();
 #endif
 
         // Check if date and time are valid and synchronize RTC with GNSS
@@ -192,9 +197,8 @@ void syncRtc()
           DEBUG_PRINT("Info: RTC time synced to "); printDateTime();
 
           // Display OLED message(s)
-          displaySuccess();
           displayRtcOffset(rtcDrift);
-          blinkLed(4, 1000);
+          //blinkLed(4, 1000);
         }
       }
     }
@@ -202,7 +206,7 @@ void syncRtc()
     {
       DEBUG_PRINTLN("Warning: Unable to sync RTC!");
       // Display OLED message(s)
-      displayFailure();
+      displayRtcFailure();
       //blinkLed(10, 500);
     }
   }
@@ -340,7 +344,7 @@ void logGnss()
         if (online.oled && displayDebug)
         {
           // After a specified number of cycles put OLED to sleep (1.2 uA)
-          if (displayCounter <= 10)
+          if (displayCounter >= 0)
           {
             displayCounter++;
             if (!displayToggle)
