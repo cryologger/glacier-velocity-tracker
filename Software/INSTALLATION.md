@@ -22,12 +22,12 @@ The glacier velocity measurement system requires two external libraries. These c
 * Search for and install the following libraries:
 
 ### 1) SparkFun u-blox Arduino GNSS Library
-- Version: 2.2.7
+- Version: 2.2.13
 - GitHub: https://github.com/sparkfun/SparkFun_u-blox_GNSS_Arduino_Library
 <img src="https://user-images.githubusercontent.com/22924092/166262645-62a74d75-e5e4-46d5-9339-b7fdb450908d.png" width="640">
 
 ### 2) SdFat
-- Version: 2.1.2
+- Version: 2.2.0
 - Github URL: https://github.com/greiman/SdFat
 <img src="https://user-images.githubusercontent.com/22924092/166266664-f8baef8f-f3eb-4878-bb9f-8899a40303b9.png" width="640">
 
@@ -51,7 +51,7 @@ The glacier velocity measurement system requires two external libraries. These c
 ## Step 6: Download Glacier Velocity Measurement System Program
 Code for the Cryologger GVMS is made available on the following GitHubrepository:
 * https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Tracker
-* Click on "Releases" and download the v2.0.x .zip file:
+* Click on "Releases" and download the v2.1.1 .zip file:
 ![image](https://user-images.githubusercontent.com/22924092/125166162-5858e000-e168-11eb-8b9d-ef07eb5580bc.png)
 
 ## Step 7: Test Program Compiliation
