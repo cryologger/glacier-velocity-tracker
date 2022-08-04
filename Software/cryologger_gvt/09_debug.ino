@@ -42,6 +42,7 @@ void printLoggingSettings()
   DEBUG_PRINT("Logging alarm mode: "); printTab(2);  DEBUG_PRINTLN(loggingAlarmMode);
   DEBUG_PRINT("Sleep alarm mode: "); printTab(2);  DEBUG_PRINTLN(sleepAlarmMode);
   DEBUG_PRINT("Initial alarm mode: "); printTab(2);  DEBUG_PRINTLN(initialAlarmMode);
+  printLine();
 }
 
 // Print values of u-blox registers

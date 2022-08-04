@@ -14,12 +14,19 @@ void setInitialAlarm()
   // Manually set the RTC date and time
   //rtc.setTime(14, 58, 50, 0, 24, 6, 22); // hour, minutes, seconds, hundredths, day, month, year
 
-  // Set initial alarm
-  rtc.setAlarm(loggingStartTime, 0, 0, 0, 0, 0);
+  if (loggingMode == 1)
+  {
+    // Set initial alarm
+    rtc.setAlarm(loggingStartTime, 0, 0, 0, 0, 0);
+  }
+  else
+  {
+    // Set initial alarm
+    rtc.setAlarm(0, 0, 0, 0, 0, 0);
+  }
 
   // Set the alarm mode
-  //rtc.setAlarmMode(initialAlarmMode);
-  rtc.setAlarmMode(4); // Alarm match hundredths, seconds, minutes
+  rtc.setAlarmMode(initialAlarmMode);
 
   // Attach alarm interrupt
   rtc.attachInterrupt();
@@ -82,8 +89,7 @@ void setSleepAlarm()
     rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
     // Set RTC alarm mode
-    //rtc.setAlarmMode(sleepAlarmMode); // Alarm match on hundredths, seconds, minutes, hours
-    rtc.setAlarmMode(5); // Alarm match on hundredths, seconds,  minutes
+    rtc.setAlarmMode(sleepAlarmMode); // Alarm match on hundredths, seconds, minutes, hours
 
     // Clear alarm flag
     alarmFlag = false;
@@ -117,8 +123,7 @@ void setLoggingAlarm()
     rtc.setAlarm(loggingStopTime, 0, 0, 0, 0, 0);
 
     // Set RTC alarm mode
-    //rtc.setAlarmMode(loggingAlarmMode); // Alarm match on hundredths, seconds,  minutes, hours
-    rtc.setAlarmMode(4); // Alarm match on hundredths, seconds,  minutes, hours
+    rtc.setAlarmMode(loggingAlarmMode); // Alarm match on hundredths, seconds,  minutes, hours
   }
   else if (loggingMode == 2) // Rolling mode
   {
@@ -126,8 +131,7 @@ void setLoggingAlarm()
     rtc.setAlarm((rtc.hour + loggingAlarmHours) % 24, (rtc.minute + loggingAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
     // Set RTC alarm mode
-    //rtc.setAlarmMode(loggingAlarmMode);
-    rtc.setAlarmMode(5); // Alarm match on hundredths, seconds,  minutes
+    rtc.setAlarmMode(loggingAlarmMode);
   }
   else if (loggingMode == 3) // Continuous mode
   {
