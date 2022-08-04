@@ -12,6 +12,7 @@ void configureOled()
   }
   else
   {
+    lineTest();
     online.oled = true;
   }
 
@@ -56,7 +57,7 @@ void displayInitialize(char *device)
   {
     enablePullups();
     char displayBuffer[24];
-    sprintf(displayBuffer, "Initializing %s...", device);
+    sprintf(displayBuffer, "Initialize %s...", device);
     oled.erase();
     oled.text(0, 0, displayBuffer);
     oled.display();
@@ -99,6 +100,18 @@ void displayReattempt()
   }
 }
 
+void displaySetupComplete()
+{
+  if (online.oled)
+  {
+    enablePullups();
+    oled.erase();
+    oled.text(0, 0, "Setup complete!");
+    oled.display();
+    disablePullups();
+    myDelay(2000);
+  }
+}
 
 void displayLoggingMode()
 {
@@ -129,18 +142,6 @@ void displayLoggingMode()
   }
 }
 
-void displayRtcSync()
-{
-  if (online.oled)
-  {
-    enablePullups();
-    oled.erase();
-    oled.text(0, 0, "Syncing RTC...");
-    oled.display();
-    disablePullups();
-  }
-}
-
 void displayRtcSyncStatus()
 {
   if (online.oled)
@@ -148,22 +149,22 @@ void displayRtcSyncStatus()
     enablePullups();
     oled.erase();
     oled.setCursor(0, 0);
-    oled.print("Acquring GNSS fix...");
+    oled.print("Syncing RTC/GNSS...");
     oled.setCursor(0, 10);
-    oled.print("Sat: ");
-    oled.setCursor(36, 10);
+    oled.print("Sat:");
+    oled.setCursor(35, 10);
     oled.print(gnss.getSIV());
-    oled.setCursor(48, 10);
-    oled.print("Fix: ");
-    oled.setCursor(84, 10);
+    oled.setCursor(55, 10);
+    oled.print("Fix:");
+    oled.setCursor(90, 10);
     oled.print(gnss.getFixType());
     oled.setCursor(0, 20);
-    oled.print("Date: ");
-    oled.setCursor(36, 20);
+    oled.print("Date:");
+    oled.setCursor(35, 20);
     oled.print(gnss.getConfirmedDate());
-    oled.setCursor(48, 20);
-    oled.print("Time: ");
-    oled.setCursor(84, 20);
+    oled.setCursor(55, 20);
+    oled.print("Time:");
+    oled.setCursor(90, 20);
     oled.print(gnss.getConfirmedTime());
     oled.display();
     disablePullups();
@@ -185,25 +186,28 @@ void displayRtcFailure()
 
 void displayRtcOffset(long drift)
 {
-  if (online.oled)
+  if (online.oled && firstTimeFlag)
   {
     // Get current date and time
     getDateTime();
-
     enablePullups();
     oled.erase();
     oled.setCursor(0, 0);
-    oled.print(dateTimeBuffer);
+    oled.print("RTC sync success!");
     oled.setCursor(0, 10);
+    oled.print(dateTimeBuffer);
+    oled.display();
+    myDelay(4000);
+    oled.erase();
+    oled.setCursor(0, 0);
     oled.print("RTC drift (s): ");
-    oled.setCursor(0, 20);
+    oled.setCursor(0, 10);
     oled.print(drift);
     oled.display();
     disablePullups();
+    myDelay(2000);
   }
 }
-
-
 
 void displayErrorMicrosd1()
 {
@@ -301,4 +305,23 @@ void displayOn()
   {
     oled.displayPower(0);
   }
+}
+void lineTest(void)
+{
+  int width = oled.getWidth();
+  int height = oled.getHeight();
+
+  for (int i = 0; i < width; i += 6)
+  {
+    oled.line(0, 0, i, height - 1);
+    oled.display();
+  }
+  myDelay(2000);
+  oled.erase();
+  for (int i = width - 1; i >= 0; i -= 6)
+  {
+    oled.line(width - 1, 0, i, height - 1);
+    oled.display();
+  }
+  myDelay(2000);
 }

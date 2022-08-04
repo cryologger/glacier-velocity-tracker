@@ -30,9 +30,13 @@ void disablePullups()
 // Enter deep sleep
 void goToSleep()
 {
+  // Clear flag
+  firstTimeFlag = false;
+
   // Skip deep sleep if logging 24 hours/day
-  if (loggingMode == 3 && !sleepFlag)
+  if (loggingMode == 3)
   {
+    //alarmFlag = true; // Set flag
     return;
   }
   else

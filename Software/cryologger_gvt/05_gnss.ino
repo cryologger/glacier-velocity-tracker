@@ -11,7 +11,7 @@ void configureGnss()
     disablePullups();
 
     // Uncomment  line to enable GNSS debug messages on Serial
-    gnss.enableDebugging();
+    //gnss.enableDebugging();
 
     // Disable the "7F" check in checkUbloxI2C as RAWX data can legitimately contain 0x7F
     gnss.disableUBX7Fcheck();
@@ -75,24 +75,24 @@ void configureGnss()
     if (gnssConfigFlag)
     {
       /*
-      // Configure communciation interfaces
-      bool setValueSuccess = true;
-      setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);    // Enable I2C
-      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);    // Disable SPI
-      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 0);  // Disable UART1
-      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);  // Disable UART2
-      setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_USB_ENABLED, 1);   // Disable USB
-      if (!setValueSuccess)
-      {
+        // Configure communciation interfaces
+        bool setValueSuccess = true;
+        setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);    // Enable I2C
+        setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);    // Disable SPI
+        setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 0);  // Disable UART1
+        setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);  // Disable UART2
+        setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_USB_ENABLED, 1);   // Disable USB
+        if (!setValueSuccess)
+        {
         DEBUG_PRINTLN("Warning: Communication interfaces not configured!");
-      }
+        }
       */
       // Configure satellite signals
       bool setValueSuccess = true;
       setValueSuccess &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, 1);   // Enable GPS
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GLO_ENA, 1);   // Enable GLONASS
-      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 1);   // Enable Galileo
-      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, 1);   // Enable BeiDou
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 0);   // Enable Galileo
+      setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, 0);   // Enable BeiDou
       setValueSuccess &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_SBAS_ENA, 0);   // Disable SBAS
       setValueSuccess &= gnss.sendCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0); // Disable QZSS
       myDelay(2000);
@@ -104,13 +104,13 @@ void configureGnss()
       gnssConfigFlag = false; // Clear flag
 
       // Print current GNSS settings
-      printGnssSettings();
+      //printGnssSettings();
     }
 
     // Configure u-blox GNSS
     gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
     gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
-    gnss.setNavigationFrequency(1);                  // Produce X navigation solution(s) per second
+    gnss.setNavigationFrequency(1);                   // Produce 1 navigation solution(s) per second
     gnss.setAutoPVT(true);                            // Enable automatic NAV-PVT messages
     gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM-SFRBX messages
     gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM-RAWX messages
@@ -141,11 +141,9 @@ void syncRtc()
     // Clear flag
     rtcSyncFlag = false;
     rtcDrift = 0;
+    fixCounter = 0;
 
     DEBUG_PRINTLN("Info: Attempting to sync RTC with GNSS...");
-
-    // Display OLED message(s)
-    displayRtcSync();
 
     // Attempt to acquire a valid GNSS position fix for up to 5 minutes
     while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 60UL * 1000UL)
@@ -172,33 +170,39 @@ void syncRtc()
                 dateValidFlag, timeValidFlag);
         DEBUG_PRINTLN(gnssBuffer);
 
+        // Display OLED message(s)
         displayRtcSyncStatus();
 #endif
 
-        // Check if date and time are valid and synchronize RTC with GNSS
-        //if (fixType >= 2) // Debugging
+        // Check if date and time are valid 
         if (fixType >= 2 && dateValidFlag && timeValidFlag)
         {
-          unsigned long rtcEpoch = rtc.getEpoch();        // Get RTC epoch time
-          unsigned long gnssEpoch = gnss.getUnixEpoch();  // Get GNSS epoch time
-          rtc.setEpoch(gnssEpoch);                        // Set RTC date and time
-          rtcDrift = gnssEpoch - rtcEpoch;                // Calculate RTC drift
-          rtcSyncFlag = true;                             // Set flag
-
-          // Update logfile timestamp if more than 30 seconds of drift
-          if (abs(rtcDrift) > 30)
+          fixCounter++;
+          
+          // Collect a minimum number of valid positions before synchronizing RTC with GNSS
+          if (fixCounter >= 10)
           {
-            DEBUG_PRINTLN("Info: Updating logfile timestamp");
-            rtc.getTime(); // Get the RTC's date and time
-            getLogFileName(); // Update logfile timestamp
+            unsigned long rtcEpoch = rtc.getEpoch();        // Get RTC epoch time
+            unsigned long gnssEpoch = gnss.getUnixEpoch();  // Get GNSS epoch time
+            rtc.setEpoch(gnssEpoch);                        // Set RTC date and time
+            rtcDrift = gnssEpoch - rtcEpoch;                // Calculate RTC drift
+            rtcSyncFlag = true;                             // Set flag
+
+            // Update logfile timestamp if more than 30 seconds of drift
+            if (abs(rtcDrift) > 30)
+            {
+              DEBUG_PRINTLN("Info: Updating logfile timestamp");
+              rtc.getTime(); // Get the RTC's date and time
+              getLogFileName(); // Update logfile timestamp
+            }
+
+            DEBUG_PRINT("Info: RTC drift: "); DEBUG_PRINTLN(rtcDrift);
+            DEBUG_PRINT("Info: RTC time synced to "); printDateTime();
+
+            // Display OLED message(s)
+            displayRtcOffset(rtcDrift);
+            //blinkLed(4, 1000);
           }
-
-          DEBUG_PRINT("Info: RTC drift: "); DEBUG_PRINTLN(rtcDrift);
-          DEBUG_PRINT("Info: RTC time synced to "); printDateTime();
-
-          // Display OLED message(s)
-          displayRtcOffset(rtcDrift);
-          //blinkLed(4, 1000);
         }
       }
     }
@@ -318,7 +322,7 @@ void logGnss()
       }
 
       // Periodically print number of bytes written
-      if (millis() - previousMillis > 10000)
+      if (millis() - previousMillis > 5000)
       {
         // Sync the log file
         if (!logFile.sync())
@@ -344,7 +348,7 @@ void logGnss()
         if (online.oled && displayDebug)
         {
           // After a specified number of cycles put OLED to sleep (1.2 uA)
-          if (displayCounter >= 0)
+          if (displayCounter <= 30)
           {
             displayCounter++;
             if (!displayToggle)
