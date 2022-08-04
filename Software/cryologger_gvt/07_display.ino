@@ -38,7 +38,9 @@ void displayWelcome()
     oled.erase();
     oled.setCursor(0, 0);
     oled.print("Cryologger GVT #");
-    oled.print(CRYOLOGGER_ID);
+    oled.print(ID);
+    oled.print("_");
+    oled.print(UNIT);
     oled.setCursor(0, 10);
     oled.print(dateTimeBuffer);
     oled.setCursor(0, 20);
@@ -122,7 +124,13 @@ void displayLoggingMode()
     oled.text(0, 0, "Logging mode:");
     if (loggingMode == 1)
     {
-      oled.text(0, 10, "Daily");
+      oled.setCursor(0, 10);
+      oled.print("Daily");
+      oled.setCursor(0, 20);
+      oled.print("Start: ");
+      oled.print(loggingStartTime);
+      oled.print(" End: ");
+      oled.print(loggingStopTime);
     }
     else if (loggingMode == 2)
     {
@@ -138,7 +146,7 @@ void displayLoggingMode()
     }
     oled.display();
     disablePullups();
-    myDelay(4000);
+    myDelay(8000);
   }
 }
 
@@ -176,7 +184,7 @@ void displayRtcFailure()
   if (online.oled)
   {
     enablePullups();
-    //oled.erase();
+    oled.erase();
     oled.text(0, 0, "Warning: RTC sync failed!");
     oled.display();
     disablePullups();

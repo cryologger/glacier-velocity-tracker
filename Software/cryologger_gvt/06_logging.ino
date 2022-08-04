@@ -2,7 +2,7 @@
 void createDebugFile()
 {
   // Debug log file name
-  sprintf(debugFileName, "gvt_%d_debug.csv", CRYOLOGGER_ID);
+  sprintf(debugFileName, "%s_%d_debug.csv", ID, UNIT);
   
   // Create debug log file
   // O_CREAT - Create the file if it does not exist

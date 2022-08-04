@@ -16,6 +16,8 @@
     - SparkFun Qwiic OLED Arduino Library v1.0.5
     - SdFat v2.2.0
 
+    Comments:
+    - Code intended for deployment on Sydkap Glacier, Ellesmere Island, Nunavut
 */
 
 // ----------------------------------------------------------------------------
@@ -32,7 +34,8 @@
 // ----------------------------------------------------------------------------
 // Define unique identifier
 // ----------------------------------------------------------------------------
-#define CRYOLOGGER_ID 1
+char        ID[4] = "SYD";
+const int   UNIT  = 2;
 
 // -----------------------------------------------------------------------------
 // Debugging macros
@@ -86,8 +89,8 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 byte          loggingMode           = 1;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
-byte          loggingStartTime      = 18;   // Logging start hour (UTC)
-byte          loggingStopTime       = 19;   // Logging end hour (UTC)
+byte          loggingStartTime      = 17;   // Logging start hour (UTC)
+byte          loggingStopTime       = 20;   // Logging end hour (UTC)
 
 // Rolling alarm
 byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
@@ -188,7 +191,7 @@ void setup()
   configureOled();
 
   printLine();
-  DEBUG_PRINT("Cryologger Glacier Velocity Tracker #"); DEBUG_PRINTLN(CRYOLOGGER_ID);
+  DEBUG_PRINT("Cryologger Glacier Velocity Tracker #"); DEBUG_PRINTLN(UNIT);
   printLine();
   printDateTime(); // Print RTC's current date and time
   DEBUG_PRINT("Voltage: "); DEBUG_PRINTLN(readVoltage()); // Print battery voltage

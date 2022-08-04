@@ -180,7 +180,7 @@ void syncRtc()
           fixCounter++;
           
           // Collect a minimum number of valid positions before synchronizing RTC with GNSS
-          if (fixCounter >= 10)
+          if (fixCounter >= 5)
           {
             unsigned long rtcEpoch = rtc.getEpoch();        // Get RTC epoch time
             unsigned long gnssEpoch = gnss.getUnixEpoch();  // Get GNSS epoch time
@@ -227,8 +227,8 @@ void syncRtc()
 // Create timestamped log file name
 void getLogFileName()
 {
-  sprintf(logFileName, "GVT_%d_20%02d%02d%02d_%02d%02d%02d.ubx",
-          CRYOLOGGER_ID, rtc.year, rtc.month, rtc.dayOfMonth,
+  sprintf(logFileName, "%s_%d_20%02d%02d%02d_%02d%02d%02d.ubx",
+          ID, UNIT, rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 }
 
@@ -348,7 +348,7 @@ void logGnss()
         if (online.oled && displayDebug)
         {
           // After a specified number of cycles put OLED to sleep (1.2 uA)
-          if (displayCounter <= 30)
+          if (displayCounter <= 100)
           {
             displayCounter++;
             if (!displayToggle)
