@@ -1,3 +1,0 @@
-(sym_lib_table
-  (lib (name Cryologger_GVMS)(type Legacy)(uri "${KIPRJMOD}/Cryologger GVMS.lib")(options "")(descr ""))
-)
