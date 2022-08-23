@@ -76,8 +76,7 @@ void setSleepAlarm()
     rtc.setAlarm(loggingStartTime, 0, 0, 0, 0, 0);
 
     // Set RTC alarm mode
-    //rtc.setAlarmMode(sleepAlarmMode); // Alarm match on hundredths, seconds, minutes, hours
-    rtc.setAlarmMode(4); // Alarm match on hundredths, seconds, minutes, hours
+    rtc.setAlarmMode(sleepAlarmMode); // Alarm match
 
     // Clear alarm flag
     alarmFlag = false;
@@ -85,6 +84,7 @@ void setSleepAlarm()
   else if (loggingMode == 2) // Rolling mode
   {
     DEBUG_PRINTLN(F("Info: Setting rolling RTC alarm"));
+    
     // Set rolling RTC alarm
     rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
