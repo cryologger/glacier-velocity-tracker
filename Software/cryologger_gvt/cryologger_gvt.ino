@@ -34,8 +34,8 @@
 // ----------------------------------------------------------------------------
 // Define unique identifier
 // ----------------------------------------------------------------------------
-char        ID[4] = "SYD";
-const int   UNIT  = 2;
+char        ID[4] = "TST";
+const int   UNIT  = 1;
 
 // -----------------------------------------------------------------------------
 // Debugging macros
@@ -86,22 +86,22 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // 1: Daily logging (e.g., log 3 hours each day between 19:00-22:00)
 // 2: Rolling logging (e.g., log for 2 hours, sleep for 3, repeat)
 // 3: Continuous logging (e.g., new log file created each day at 00:00)
-byte          loggingMode           = 1;    // 1: daily, 2: rolling, 3: 24-hour
+byte          loggingMode           = 2;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
 byte          loggingStartTime      = 17;   // Logging start hour (UTC)
 byte          loggingStopTime       = 20;   // Logging end hour (UTC)
 
 // Rolling alarm
-byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
+byte          loggingAlarmMinutes   = 30;    // Rolling minutes alarm
 byte          loggingAlarmHours     = 0;    // Rolling hours alarm
-byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
+byte          sleepAlarmMinutes     = 30;    // Rolling minutes alarm
 byte          sleepAlarmHours       = 0;    // Rolling hours alarm
 
 // Manual alarm modes (debugging only)
-byte          loggingAlarmMode      = 4;    // Logging alarm mode
-byte          sleepAlarmMode        = 4;    // Sleep alarm mode
-byte          initialAlarmMode      = 4;    // Initial alarm mode
+byte          loggingAlarmMode      = 5;    // Logging alarm mode
+byte          sleepAlarmMode        = 5;    // Sleep alarm mode
+byte          initialAlarmMode      = 5;    // Initial alarm mode
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
