@@ -59,10 +59,8 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 #### 2.1.2 Carrier board
 A carrier board was designed to simplify assembly and deployment of the Cryologger GVT. It provides 5 mm, 2-pin screw terminals for wiring the battery connection, and an optional resistor divider to measure battery voltage.
 
-<p align="center"><img width="720" alt="image" src="https://user-images.githubusercontent.com/22924092/162819459-2b7ba31f-023a-456d-93b4-c77dd59353f6.png">
-</p>
+<p align="center"><img width="720" alt="image" src="https://user-images.githubusercontent.com/22924092/186201944-ff52a2b9-d714-46c5-bb36-c9115895dd63.png"></p>
 <p align="center"><b>Figure 5.</b> Open-source carrier board design.</p>
-
 
 #### 2.1.3 Mock-up
 ![L-Com v16](https://user-images.githubusercontent.com/22924092/113727907-9525be80-96c3-11eb-9db5-a16260b8cdfe.png)
