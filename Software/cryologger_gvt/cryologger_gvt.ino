@@ -1,7 +1,7 @@
 /*
     Title:    Cryologger - Glacier Velocity Tracker (GVT)
     Version:  2.1.2
-    Date:     August 23, 2022
+    Date:     September 1, 2022
     Author:   Adam Garbo
 
     Components:
@@ -74,7 +74,6 @@ APM3_WDT          wdt;
 SdFs              sd;
 FsFile            logFile;
 FsFile            debugFile;
-//QwiicMicroOLED    oled;       // I2C address: 0x3C
 QwiicNarrowOLED   oled;       // I2C address: 0x3C
 SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 

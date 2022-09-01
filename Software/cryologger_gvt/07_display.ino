@@ -38,6 +38,7 @@ void configureOled()
 void resetOled()
 {
 #if OLED
+  myDelay(4000);
   online.oled = true;
   enablePullups();
   oled.reset(1);
@@ -135,28 +136,37 @@ void displayLoggingMode()
   {
     enablePullups();
     oled.erase();
-    oled.text(0, 0, "Logging mode:");
+    oled.setCursor(0, 0);
+    oled.print("Log Mode: ");
     if (loggingMode == 1)
     {
-      oled.setCursor(0, 10);
+      char displayBuffer1[32];
+      char displayBuffer2[32];
+      sprintf(displayBuffer1, "Start time: %d:00", loggingStartTime);
+      sprintf(displayBuffer2, "End time: %d:00", loggingStopTime);
       oled.print("Daily");
-      oled.setCursor(0, 20);
-      oled.print("Start: ");
-      oled.print(loggingStartTime);
-      oled.print(" End: ");
-      oled.print(loggingStopTime);
+      oled.text(0, 10, displayBuffer1);
+      oled.text(0, 20, displayBuffer2);
     }
     else if (loggingMode == 2)
     {
-      oled.text(0, 10, "Rolling");
+      char displayBuffer1[32];
+      char displayBuffer2[32];
+      sprintf(displayBuffer1, "Log: %d hrs %d min", loggingAlarmHours, loggingAlarmMinutes);
+      sprintf(displayBuffer2, "Sleep: %d hrs %d min", sleepAlarmHours, sleepAlarmMinutes);
+
+      oled.print("Rolling");
+      oled.text(0, 10, displayBuffer1);
+      oled.text(0, 20, displayBuffer2);
+
     }
     else if (loggingMode == 3)
     {
-      oled.text(0, 10, "Continuous");
+      oled.print("Continuous");
     }
     else
     {
-      oled.text(0, 10, "Not specified!");
+      oled.print("Not specified!");
     }
     oled.display();
     disablePullups();
