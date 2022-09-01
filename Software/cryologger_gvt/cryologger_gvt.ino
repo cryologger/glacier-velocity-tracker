@@ -35,7 +35,7 @@
 // Define unique identifier
 // ----------------------------------------------------------------------------
 char        ID[4] = "LWL";
-const int   UNIT  = 3;
+const int   UNIT  = 4;
 
 // -----------------------------------------------------------------------------
 // Debugging macros
@@ -88,8 +88,8 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 byte          loggingMode           = 1;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
-byte          loggingStartTime      = 17;   // Logging start hour (UTC)
-byte          loggingStopTime       = 20;   // Logging end hour (UTC)
+byte          loggingStartTime      = 19;   // Logging start hour (UTC)
+byte          loggingStopTime       = 22;   // Logging end hour (UTC)
 
 // Rolling alarm
 byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
