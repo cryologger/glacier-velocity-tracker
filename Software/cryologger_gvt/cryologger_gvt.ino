@@ -1,6 +1,6 @@
 /*
     Title:    Cryologger - Glacier Velocity Tracker (GVT)
-    Version:  2.1.3
+    Version:  2.1.2
     Date:     September 1, 2022
     Author:   Adam Garbo
 
@@ -17,7 +17,7 @@
     - SdFat v2.2.0
 
     Comments:
-    - Code intended for deployments on Lowell Glacier, Yukon
+    - Code intended for deployment on Lowell Glacier, Yukon
 */
 
 // ----------------------------------------------------------------------------
