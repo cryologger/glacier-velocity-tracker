@@ -45,14 +45,15 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 | Resistor | [10Mohm 1% 50ppm MBB02070C1005FRP00](https://octopart.com/mbb02070c1005frp00-vishay-42881138?r=sp) | 1 |	$0.33 |
 | Capacitor | [0.1 uF K104K15X7RF53L2](https://octopart.com/k104k15x7rf53l2-vishay-39696446?r=sp) | 1 | $0.23 |
 | Power Connector	| [PCB terminal block - MKDS 1,5/ 2-5,08 1715721](https://octopart.com/1715721-phoenix+contact-12533?r=sp) | 1 | $1.55 |
-| Female Header | [0.100" (2.54 mm) Female Header: 1x2-Pin, Straight (optional)](https://www.pololu.com/product/1012) | 1 | $0.39 |
-| Female Header | [0.100" (2.54 mm) Female Header: 1x4-Pin, Straight (optional)](https://www.pololu.com/product/1014) | 1 | $0.53 |
-| Female Header | [0.100" (2.54 mm) Female Header: 1x6-Pin, Straight (optional)](https://www.pololu.com/product/1016) | 1 | $0.66 |
-| Female Header | [0.100" (2.54 mm) Female Header: 1x9-Pin, Straight (optional)](https://www.pololu.com/product/1019) | 2 | $0.85 |
-| Female Header | [0.100" (2.54 mm) Female Header: 1x10-Pin, Straight (optional)](https://www.pololu.com/product/1020) | 1 | $0.46 |
-| Female Header | [0.100" (2.54 mm) Female Header: 1x12-Pin, Straight (optional)](https://www.pololu.com/product/1030) | 1 | $0.55 |
-| Standoff | [Standoff - Nylon (4-40; 3/4"; 10 pack)](https://www.sparkfun.com/products/11796) | 1 | $4.50 |
-| Screw | [Screw - Phillips Head (1/4", 4-40, 10 pack)](https://www.sparkfun.com/products/10453) | 1 | $1.60 |
+| Male Header | [SparkFun Break Away Headers - Straight](https://www.sparkfun.com/products/116) | 2 | $3.10 |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x2-Pin, Straight (optional)](https://www.pololu.com/product/1012) | 1 | $0.39 |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x4-Pin, Straight (optional)](https://www.pololu.com/product/1014) | 1 | $0.53 |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x6-Pin, Straight (optional)](https://www.pololu.com/product/1016) | 1 | $0.66 |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x9-Pin, Straight (optional)](https://www.pololu.com/product/1019) | 2 | $0.85 |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x10-Pin, Straight (optional)](https://www.pololu.com/product/1020) | 1 | $0.46 |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x12-Pin, Straight (optional)](https://www.pololu.com/product/1030) | 1 | $0.55 |
+| Standoff | [SparkFun Standoff - Nylon (4-40; 3/4"; 10 pack)](https://www.sparkfun.com/products/11796) | 1 | $4.50 |
+| Screw | [SparkFun Screw - Phillips Head (1/4", 4-40, 10 pack)](https://www.sparkfun.com/products/10453) | 1 | $1.60 |
 | Electronics Enclosure | Hammond Manufacturing 1554HL2GYCL | 1 | $17.51 | 
 | | | **Total** | |
 
@@ -62,15 +63,16 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 | Solar Panel | [Ameresco Solar 20 Watt Solar Panel 20J](https://www.amerescosolar.com/20j-ameresco-solar-20-watt-solar-panel) | 1 |  $99.00 |
 | Solar Panel Bracket | [Ameresco Solar HPM18-30 Solar Panel Pole Mount (optional)](https://www.amerescosolar.com/hpm18-30solar-panel-pole-mount) | 1 |  $39.00 |
 | Charge Controller | [Genasun GV-4 4A MPPT Solar Charge Controller](https://www.altestore.com/store/charge-controllers/solar-charge-controllers/mppt-solar-charge-controllers/genasun-gv-4-pb-12v-4a-mppt-controller-for-12v-lead-acid-batteries-p10622/) | 1 |  $63.00 |
-| Battery | Deka SOLAR Gel 48 Ah 8G40C | |  $150.00 |
-| Enclosure | L-Com 14x12x7 Inch Weatherproof NEMA Enclosure | 1 |  $118.00 |
-| Enclosure Panel | L-Com Blank Aluminum Mounting Plate | 1 |  $30.00 |
-| Pole Mount | L-Com Enclosure Pole Mounting Kit | 1 | $53.30 |
-| Tripod | Onset HOBO Weather Station m 3m Tripod | 1 |  $200.00 | 
+| Power Cable | Polar Wire | | |
+| Battery | Deka SOLAR Gel 48 Ah 8G40C | 1 |  $150.00 |
+| Enclosure | [L-Com 14x12x7 Inch Weatherproof NEMA Enclosure](https://www.l-com.com/nema-enclosures-14x12x7-inch-weatherproof-nema-enclosure-only) | 1 |  $161.99 |
+| Enclosure Panel | [L-Com Blank Aluminum Mounting Plate](https://www.l-com.com/nema-enclosures-blank-aluminum-mounting-plate-for-1412xx-series-enclosures) | 1 |  $32.39 |
+| Pole Mount | [L-Com Enclosure Pole Mounting Kit](https://www.l-com.com/nema-enclosures-enclosure-pole-mounting-kit-pole-diameters-1-1-4-to-2-inches) | 1 | $75.99 |
+| Tripod | [Onset HOBO Weather Station m 3m Tripod M-TPA](https://www.onsetcomp.com/products/mounting/m-tpa/) | 1 |  $200.00 | 
 | | | **Total** | |
 
 #### 2.1.2 Carrier board
-A carrier board was designed to simplify assembly and deployment of the Cryologger GVT. It provides 5 mm, 2-pin screw terminals for wiring the battery connection, and an optional resistor divider to measure battery voltage.
+A carrier board was designed to simplify assembly and deployment of the Cryologger GVT. It provides 5.08 mm, 2-pin screw terminals for wiring the battery connection, and a resistor divider to measure battery voltage.
 
 <p align="center"><img width="720" alt="image" src="https://user-images.githubusercontent.com/22924092/186201944-ff52a2b9-d714-46c5-bb36-c9115895dd63.png"></p>
 <p align="center"><b>Figure 5.</b> Open-source carrier board design.</p>
