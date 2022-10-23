@@ -5,7 +5,7 @@
 </p>
 
 
-# Cryologger - Glacier Velocity Tracker
+# Cryologger - Glacier Velocity Tracker (GVT)
 
 ![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Photos/DSC_6546.JPG)
 
@@ -28,33 +28,46 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 
 #### 2.1.1 Bill of materials 
 
-**Table 1.** Components making up the glacier velocity tracker.
+**Table 1.** Components making up the Cryologger glacier velocity tracker v2.21. Prices current as of October 23, 2022.
+| Component | Product | Quantity | Cost (USD) |
+| --- | --- | :---: | :---: |
+| PCB | [Custom Cryologger Printed Circuit Board](https://jlcpcb.com) | 1 | $5.00 | 
+| Processor | [SparkFun MicroMod Artemis Processor](https://www.sparkfun.com/products/16401) | 1 | $14.95 | 
+| Carrier Board | [SparkFun MicroMod Data Logging Carrier Board](https://www.sparkfun.com/products/16829) | 1 | $21.50 | 
+| GNSS Receiver | [SparkFun GPS-RTK-SMA Breakout - ZED-F9P](https://www.sparkfun.com/products/16481) | 1 | $274.95 | 
+| GNSS Antenna | [SparkFun GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106](https://www.sparkfun.com/products/17751) | 1 | $133.95 | 
+| Display | [SparkFun Qwiic OLED Display](https://www.sparkfun.com/products/17153) | 1 | $10.95 | 
+| GNSS Antenna Cable | [SparkFun Interface Cable - SMA Female to SMA Male (25cm)](https://www.sparkfun.com/products/12861) | 1 | $5.50 |
+| GNSS Antenna Cable | [SparkFun Interface Cable - SMA Male to TNC Male (300mm)](https://www.sparkfun.com/products/17833) | 1 |	$10.95 | 
+| Voltage Regulator | [Pololu 5V, 600mA Step-Down Voltage Regulator D36V6F5](https://www.pololu.com/product/3792) | 1 | $9.95 |
+| microSD Card| [SanDisk MAX Endurance 64 GB microSD](https://www.amazon.com/SanDisk-Endurance-microSDXC-Adapter-Security/dp/B084CJ96GT) | 1 | $17.99 | 
+| Resistor | [1 Mohms 1% MBB02070C1004FRP00](https://octopart.com/mbb02070c1004frp00-vishay-42819429?r=sp) | 1 | $0.30 |
+| Resistor | [10Mohm 1% 50ppm MBB02070C1005FRP00](https://octopart.com/mbb02070c1005frp00-vishay-42881138?r=sp) | 1 |	$0.33 |
+| Capacitor | [0.1 uF K104K15X7RF53L2](https://octopart.com/k104k15x7rf53l2-vishay-39696446?r=sp) | 1 | $0.23 |
+| Power Connector	| [PCB terminal block - MKDS 1,5/ 2-5,08 1715721](https://octopart.com/1715721-phoenix+contact-12533?r=sp) | 1 | $1.55 |
+| Female Header | [0.100" (2.54 mm) Female Header: 1x2-Pin, Straight (optional)](https://www.pololu.com/product/1012) | 1 | $0.39 |
+| Female Header | [0.100" (2.54 mm) Female Header: 1x4-Pin, Straight (optional)](https://www.pololu.com/product/1014) | 1 | $0.53 |
+| Female Header | [0.100" (2.54 mm) Female Header: 1x6-Pin, Straight (optional)](https://www.pololu.com/product/1016) | 1 | $0.66 |
+| Female Header | [0.100" (2.54 mm) Female Header: 1x9-Pin, Straight (optional)](https://www.pololu.com/product/1019) | 2 | $0.85 |
+| Female Header | [0.100" (2.54 mm) Female Header: 1x10-Pin, Straight (optional)](https://www.pololu.com/product/1020) | 1 | $0.46 |
+| Female Header | [0.100" (2.54 mm) Female Header: 1x12-Pin, Straight (optional)](https://www.pololu.com/product/1030) | 1 | $0.55 |
+| Standoff | [Standoff - Nylon (4-40; 3/4"; 10 pack)](https://www.sparkfun.com/products/11796) | 1 | $4.50 |
+| Screw | [Screw - Phillips Head (1/4", 4-40, 10 pack)](https://www.sparkfun.com/products/10453) | 1 | $1.60 |
+| Electronics Enclosure | Hammond Manufacturing 1554HL2GYCL | 1 | $17.51 | 
+| | | **Total** | |
 
-| Component | Product | Cost (USD) | 
-| --- | --- | :---: | 
-| Processor | SparkFun MicroMod Artemis Processor | $14.95 | 
-| Carrier Board | SparkFun MicroMod Data Logging Carrier Board | $19.95 | 
-| GNSS Receiver | SparkFun GPS-RTK-SMA Breakout - ZED-F9P | $219.95 | 
-| GNSS Antenna | SparkFun GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106 | $124.95 | 
-| GNSS Antenna Cable |	SparkFun Interface Cable - SMA Female to SMA Male (25cm) | $5.50 |
-| GNSS Antenna Cable |	SparkFun Interface Cable - SMA Male to TNC Male (300mm) | $10.95 | 
-| Voltage Regulator | Pololu 5V, 600mA Step-Down Voltage Regulator D36V6F5 | $4.95 |
-| microSD Card| SanDisk MAX Endurance 64 GB microSD | $20.00 | 
-| Resistor |	1 Mohms 1% MBB02070C1004FRP00 | $0.25 |
-| Resistor |	10Mohm 1% 50ppm MBB02070C1005FRP00 | $0.25 |
-| Capacitor | 0.1 uF K104K15X7RF53L2 | $0.25 | 
-| Power Connector	| Phoenix Contact MSTB 2,5/ 2-ST-5,08 - 1757019 | $0.71 | 
-| Power Connector	| Phoenix Contact MSTBA 2,5/ 2-G-5,08 - 1757242 | $2.21 | 
-| Electronics Enclosure | Hammond Manufacturing 1554HL2GYCL | $17.51 | 
-| Solar Panel | Ameresco Solar 20 Watt Solar Panel 20J | $99.00 |
-| Solar Panel Bracket | Ameresco Solar HPM18-30 Solar Panel Pole Mount (optional) | $39.00 |
-| Charge Controller | Genasun GV-5 65W 5A Solar charge controller with MPPT  | $68.00 |
-| Battery | Deka SOLAR Gel 48 Ah 8G40C | $150.00 |
-| Enclosure | L-Com 14x12x7 Inch Weatherproof NEMA Enclosure | $118.00 |
-| Enclosure Panel | L-Com Blank Aluminum Mounting Plate | $30.00 |
-| Pole Mount | L-Com Enclosure Pole Mounting Kit | $53.30 |
-| Tripod | Onset HOBO Weather Station m 3m Tripod |  $200.00 | 
-
+**Table 2.** Components making up the mounting and power systems for the Cryologger GVT. Denotes educational pricing
+| Component | Product | Quantity | Cost (USD) | 
+| --- | --- | :---: | :---: | 
+| Solar Panel | [Ameresco Solar 20 Watt Solar Panel 20J](https://www.amerescosolar.com/20j-ameresco-solar-20-watt-solar-panel) | 1 |  $99.00 |
+| Solar Panel Bracket | [Ameresco Solar HPM18-30 Solar Panel Pole Mount (optional)](https://www.amerescosolar.com/hpm18-30solar-panel-pole-mount) | 1 |  $39.00 |
+| Charge Controller | [Genasun GV-4 4A MPPT Solar Charge Controller](https://www.altestore.com/store/charge-controllers/solar-charge-controllers/mppt-solar-charge-controllers/genasun-gv-4-pb-12v-4a-mppt-controller-for-12v-lead-acid-batteries-p10622/) | 1 |  $63.00 |
+| Battery | Deka SOLAR Gel 48 Ah 8G40C | |  $150.00 |
+| Enclosure | L-Com 14x12x7 Inch Weatherproof NEMA Enclosure | 1 |  $118.00 |
+| Enclosure Panel | L-Com Blank Aluminum Mounting Plate | 1 |  $30.00 |
+| Pole Mount | L-Com Enclosure Pole Mounting Kit | 1 | $53.30 |
+| Tripod | Onset HOBO Weather Station m 3m Tripod | 1 |  $200.00 | 
+| | | **Total** | |
 
 #### 2.1.2 Carrier board
 A carrier board was designed to simplify assembly and deployment of the Cryologger GVT. It provides 5 mm, 2-pin screw terminals for wiring the battery connection, and an optional resistor divider to measure battery voltage.
