@@ -28,7 +28,7 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 
 #### 2.1.1 Bill of materials 
 
-**Table 1.** Components making up the Cryologger glacier velocity tracker v2.21. Prices current as of October 23, 2022.
+**Table 1.** Components making up version 2.0 of the Cryologger GVT. Prices current as of October, 2022 and do not include taxes and/or shipping. <sup>1</sup>Denotes optional component.
 | Component | Product | Quantity | Cost (USD) |
 | --- | --- | :---: | :---: |
 | PCB | [Custom Cryologger Printed Circuit Board](https://jlcpcb.com) | 1 | $5.00 | 
@@ -46,30 +46,38 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 | Capacitor | [0.1 uF K104K15X7RF53L2](https://octopart.com/k104k15x7rf53l2-vishay-39696446?r=sp) | 1 | $0.23 |
 | Power Connector	| [PCB terminal block - MKDS 1,5/ 2-5,08 1715721](https://octopart.com/1715721-phoenix+contact-12533?r=sp) | 1 | $1.55 |
 | Male Header | [SparkFun Break Away Headers - Straight](https://www.sparkfun.com/products/116) | 2 | $3.10 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x2-Pin, Straight (optional)](https://www.pololu.com/product/1012) | 1 | $0.39 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x4-Pin, Straight (optional)](https://www.pololu.com/product/1014) | 1 | $0.53 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x6-Pin, Straight (optional)](https://www.pololu.com/product/1016) | 1 | $0.66 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x9-Pin, Straight (optional)](https://www.pololu.com/product/1019) | 2 | $0.85 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x10-Pin, Straight (optional)](https://www.pololu.com/product/1020) | 1 | $0.46 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x12-Pin, Straight (optional)](https://www.pololu.com/product/1030) | 1 | $0.55 |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x2-Pin, Straight<sup>1</sup>](https://www.pololu.com/product/1012) | 1 | $0.39 |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x4-Pin, Straight<sup>1</sup>](https://www.pololu.com/product/1014) | 1 | $0.53 |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x6-Pin, Straight<sup>1</sup>](https://www.pololu.com/product/1016) | 1 | $0.66 |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x9-Pin, Straight<sup>1</sup>](https://www.pololu.com/product/1019) | 2 | $0.85 |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x10-Pin, Straight<sup>1</sup>](https://www.pololu.com/product/1020) | 1 | $0.46 |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x12-Pin, Straight<sup>1</sup>](https://www.pololu.com/product/1030) | 1 | $0.55 |
 | Standoff | [SparkFun Standoff - Nylon (4-40; 3/4"; 10 pack)](https://www.sparkfun.com/products/11796) | 1 | $4.50 |
 | Screw | [SparkFun Screw - Phillips Head (1/4", 4-40, 10 pack)](https://www.sparkfun.com/products/10453) | 1 | $1.60 |
-| Electronics Enclosure | Hammond Manufacturing 1554HL2GYCL | 1 | $17.51 | 
-| | | **Total** | |
+| Enclosure | [Hammond Manufacturing 1554Q2GYCL](https://octopart.com/1554q2gycl-hammond-99088964?r=sp) | 1 | $28.50 |
+| Enclosure Inner Panel | [Hammond Manufacturing 1554QPL](https://octopart.com/1554qpl-hammond-97562074?r=sp) | 1 | $9.00 |
+| Power Panel Mount Connector | Bulgin<sup>1</sup> | 1 | $25.00 |
+| Power Cable Connector | Bulgin<sup>1</sup> | 1 | $25.00 |
+| Battery Ring Terminal | [Molex Perma-Seal Ring Terminal 14-16 AWG Wire 1/4" (M6) 19164-0026](https://octopart.com/19164-0026-molex-99569?r=sp) | 2 | $1.00 |
+| | | **Total** | **~$600** |
 
-**Table 2.** Components making up the mounting and power systems for the Cryologger GVT. Denotes educational pricing
+**Table 2.** Components making up the enclosure, mounting and power systems for Cryologger GVT version 2.0. <sup>1</sup>Denotes optional component. <sup>2</sup>Denotes educational pricing.
 | Component | Product | Quantity | Cost (USD) | 
 | --- | --- | :---: | :---: | 
-| Solar Panel | [Ameresco Solar 20 Watt Solar Panel 20J](https://www.amerescosolar.com/20j-ameresco-solar-20-watt-solar-panel) | 1 |  $99.00 |
-| Solar Panel Bracket | [Ameresco Solar HPM18-30 Solar Panel Pole Mount (optional)](https://www.amerescosolar.com/hpm18-30solar-panel-pole-mount) | 1 |  $39.00 |
-| Charge Controller | [Genasun GV-4 4A MPPT Solar Charge Controller](https://www.altestore.com/store/charge-controllers/solar-charge-controllers/mppt-solar-charge-controllers/genasun-gv-4-pb-12v-4a-mppt-controller-for-12v-lead-acid-batteries-p10622/) | 1 |  $63.00 |
-| Power Cable | Polar Wire | | |
-| Battery | Deka SOLAR Gel 48 Ah 8G40C | 1 |  $150.00 |
+| Solar Panel | [Ameresco Solar 20 Watt Solar Panel 20J<sup>2</sup>](https://www.amerescosolar.com/20j-ameresco-solar-20-watt-solar-panel) | 1 |  $99.00 |
+| Solar Panel Bracket | [Ameresco Solar HPM18-30 Solar Panel Pole Mount<sup>2</sup>](https://www.amerescosolar.com/hpm18-30solar-panel-pole-mount) | 1 |  $39.00 
+| Solar Charge Controller | [Genasun GV-4 4A MPPT Solar Charge Controller](https://www.altestore.com/store/charge-controllers/solar-charge-controllers/mppt-solar-charge-controllers/genasun-gv-4-pb-12v-4a-mppt-controller-for-12v-lead-acid-batteries-p10622/) | 1 |  $63.00 |
+| Power Cable | [Polarwire Arctic Ultraflex Blue Twin Trailer Cable AUF-TC162](https://store.polarwire.com/arctic-trailer-cable-16-2-gray-16ga-2-conductors/) | Variable | $0.55/ft |
+| Cable Gland | [Heyco M4340 M20 Cable Gland](https://octopart.com/m4340-heyco-2298364?r=sp) | 2 | $5.94 |
+| Battery Ring Terminal | [Molex Perma-Seal Ring Terminal 14-16 AWG Wire 1/4" (M6) 19164-0026](https://octopart.com/19164-0026-molex-99569?r=sp) | 2 | $1.00 |
+| Battery | Deka SOLAR Gel 48 Ah 8G40C | 1 | ~$150.00 |
+| Antenna Bulkhead Adapter | [Amphenol TNC Jk to TNC Jk 50 Ohm Str Bkhd IP67 AD-TNCJTNCJ-1](https://octopart.com/ad-tncjtncj-1-amphenol+rf-108109770?r=sp) | 1 | $42.79 |
+| Antenna Cable | [GPAC GPS Antenna Cable TNC to Right Angle TNC (3 m)](https://www.gpac-llc.com/product.php?product=10) | 1 | $83.00 |
 | Enclosure | [L-Com 14x12x7 Inch Weatherproof NEMA Enclosure](https://www.l-com.com/nema-enclosures-14x12x7-inch-weatherproof-nema-enclosure-only) | 1 |  $161.99 |
 | Enclosure Panel | [L-Com Blank Aluminum Mounting Plate](https://www.l-com.com/nema-enclosures-blank-aluminum-mounting-plate-for-1412xx-series-enclosures) | 1 |  $32.39 |
 | Pole Mount | [L-Com Enclosure Pole Mounting Kit](https://www.l-com.com/nema-enclosures-enclosure-pole-mounting-kit-pole-diameters-1-1-4-to-2-inches) | 1 | $75.99 |
 | Tripod | [Onset HOBO Weather Station m 3m Tripod M-TPA](https://www.onsetcomp.com/products/mounting/m-tpa/) | 1 |  $200.00 | 
-| | | **Total** | |
+| | | **Total** | **~$1,000** |
 
 #### 2.1.2 Carrier board
 A carrier board was designed to simplify assembly and deployment of the Cryologger GVT. It provides 5.08 mm, 2-pin screw terminals for wiring the battery connection, and a resistor divider to measure battery voltage.
@@ -86,18 +94,27 @@ The system is programmed to wake daily and log UBX RAWX/SFRBX messages at 1 Hz f
 
 ### 2.3 Operation
 
-When initially powered on, the system will attempt to establish a GNSS fix and sychronize the real-time clock (RTC) of the MicroMod Artemis Processor for up to 5 minutes. During this time, the LED will blink once a second. Once the RTC is synchronized, the system will set an alarm to wake at the user-specified time and then enter a low-power deep sleep. 
+When initially powered on, the system will attempt to establish a GNSS fix and sychronize the real-time clock (RTC) of the MicroMod Artemis Processor for up to 5 minutes. Once the RTC is synchronized, the system will set an alarm to wake at the user-specified time and then enter a low-power deep sleep. 
 
 While the system is in deep sleep, the Watchdog Timer (WDT) will wake the system to check the program has not frozen once every 10 seconds. The LED will blink briefly (100 ms) during this time. 
 
+#### 2.3.1 OLED Display Messages
+Version 2.x of the Cryologger GVT is equipped with an OLED display, which is used to provided detailed messages to the end user. These messages will indicate the status of the Cryologger at each stage of system operation, including booting up, initializing of components, acquring of GNSS fix, and logging of data. 
 
-#### 2.3.1 LED Blink Patterns
-* 10 seconds between LED blink - Watchdog interrupt. System is in deep sleep.
-* 1 second between LED blinks - Attempting to synchronize real-time clock with u-blox receiver.
-* 10 quick LED blinks - RTC synchronized with u-blox receiver. Configuration complete.
-* Sets of 2 LED blinks - Unable to initialize microSD card
-* Sets of 3 LED blinks - Unable to initialize u-blox receiver
-* Periodic fast LED blinks - Logging data to microSD card
+#### 2.3.2 LED Blink Patterns
+In addition to the OLED display messages, a series of LED blink patterns is also used to indicate system operation. The following table can be used to determine the status of the system, as well as any possible troubleshooting steps that should be attempted if an error is encountered.
+
+**Table 1.** LED blink patterns, associated description and troubleshooting guide.
+| Number | Interval (s)  |   Pattern   | Description                     | Troubleshooting Steps                                 |
+|:------:|:-------------:|:-----------:|---------------------------------|-------------------------------------------------------|
+|    1   |      10       |   Single    | System is in deep sleep         | None                                                  |
+|   10   |      0.1      |   Single    | Initialization complete         | None                                                  | 
+|    2   |      2        |   Repeating | microSD failure                 | Reseat microSD card and reboot system                 |
+|    3   |      2        |   Repeating | GNSS receiver failure           | Ensure components are firmly seated and reboot system |
+|    1   |      1        |   Single    | GNSS signal acquisition         | None                                                  |
+|    5   |      1        |   Single    | GNSS fix found & RTC synced     | None                                                  |
+|    5   |      0.5      |   Single    | GNSS fix not found              | Ensure antenna cables are connected and reboot system |
+| Random |      Random   |   Random    | Logging data to microSD card    | None                                                  |
 
 ### 2.4 Data Processing
 Data is logged in u-blox's proprietary .ubx format. Log files can be converted to RINEX using RTKLIB or Emlid Studio and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
