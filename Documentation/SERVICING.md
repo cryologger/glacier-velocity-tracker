@@ -52,7 +52,7 @@ While the system is in deep sleep, the system will wake to check the program has
 Please use the following table to determine the status of the operation of the system and possible troubleshooting steps to attempt.
 
 **Table 1.** LED blink patterns and associated description and troubleshooting guide.
-| Number | Interval (s)  |   Pattern   | Description                     | Troubleshooting Steps                                 |
+| Blinks | Interval (s)  |   Pattern   | Description                     | Troubleshooting Steps                                 |
 |:------:|:-------------:|:-----------:|---------------------------------|-------------------------------------------------------|
 |    1   |      10       |   Single    | System is in deep sleep         | None                                                  |
 |   10   |      0.1      |   Single    | Initialization complete         | None                                                  | 
