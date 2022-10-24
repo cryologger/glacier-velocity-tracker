@@ -105,7 +105,7 @@ Version 2.x of the Cryologger GVT is equipped with an OLED display, which is use
 In addition to the OLED display messages, a series of LED blink patterns is also used to indicate system operation. The following table can be used to determine the status of the system, as well as any possible troubleshooting steps that should be attempted if an error is encountered.
 
 **Table 1.** LED blink patterns, associated description and troubleshooting guide.
-| Number | Interval (s)  |   Pattern   | Description                     | Troubleshooting Steps                                 |
+| Blinks | Interval (s)  |   Pattern   | Description                     | Troubleshooting Steps                                 |
 |:------:|:-------------:|:-----------:|---------------------------------|-------------------------------------------------------|
 |    1   |      10       |   Single    | System is in deep sleep         | None                                                  |
 |   10   |      0.1      |   Single    | Initialization complete         | None                                                  | 
