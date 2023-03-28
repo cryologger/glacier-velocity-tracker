@@ -13,9 +13,6 @@ void configureGnss()
     // Uncomment  line to enable GNSS debug messages on Serial
     //gnss.enableDebugging();
 
-    // Disable the "7F" check in checkUbloxI2C as RAWX data can legitimately contain 0x7F
-    gnss.disableUBX7Fcheck();
-
     // Allocate sufficient RAM to store RAWX messages (>2 KB)
     gnss.setFileBufferSize(fileBufferSize); // Must be called before gnss.begin()
 

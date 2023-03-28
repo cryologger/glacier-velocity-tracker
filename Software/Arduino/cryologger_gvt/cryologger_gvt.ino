@@ -1,7 +1,7 @@
 /*
     Title:    Cryologger - Glacier Velocity Tracker (GVT)
-    Version:  2.1.2
-    Date:     September 1, 2022
+    Version:  2.2
+    Date:     March 28, 2023
     Author:   Adam Garbo
 
     Components:
@@ -9,6 +9,8 @@
     - SparkFun MicroMod Data Logging Carrier Board
     - SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic)
     - Pololu 5V 600mA Step-Down Voltage Regulator D36V6F5
+    - RFD900x serial telemetry radio
+    - RockBLOCK 9603
 
     Dependencies:
     - Apollo3 Core v1.2.3
@@ -17,16 +19,16 @@
     - SdFat v2.2.0
 
     Comments:
-    - Code intended for deployment on Lowell Glacier, Yukon
+    - Code intended for deployment in Arctic Bay
 */
 
 // ----------------------------------------------------------------------------
 // Libraries
 // ----------------------------------------------------------------------------
 #include <RTC.h>
-#include <SdFat.h>                                // https://github.com/greiman/SdFat
-#include <SparkFun_Qwiic_OLED.h>                  // https://github.com/sparkfun/SparkFun_Qwiic_OLED_Arduino_Library
-#include <SparkFun_u-blox_GNSS_Arduino_Library.h> // https://github.com/sparkfun/SparkFun_u-blox_GNSS_Arduino_Library
+#include <SdFat.h>                    // http://librarymanager/All#SdFat
+#include <SparkFun_Qwiic_OLED.h>      // http://librarymanager/All#SparkFun_Qwiic_OLED_Arduino_Library
+#include <SparkFun_u-blox_GNSS_v3.h>  // http://librarymanager/All#SparkFun_u-blox_GNSS_v3
 #include <SPI.h>
 #include <WDT.h>
 #include <Wire.h>
@@ -34,8 +36,8 @@
 // ----------------------------------------------------------------------------
 // Define unique identifier
 // ----------------------------------------------------------------------------
-char        ID[4] = "LWL";
-const int   UNIT  = 4;
+char        ID[5] = "TST";
+const int   UNIT  = 1;
 
 // -----------------------------------------------------------------------------
 // Debugging macros
@@ -88,8 +90,8 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 byte          loggingMode           = 1;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
-byte          loggingStartTime      = 19;   // Logging start hour (UTC)
-byte          loggingStopTime       = 22;   // Logging end hour (UTC)
+byte          loggingStartTime      = 17;   // Logging start hour (UTC)
+byte          loggingStopTime       = 20;   // Logging end hour (UTC)
 
 // Rolling alarm
 byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
