@@ -14,7 +14,7 @@
 
     Dependencies:
     - Apollo3 Core v1.2.3
-    - SparkFun u-blox GNSS Arduino Library v2.2.13
+    - SparkFun u-blox GNSS v3 v3.0.6
     - SparkFun Qwiic OLED Arduino Library v1.0.5
     - SdFat v2.2.0
 
