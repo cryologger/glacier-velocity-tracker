@@ -7,7 +7,7 @@
 
 # Cryologger - Glacier Velocity Tracker (GVT)
 
-![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Photos/DSC_6546.JPG)
+![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Images/DSC_6546.JPG)
 
 ## 1.0 Introduction
 The Cryologger glacier velocity tracker (GVT) is a low-cost, open-source multi-frequency GNSS receiver and data logger designed to measure the daily displacement and annual velocities of glaciers in the Canadian Arctic. It is based on the u-blox ZED-F9P GNSS receiver and powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board.
