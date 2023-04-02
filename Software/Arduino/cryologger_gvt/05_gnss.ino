@@ -22,7 +22,7 @@ void configureGnss()
     // Initialize u-blox GNSS
     if (!gnss.begin())
     {
-      // Display OLED messages(s)s(s)
+      // Display OLED messages(s)
       displayFailure();
 
       DEBUG_PRINTLN("Warning - u-blox failed to initialize. Reattempting...");
@@ -36,7 +36,7 @@ void configureGnss()
         online.gnss = false;
         logDebug(); // Log system debug information
 
-        // Display OLED messages(s)s(s)
+        // Display OLED messages(s)
         displayFailure();
 
         // Disable power to Qwiic connector
@@ -50,7 +50,7 @@ void configureGnss()
         online.gnss = true;
         DEBUG_PRINTLN("Info - u-blox initialized.");
 
-        // Display OLED messages(s)s(s)
+        // Display OLED messages(s)
         displaySuccess();
       }
     }
@@ -59,7 +59,7 @@ void configureGnss()
       online.gnss = true;
       DEBUG_PRINTLN("Info - u-blox initialized.");
 
-      // Display OLED messages(s)s(s)
+      // Display OLED messages(s)
       displaySuccess();
     }
 
@@ -110,7 +110,7 @@ void configureGnss()
       gnssConfigFlag = false;
 
       // Print current GNSS settings
-      //printGnssSettings();
+      printGnssSettings();
     }
 
     // Configure u-blox GNSS
@@ -186,7 +186,7 @@ void syncRtc()
           fixCounter++;
 
           // Collect a minimum number of valid positions before synchronizing RTC with GNSS
-          if (fixCounter >= 5)
+          if (fixCounter >= 10)
           {
             unsigned long rtcEpoch = rtc.getEpoch();        // Get RTC epoch time
             unsigned long gnssEpoch = gnss.getUnixEpoch();  // Get GNSS epoch time

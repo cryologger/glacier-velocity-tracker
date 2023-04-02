@@ -26,7 +26,7 @@ void configureSd()
         DEBUG_PRINTLN("Warning - microSD failed to initialize.");
         online.microSd = false; // Set flag
 
-        // Display OLED messages(s)s(s)
+        // Display OLED messages(s)
         displayErrorMicrosd2();
 
         // Disable power to Qwiic connector
@@ -39,7 +39,7 @@ void configureSd()
       {
         online.microSd = true; // Set flag
         DEBUG_PRINTLN("Info - microSD initialized.");
-        // Display OLED messages(s)s(s)
+        // Display OLED messages(s)
         displaySuccess();
       }
     }
@@ -47,7 +47,7 @@ void configureSd()
     {
       online.microSd = true; // Set flag
       DEBUG_PRINTLN("Info - microSD initialized.");
-      // Display OLED messages(s)s(s)
+      // Display OLED messages(s)
       displaySuccess();
     }
   }
