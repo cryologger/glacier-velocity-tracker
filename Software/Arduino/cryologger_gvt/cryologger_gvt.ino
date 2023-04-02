@@ -88,8 +88,8 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 byte          loggingMode           = 1;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
-byte          loggingStartTime      = 16;   // Logging start hour (UTC)
-byte          loggingStopTime       = 17;   // Logging end hour (UTC)
+byte          loggingStartTime      = 14;   // Logging start hour (UTC)
+byte          loggingStopTime       = 15;   // Logging end hour (UTC)
 
 // Rolling alarm
 byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
@@ -183,7 +183,7 @@ void setup()
 #if DEBUG
   Serial.begin(115200);   // Open Serial port
   //while (!Serial);        // Wait for user to open Serial Monitor
-  //blinkLed(2, 1000);      // Delay to allow user to open Serial Monitor
+  blinkLed(2, 1000);      // Delay to allow user to open Serial Monitor
 #endif
 
   // Configure OLED display
@@ -213,8 +213,7 @@ void setup()
   DEBUG_PRINT("Info - Datetime "); printDateTime();
   DEBUG_PRINT("Info - Initial alarm "); printAlarm();
 
-  // Blink LED to indicate completion of setup
-  //blinkLed(10, 100);
+  // Indicate completion of setup
   displaySetupComplete();
 }
 
