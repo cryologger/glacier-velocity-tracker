@@ -7,15 +7,15 @@ void configureSd()
   // Check if microSD has been initialized
   if (!online.microSd)
   {
-    // Display OLED message
+    // Display OLED messages(s)
     displayInitialize("microSD");
 
     // Initialize microSD
     if (!sd.begin(PIN_SD_CS, SD_SCK_MHZ(24)))
     {
-      DEBUG_PRINTLN("Warning: microSD failed to initialize. Reattempting...");
+      DEBUG_PRINTLN("Warning - microSD failed to initialize. Reattempting...");
 
-      // Display OLED message
+      // Display OLED messages(s)
       displayErrorMicrosd1();
 
       // Delay between initialization attempts
@@ -23,10 +23,10 @@ void configureSd()
 
       if (!sd.begin(PIN_SD_CS, SD_SCK_MHZ(24)))
       {
-        DEBUG_PRINTLN("Warning: microSD failed to initialize.");
-        online.microSd = false;
+        DEBUG_PRINTLN("Warning - microSD failed to initialize.");
+        online.microSd = false; // Set flag
 
-        // Display OLED messages(s)
+        // Display OLED messages(s)s(s)
         displayErrorMicrosd2();
 
         // Disable power to Qwiic connector
@@ -34,33 +34,26 @@ void configureSd()
 
         // Disable power to peripherals
         peripheralPowerOff();
-
-        while (1)
-        {
-          // Force WDT to reset system
-          blinkLed(2, 250);
-          delay(2000);
-        }
       }
       else
       {
         online.microSd = true; // Set flag
-        DEBUG_PRINTLN("Info: microSD initialized.");
-        // Display OLED messages(s)
+        DEBUG_PRINTLN("Info - microSD initialized.");
+        // Display OLED messages(s)s(s)
         displaySuccess();
       }
     }
     else
     {
       online.microSd = true; // Set flag
-      DEBUG_PRINTLN("Info: microSD initialized.");
-      // Display OLED messages(s)
+      DEBUG_PRINTLN("Info - microSD initialized.");
+      // Display OLED messages(s)s(s)
       displaySuccess();
     }
   }
   else
   {
-    DEBUG_PRINTLN("Info: microSD already initialized.");
+    DEBUG_PRINTLN("Info - microSD already initialized.");
     return;
   }
   // Stop the loop timer
@@ -76,7 +69,7 @@ void updateFileCreate(FsFile *dataFile)
   // Update the file create timestamp
   if (!dataFile->timestamp(T_CREATE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
   {
-    DEBUG_PRINT("Warning: Could not update file create timestamp.");
+    DEBUG_PRINT("Warning - Could not update file create timestamp.");
   }
 }
 
@@ -89,10 +82,10 @@ void updateFileAccess(FsFile *dataFile)
   // Update the file access and write timestamps
   if (!dataFile->timestamp(T_ACCESS, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
   {
-    DEBUG_PRINT("Warning: Could not update file access timestamp.");
+    DEBUG_PRINT("Warning - Could not update file access timestamp.");
   }
   if (!dataFile->timestamp(T_WRITE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
   {
-    DEBUG_PRINT("Warning: Could not update file write timestamp.");
+    DEBUG_PRINT("Warning - Could not update file write timestamp.");
   }
 }

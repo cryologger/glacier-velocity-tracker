@@ -1,7 +1,7 @@
 /*
     Title:    Cryologger - Glacier Velocity Tracker (GVT)
     Version:  2.2
-    Date:     March 28, 2023
+    Date:     April 2, 2023
     Author:   Adam Garbo
 
     Components:
@@ -9,8 +9,6 @@
     - SparkFun MicroMod Data Logging Carrier Board
     - SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic)
     - Pololu 5V 600mA Step-Down Voltage Regulator D36V6F5
-    - RFD900x serial telemetry radio
-    - RockBLOCK 9603
 
     Dependencies:
     - Apollo3 Core v1.2.3
@@ -19,7 +17,7 @@
     - SdFat v2.2.0
 
     Comments:
-    - Code intended for deployment in Arctic Bay
+    - 
 */
 
 // ----------------------------------------------------------------------------
@@ -90,8 +88,8 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 byte          loggingMode           = 1;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
-byte          loggingStartTime      = 17;   // Logging start hour (UTC)
-byte          loggingStopTime       = 20;   // Logging end hour (UTC)
+byte          loggingStartTime      = 16;   // Logging start hour (UTC)
+byte          loggingStopTime       = 17;   // Logging end hour (UTC)
 
 // Rolling alarm
 byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
@@ -197,7 +195,7 @@ void setup()
   printDateTime(); // Print RTC's current date and time
   DEBUG_PRINT("Voltage: "); DEBUG_PRINTLN(readVoltage()); // Print battery voltage
 
-  // Display OLED message(s)
+  // Display OLED messages(s)
   displayWelcome();
 
   // Display logging configuration
@@ -212,8 +210,8 @@ void setup()
   createDebugFile();      // Create debug log file
   setInitialAlarm();      // Configure RTC and set initial alarm
 
-  DEBUG_PRINT("Info: Datetime "); printDateTime();
-  DEBUG_PRINT("Info: Initial alarm "); printAlarm();
+  DEBUG_PRINT("Info - Datetime "); printDateTime();
+  DEBUG_PRINT("Info - Initial alarm "); printAlarm();
 
   // Blink LED to indicate completion of setup
   //blinkLed(10, 100);
@@ -227,8 +225,8 @@ void loop()
 {
   // Check if alarm flag is set
   if (alarmFlag)
-  {   
-    DEBUG_PRINT("Info: Alarm trigger "); printDateTime();
+  {
+    DEBUG_PRINT("Info - Alarm trigger "); printDateTime();
 
     // Configure logging
     readRtc();            // Get the RTC's alarm date and time

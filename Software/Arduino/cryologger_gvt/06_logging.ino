@@ -10,12 +10,12 @@ void createDebugFile()
   // O_WRITE - Open the file for writing
   if (!debugFile.open(debugFileName, O_CREAT | O_APPEND | O_WRITE))
   {
-    DEBUG_PRINTLN("Warning: Failed to create debug file.");
+    DEBUG_PRINTLN("Warning - Failed to create debug file.");
     return;
   }
   else
   {
-    DEBUG_PRINT("Info: Created "); DEBUG_PRINTLN(debugFileName);
+    DEBUG_PRINT("Info - Created "); DEBUG_PRINTLN(debugFileName);
   }
 
   // Write header to file
@@ -27,7 +27,7 @@ void createDebugFile()
   // Sync the debug file
   if (!debugFile.sync())
   {
-    DEBUG_PRINTLN("Warning: Failed to sync debug file.");
+    DEBUG_PRINTLN("Warning - Failed to sync debug file.");
   }
 
   // Update the file create timestamp
@@ -36,7 +36,7 @@ void createDebugFile()
   // Close log file
   if (!debugFile.close())
   {
-    DEBUG_PRINTLN("Warning: Failed to close debug file.");
+    DEBUG_PRINTLN("Warning - Failed to close debug file.");
   }
 }
 
@@ -52,13 +52,13 @@ void logDebug()
   // Open debug file for writing
   if (!debugFile.open(debugFileName, O_APPEND | O_WRITE))
   {
-    DEBUG_PRINTLN("Warning: Failed to open debug file.");
+    DEBUG_PRINTLN("Warning - Failed to open debug file.");
     online.logDebug = false; // Set flag
     return;
   }
   else
   {
-    DEBUG_PRINT("Info: Opened "); DEBUG_PRINTLN(debugFileName);
+    DEBUG_PRINT("Info - Opened "); DEBUG_PRINTLN(debugFileName);
     online.logDebug = true; // Set flag
   }
 
@@ -94,7 +94,7 @@ void logDebug()
   // Sync the debug file
   if (!debugFile.sync())
   {
-    DEBUG_PRINTLN("Warning: Failed to sync debug file.");
+    DEBUG_PRINTLN("Warning - Failed to sync debug file.");
     syncFailCounter++; // Count number of failed file syncs
   }
 
@@ -104,7 +104,7 @@ void logDebug()
   // Close the debug file
   if (!debugFile.close())
   {
-    DEBUG_PRINTLN("Warning: Failed to close debug file.");
+    DEBUG_PRINTLN("Warning - Failed to close debug file.");
     closeFailCounter++; // Count number of failed file closes
   }
                    

@@ -55,7 +55,7 @@ void readRtc()
   // Get the RTC's current date and time
   rtc.getTime();
 
-  //DEBUG_PRINT("Info: Unix epoch time "); DEBUG_PRINTLN(rtc.getEpoch());
+  //DEBUG_PRINT("Info - Unix epoch time "); DEBUG_PRINTLN(rtc.getEpoch());
 
   // Stop the loop timer
   timer.rtc = micros() - loopStartTime;
@@ -70,7 +70,7 @@ void setSleepAlarm()
   // Check for logging mode
   if (loggingMode == 1) // Daily mode
   {
-    DEBUG_PRINTLN(F("Info: Setting daily RTC alarm"));
+    DEBUG_PRINTLN(F("Info - Setting daily RTC alarm"));
 
     // Set daily alarm
     rtc.setAlarm(loggingStartTime, 0, 0, 0, 0, 0);
@@ -83,7 +83,7 @@ void setSleepAlarm()
   }
   else if (loggingMode == 2) // Rolling mode
   {
-    DEBUG_PRINTLN(F("Info: Setting rolling RTC alarm"));
+    DEBUG_PRINTLN(F("Info - Setting rolling RTC alarm"));
     
     // Set rolling RTC alarm
     rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
@@ -96,7 +96,7 @@ void setSleepAlarm()
   }
   else if (loggingMode == 3) // Continuous mode
   {
-    DEBUG_PRINTLN(F("Info: Continuous logging enabled"));
+    DEBUG_PRINTLN(F("Info - Continuous logging enabled"));
     return; // Skip setting alarm
   }
   else
@@ -106,8 +106,8 @@ void setSleepAlarm()
   }
 
   // Print the next RTC alarm date and time
-  DEBUG_PRINT("Info: Current time "); printDateTime();
-  DEBUG_PRINT("Info: Sleeping until "); printAlarm();
+  DEBUG_PRINT("Info - Current time "); printDateTime();
+  DEBUG_PRINT("Info - Sleeping until "); printAlarm();
 }
 
 // Set logging duration alarm
@@ -146,7 +146,7 @@ void setLoggingAlarm()
   alarmFlag = false;
 
   // Print the next RTC alarm date and time
-  DEBUG_PRINT("Info: Logging until "); printAlarm();
+  DEBUG_PRINT("Info - Logging until "); printAlarm();
 }
 
 // Get the RTC's date and time and store it in a buffer

@@ -42,11 +42,11 @@ void goToSleep()
   else
   {
     alarmFlag = false; // Clear flag
-    //DEBUG_PRINTLN("Info: Entering deep sleep.");
-    //DEBUG_PRINT("Info: Sleeping until "); printAlarm();
+    //DEBUG_PRINTLN("Info - Entering deep sleep.");
+    //DEBUG_PRINT("Info - Sleeping until "); printAlarm();
   }
 
-  // Display OLED message(s)
+  // Display OLED messages(s)
   displayDeepSleep();
 
 #if DEBUG

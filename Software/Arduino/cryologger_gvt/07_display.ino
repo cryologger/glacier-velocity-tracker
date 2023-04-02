@@ -8,7 +8,7 @@ void configureOled()
   if (!oled.begin())
   {
     online.oled = false;
-    DEBUG_PRINTLN("Warning: OLED failed to initialize. Reattempting...");
+    DEBUG_PRINTLN("Warning - OLED failed to initialize. Reattempting...");
 
     // Delay between initialization attempts
     myDelay(2000);
@@ -16,7 +16,8 @@ void configureOled()
     if (!oled.begin())
     {
       online.oled = false;
-      DEBUG_PRINTLN("Warning: OLED failed to initialize.");
+      DEBUG_PRINTLN("Warning - OLED failed to initialize.");
+      return;
     }
     else
     {
@@ -64,7 +65,7 @@ void displayWelcome()
     oled.print(readVoltage(), 2);
     oled.display();
     disablePullups();
-    myDelay(4000);
+    myDelay(1000);
   }
 }
 
@@ -170,7 +171,7 @@ void displayLoggingMode()
     }
     oled.display();
     disablePullups();
-    myDelay(8000);
+    myDelay(2000);
   }
 }
 
@@ -209,7 +210,7 @@ void displayRtcFailure()
   {
     enablePullups();
     oled.erase();
-    oled.text(0, 0, "Warning: RTC sync failed!");
+    oled.text(0, 0, "Warning - RTC sync failed!");
     oled.display();
     disablePullups();
     myDelay(2000);
@@ -355,5 +356,5 @@ void lineTest(void)
     oled.line(width - 1, 0, i, height - 1);
     oled.display();
   }
-  myDelay(2000);
+  myDelay(1000);
 }
