@@ -23,19 +23,19 @@ void printLoggingSettings()
   printLine();
 
   DEBUG_PRINT("Logging mode: "); printTab(3);
-  if (loggingMode == 1)
+  if (operationMode == 1)
   {
     DEBUG_PRINTLN("Daily");
-    DEBUG_PRINT("Start: "); printTab(4);  DEBUG_PRINTLN(loggingStartTime);
-    DEBUG_PRINT("Stop: "); printTab(4);  DEBUG_PRINTLN(loggingStopTime);
+    DEBUG_PRINT("Start: "); printTab(4);  DEBUG_PRINTLN(startTime);
+    DEBUG_PRINT("Stop: "); printTab(4);  DEBUG_PRINTLN(stopTime);
   }
-  if (loggingMode == 2)
+  if (operationMode == 2)
   {
     DEBUG_PRINTLN("Rolling");
-    DEBUG_PRINT("Logging duration: "); printTab(2);  DEBUG_PRINT(loggingAlarmHours); DEBUG_PRINT(" hours "); DEBUG_PRINT(loggingAlarmMinutes); DEBUG_PRINTLN(" minutes ");
+    DEBUG_PRINT("Logging duration: "); printTab(2);  DEBUG_PRINT(awakeAlarmHours); DEBUG_PRINT(" hours "); DEBUG_PRINT(awakeAlarmMinutes); DEBUG_PRINTLN(" minutes ");
     DEBUG_PRINT("Sleep duration: "); printTab(2);  DEBUG_PRINT(sleepAlarmHours); DEBUG_PRINT(" hours "); DEBUG_PRINT(sleepAlarmMinutes); DEBUG_PRINTLN(" minutes ");
   }
-  if (loggingMode == 3)
+  if (operationMode == 3)
   {
     DEBUG_PRINTLN("Continuous");
   }

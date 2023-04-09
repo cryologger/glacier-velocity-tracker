@@ -85,15 +85,15 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // 1: Daily logging (e.g., log 3 hours each day between 19:00-22:00)
 // 2: Rolling logging (e.g., log for 2 hours, sleep for 3, repeat)
 // 3: Continuous logging (e.g., new log file created each day at 00:00)
-byte          loggingMode           = 1;    // 1: daily, 2: rolling, 3: 24-hour
+byte          operationMode           = 1;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
-byte          loggingStartTime      = 14;   // Logging start hour (UTC)
-byte          loggingStopTime       = 15;   // Logging end hour (UTC)
+byte          startTime      = 14;   // Logging start hour (UTC)
+byte          stopTime       = 15;   // Logging end hour (UTC)
 
 // Rolling alarm
-byte          loggingAlarmMinutes   = 0;    // Rolling minutes alarm
-byte          loggingAlarmHours     = 1;    // Rolling hours alarm
+byte          awakeAlarmMinutes   = 0;    // Rolling minutes alarm
+byte          awakeAlarmHours     = 1;    // Rolling hours alarm
 byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
 byte          sleepAlarmHours       = 1;    // Rolling hours alarm
 
@@ -229,7 +229,7 @@ void loop()
 
     // Configure logging
     readRtc();            // Get the RTC's alarm date and time
-    setLoggingAlarm();    // Set logging alarm
+    setAwakeAlarm();    // Set logging alarm
     getLogFileName();     // Get timestamped log file name
 
     // Configure devices

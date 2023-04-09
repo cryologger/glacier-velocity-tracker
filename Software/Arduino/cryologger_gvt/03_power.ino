@@ -34,7 +34,7 @@ void goToSleep()
   firstTimeFlag = false;
 
   // Skip deep sleep if logging 24 hours/day
-  if (loggingMode == 3)
+  if (operationMode == 3)
   {
     //alarmFlag = true; // Set flag
     return;

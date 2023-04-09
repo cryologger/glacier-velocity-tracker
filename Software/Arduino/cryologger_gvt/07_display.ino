@@ -139,21 +139,21 @@ void displayLoggingMode()
     oled.erase();
     oled.setCursor(0, 0);
     oled.print("Log Mode: ");
-    if (loggingMode == 1)
+    if (operationMode == 1)
     {
       char displayBuffer1[32];
       char displayBuffer2[32];
-      sprintf(displayBuffer1, "Start time: %d:00", loggingStartTime);
-      sprintf(displayBuffer2, "End time: %d:00", loggingStopTime);
+      sprintf(displayBuffer1, "Start time: %d:00", startTime);
+      sprintf(displayBuffer2, "End time: %d:00", stopTime);
       oled.print("Daily");
       oled.text(0, 10, displayBuffer1);
       oled.text(0, 20, displayBuffer2);
     }
-    else if (loggingMode == 2)
+    else if (operationMode == 2)
     {
       char displayBuffer1[32];
       char displayBuffer2[32];
-      sprintf(displayBuffer1, "Log: %d hrs %d min", loggingAlarmHours, loggingAlarmMinutes);
+      sprintf(displayBuffer1, "Log: %d hrs %d min", awakeAlarmHours, awakeAlarmMinutes);
       sprintf(displayBuffer2, "Sleep: %d hrs %d min", sleepAlarmHours, sleepAlarmMinutes);
 
       oled.print("Rolling");
@@ -161,7 +161,7 @@ void displayLoggingMode()
       oled.text(0, 20, displayBuffer2);
 
     }
-    else if (loggingMode == 3)
+    else if (operationMode == 3)
     {
       oled.print("Continuous");
     }
