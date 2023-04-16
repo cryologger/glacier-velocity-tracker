@@ -81,26 +81,26 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // User defined logging/sleeping variables
 // ----------------------------------------------------------------------------
 
-// Logging modes
-// 1: Daily logging (e.g., log 3 hours each day between 19:00-22:00)
-// 2: Rolling logging (e.g., log for 2 hours, sleep for 3, repeat)
-// 3: Continuous logging (e.g., new log file created each day at 00:00)
-byte          operationMode           = 1;    // 1: daily, 2: rolling, 3: 24-hour
+// Logging operation modes
+// 1: Daily (e.g., 3 hours each day between 19:00-22:00)
+// 2: Rolling (e.g., 2 hours awake, 3 hours asleep, repeat)
+// 3: Continuous (e.g., new log file created each day at 00:00)
+byte          operationMode       = 1;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
-byte          startTime      = 14;   // Logging start hour (UTC)
-byte          stopTime       = 15;   // Logging end hour (UTC)
+byte          startTime           = 14;   // Logging start hour (UTC)
+byte          stopTime            = 15;   // Logging end hour (UTC)
 
 // Rolling alarm
 byte          awakeAlarmMinutes   = 0;    // Rolling minutes alarm
 byte          awakeAlarmHours     = 1;    // Rolling hours alarm
-byte          sleepAlarmMinutes     = 0;    // Rolling minutes alarm
-byte          sleepAlarmHours       = 1;    // Rolling hours alarm
+byte          sleepAlarmMinutes   = 0;    // Rolling minutes alarm
+byte          sleepAlarmHours     = 1;    // Rolling hours alarm
 
 // Manual alarm modes (debugging only)
-byte          loggingAlarmMode      = 4;    // Logging alarm mode
-byte          sleepAlarmMode        = 4;    // Sleep alarm mode
-byte          initialAlarmMode      = 4;    // Initial alarm mode
+byte          loggingAlarmMode    = 4;    // Logging alarm mode
+byte          sleepAlarmMode      = 4;    // Sleep alarm mode
+byte          initialAlarmMode    = 4;    // Initial alarm mode
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
