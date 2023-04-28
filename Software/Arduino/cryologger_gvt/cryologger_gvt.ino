@@ -1,7 +1,7 @@
 /*
     Title:    Cryologger - Glacier Velocity Tracker (GVT)
     Version:  2.2
-    Date:     April 2, 2023
+    Date:     April 28, 2023
     Author:   Adam Garbo
 
     Components:
@@ -15,9 +15,6 @@
     - SparkFun u-blox GNSS v3 v3.0.6
     - SparkFun Qwiic OLED Arduino Library v1.0.5
     - SdFat v2.2.0
-
-    Comments:
-    - 
 */
 
 // ----------------------------------------------------------------------------
@@ -34,8 +31,8 @@
 // ----------------------------------------------------------------------------
 // Define unique identifier
 // ----------------------------------------------------------------------------
-char        ID[5] = "TST";
-const int   UNIT  = 1;
+char        ID[5] = "YAB";
+const int   UNIT  = 3;
 
 // -----------------------------------------------------------------------------
 // Debugging macros
@@ -85,11 +82,11 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // 1: Daily (e.g., 3 hours each day between 19:00-22:00)
 // 2: Rolling (e.g., 2 hours awake, 3 hours asleep, repeat)
 // 3: Continuous (e.g., new log file created each day at 00:00)
-byte          operationMode       = 1;    // 1: daily, 2: rolling, 3: 24-hour
+byte          operationMode       = 3;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
-byte          startTime           = 14;   // Logging start hour (UTC)
-byte          stopTime            = 15;   // Logging end hour (UTC)
+byte          startTime           = 19;   // Logging start hour (UTC)
+byte          stopTime            = 22;   // Logging end hour (UTC)
 
 // Rolling alarm
 byte          awakeAlarmMinutes   = 0;    // Rolling minutes alarm
@@ -190,7 +187,7 @@ void setup()
   configureOled();
 
   printLine();
-  DEBUG_PRINT("Cryologger Glacier Velocity Tracker #"); DEBUG_PRINTLN(UNIT);
+  DEBUG_PRINT("Cryologger Glacier Velocity Tracker #"); DEBUG_PRINT(ID); DEBUG_PRINT("_"); DEBUG_PRINTLN(UNIT);
   printLine();
   printDateTime(); // Print RTC's current date and time
   DEBUG_PRINT("Voltage: "); DEBUG_PRINTLN(readVoltage()); // Print battery voltage
