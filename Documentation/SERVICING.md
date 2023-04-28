@@ -13,10 +13,10 @@
 * Two cables run externally to connect the GNSS receiver to the antenna and power from the solar panel to the solar charge controller.
 * The enclosure holds a 48 Ah battery, solar charge controller and custom electronics/GNSS receiver (Figure 3).
 
-![system](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Tracker/blob/main/Photos/DSC_6546.JPG)
+![system](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Tracker/blob/main/Images/DSC_6546.JPG)
 **Figure 2.** Photo of of Cryologger glacier velocity tracker and ablation stake deployed on Southeast 2 Glacier, Devon Island, Nunavut.
 
-![SE2](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Tracker/blob/main/Photos/DSC_5133.JPG)
+![SE2](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Tracker/blob/main/Images/DSC_5133.JPG)
 **Figure 3.** View inside the enclosure showing the Deka 48 Ah battery, Genasun solar charge controller and Cryologger glacier velocity tracker enclosure.
 
 ## Servicing
