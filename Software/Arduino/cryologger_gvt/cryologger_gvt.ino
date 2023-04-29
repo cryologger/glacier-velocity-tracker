@@ -16,6 +16,9 @@
     - SparkFun Qwiic OLED Arduino Library v1.0.5
     - SdFat v2.2.0
 
+    Comments:
+    - Code configured for sea ice monitoring in Arctic Bay, Nunavut.
+    - Operation mode: Rolling 10 minutes ON & 20 minutes OFF.
 */
 
 // ----------------------------------------------------------------------------
@@ -83,22 +86,22 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // 1: Daily (e.g., 3 hours each day between 19:00-22:00)
 // 2: Rolling (e.g., 2 hours awake, 3 hours asleep, repeat)
 // 3: Continuous (e.g., new log file created each day at 00:00)
-byte          operationMode       = 1;    // 1: daily, 2: rolling, 3: 24-hour
+byte          operationMode       = 2;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
 byte          startTime           = 19;   // Logging start hour (UTC)
 byte          stopTime            = 22;   // Logging end hour (UTC)
 
 // Rolling alarm
-byte          awakeAlarmMinutes   = 0;    // Rolling minutes alarm
-byte          awakeAlarmHours     = 1;    // Rolling hours alarm
-byte          sleepAlarmMinutes   = 0;    // Rolling minutes alarm
-byte          sleepAlarmHours     = 1;    // Rolling hours alarm
+byte          awakeAlarmMinutes   = 10;    // Rolling minutes alarm
+byte          awakeAlarmHours     = 0;    // Rolling hours alarm
+byte          sleepAlarmMinutes   = 20;    // Rolling minutes alarm
+byte          sleepAlarmHours     = 0;    // Rolling hours alarm
 
 // Manual alarm modes (debugging only)
-byte          loggingAlarmMode    = 4;    // Logging alarm mode
-byte          sleepAlarmMode      = 4;    // Sleep alarm mode
-byte          initialAlarmMode    = 4;    // Initial alarm mode
+byte          loggingAlarmMode    = 5;    // Logging alarm mode
+byte          sleepAlarmMode      = 5;    // Sleep alarm mode
+byte          initialAlarmMode    = 5;    // Initial alarm mode
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
