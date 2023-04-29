@@ -1,7 +1,7 @@
 /*
     Title:    Cryologger - Glacier Velocity Tracker (GVT)
     Version:  2.2
-    Date:     April 28, 2023
+    Date:     April 29, 2023
     Author:   Adam Garbo
 
     Components:
@@ -15,6 +15,7 @@
     - SparkFun u-blox GNSS v3 v3.0.6
     - SparkFun Qwiic OLED Arduino Library v1.0.5
     - SdFat v2.2.0
+
 */
 
 // ----------------------------------------------------------------------------
@@ -31,8 +32,8 @@
 // ----------------------------------------------------------------------------
 // Define unique identifier
 // ----------------------------------------------------------------------------
-char        ID[5] = "YAB";
-const int   UNIT  = 3;
+char        ID[5] = "GVT";
+const int   UNIT  = 1;
 
 // -----------------------------------------------------------------------------
 // Debugging macros
@@ -82,7 +83,7 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // 1: Daily (e.g., 3 hours each day between 19:00-22:00)
 // 2: Rolling (e.g., 2 hours awake, 3 hours asleep, repeat)
 // 3: Continuous (e.g., new log file created each day at 00:00)
-byte          operationMode       = 3;    // 1: daily, 2: rolling, 3: 24-hour
+byte          operationMode       = 1;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
 byte          startTime           = 19;   // Logging start hour (UTC)
@@ -126,7 +127,6 @@ unsigned long writeFailCounter    = 0;        // microSD logfile write failure c
 unsigned long closeFailCounter    = 0;        // microSD logfile close failure counter
 unsigned long logStartTime        = 0;        // Counter to track elapsed logging duration
 long          rtcDrift            = 0;        // Counter for RTC drift
-
 
 // ----------------------------------------------------------------------------
 // Unions/structures

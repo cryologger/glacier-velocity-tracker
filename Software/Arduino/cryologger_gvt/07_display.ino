@@ -65,7 +65,7 @@ void displayWelcome()
     oled.print(readVoltage(), 2);
     oled.display();
     disablePullups();
-    myDelay(1000);
+    myDelay(4000);
   }
 }
 
