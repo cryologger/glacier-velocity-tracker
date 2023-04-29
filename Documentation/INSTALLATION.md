@@ -2,6 +2,7 @@
 
 ## Step 1: Download Arduino IDE
 https://www.arduino.cc/en/software
+* Navigate to Legacy IDE (1.8.X) and download the most recent version
 
 ## Step 2: Add Additional Boards Manager URL:
 * Navigate to: Preferences
