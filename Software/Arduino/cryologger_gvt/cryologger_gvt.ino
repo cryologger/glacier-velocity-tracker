@@ -1,6 +1,6 @@
 /*
     Title:    Cryologger - Glacier Velocity Tracker (GVT)
-    Version:  2.2
+    Version:  2.2.1
     Date:     April 29, 2023
     Author:   Adam Garbo
 
