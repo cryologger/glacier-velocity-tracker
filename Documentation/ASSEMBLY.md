@@ -59,22 +59,29 @@ The components required to assemble a Cryologger GNSS system are split into two 
 ![IMG_6855](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/9b9700ce-fe95-4ca5-a075-6a302962f196)
 
 
-2) The first components to solder to the Cryologger PCB are the through-hole resistors and capacitor. Pay attention to the location of the resistors, as they have a specific order and vary in resistance.
+2) Solder through-hole resistors and capacitor
+The first components to solder to the Cryologger PCB are the through-hole resistors and capacitor. Pay attention to the location of the resistors, as they vary in resistance and have a specific order.
 
-3) Once the through-hole components are solderd, the female headers can be soldered to the PCB
+3) Solder female headers to the PCB
 * A tip 
 
 4) Insert male headers into female headers
-5) Place components and solder male headers
-6) Remove components and solder screw terminal
 
-7) Screw on two 1/4" spacers for the OLED display
+5) Solder male headers
 
-8) Cut I2C jumpers of all components. See the following section
+
+6) Solder screw terminal
+* Remove all components and insert the screw terminal. The PCB can then be turned upside for easy access to soldering the pins.
+
+7) Connect SparkFun Qwiic OLED Display
+* Attach two 3/8" nylon standoffs to the PCB with 1/4" 4-40 Phillips Head screws. Connect 50 mm Qwiic cable.
+
+8) Cut I2C jumpers 
+See section 3.1 for instructions on cutting the I2C jumpers and verifying operation of the system.
 
 ### 3.1 I2C Jumpers
 
-When working with the Artemis Processor, it is a requirement the I2C jumpers are cut for all components in the system (i.e., MicroMod Data Logging Carrier Board, u-blox ZED-F9P and OLED display) for normal operation. The u-blox ZED-F9P is sensitive to the resistance on the I2C bus and a too high I2C bus resistance will result in erratic behaviour of the system (e.g., initialization failures, intermittent logging, degraded data quality).
+When working with the Artemis Processor, I2C jumpers must be cut for all components in the system (i.e., MicroMod Data Logging Carrier Board, u-blox ZED-F9P and OLED display) for normal operation. The u-blox ZED-F9P is sensitive to the resistance on the I2C bus and a too high I2C bus resistance will result in erratic behaviour of the system (e.g., initialization failures, intermittent logging, degraded data quality).
 
 For additional background information on this I2C pull-up resistor problem, see the following GitHub issue:
 https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library/issues/40
