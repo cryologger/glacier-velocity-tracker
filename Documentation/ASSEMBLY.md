@@ -1,24 +1,25 @@
 # Assembly
 
-![pcb](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/c99a814a-51ad-43ab-b7d6-aa136ee52781)
-
 ## 1.0 Introduction
 This guide provides detailed instructions on the assembly of a Cryologger GNSS system.
 
 ## 2.0 Bill of Materials
 
 The components required to assemble a Cryologger GNSS system are split into two groups: 
-1) Components required for the assembly of the Cryologger GNSS (e.g., PCB, GNSS receiver, microcontroller, etc.) 
+1) Components required for the assembly of the Cryologger (e.g., PCB, GNSS receiver, microcontroller, etc.)
 2) Components required for the mounting, power and deployment of the complete Cryologger GNSS system (e.g., tripod, solar panel, battery, etc.).
 
+This guide will focuses exclusively on first group, the assembly of the Cryologger PCB.
+
 **Table 1.** Required tools for asssembly of Cryologger GNSS v2.21 system.
-| Tool | Recommended Product | Quantity |
-| --- | --- | :---: |
-| Soldering iron | [Hakko FX-888D Digital Soldering Station](https://hakkousa.com/fx-888d-digital-soldering-station.html) | 1 |
-| Solder | [SparkFun Solder - 1/4lb Spool (0.020") Special Blend](https://www.sparkfun.com/products/10242) | 1 |
-| Side cutter | [Hakko CHP-170 Micro Cutter](https://hakkousa.com/chp-170-micro-cutter.html) | 1 |
-| Pliers | [Hakko CHP PN-2001 Pointed Nose Pliers](https://hakkousa.com/products/chp-tools/chp-hand-tools/chp-pn-2001-pointed-nose-pliers.html) | | 1 |
-| Screw drivers | | 1 |
+| Tool | Recommended Product |
+| --- | --- | 
+| Soldering iron | [Hakko FX-888D Digital Soldering Station](https://hakkousa.com/fx-888d-digital-soldering-station.html) |
+| Solder | [SparkFun Solder - 1/4lb Spool (0.020") Special Blend](https://www.sparkfun.com/products/10242) |
+| Side cutter | [Hakko CHP-170 Micro Cutter](https://hakkousa.com/chp-170-micro-cutter.html) |
+| Pliers | [Hakko CHP PN-2001 Pointed Nose Pliers](https://hakkousa.com/products/chp-tools/chp-hand-tools/chp-pn-2001-pointed-nose-pliers.html) |
+| Hot-air rework station | [Quick 957DW+](https://www.adafruit.com/product/1869) |
+| Screw driver | Phillips head screw driver |
 
 **Table 2.** Components required for asssembly of Cryologger GNSS v2.21 system.
 | Component | Product | Quantity |
@@ -57,15 +58,24 @@ The components required to assemble a Cryologger GNSS system are split into two 
 ## 3.0 Assembly
 
 
-1) Collect all of the necssary components and remove them from their packaging (Figure 1)
-![IMG_6855](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/9b9700ce-fe95-4ca5-a075-6a302962f196)
-
+1) Collect all necessary components
+* It is suggested to first gather all of the components required for the assembly of the Cryologger and remove them from their packaging.
 
 2) Solder through-hole resistors and capacitor
-The first components to solder to the Cryologger PCB are the through-hole resistors and capacitor. Pay attention to the location of the resistors, as they vary in resistance and have a specific order.
+* The first components recommended to be soldered to the Cryologger PCB are the through-hole resistors and capacitor (Figure x). 
+* Both the capacitor and resistors can be inserted into the PCB in any orientation.
+* It is important to pay attention to the placement of the resistors, as they differ in resistance. 
+  * R1 is 10 MOhm and has the colour code: Brown Black Black Green Brown
+  * R2 is 1MOhm and has the color code: Brown Black Black Yellow Brown
+* For more information on resistance colour codes, please see: https://www.digikey.com/en/resources/conversion-calculators/conversion-calculator-resistor-color-code
+
+<p align="center"><img width="720" alt="image" src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/8fa15e3c-aedc-4379-ada3-3029dafc1340"></p>
+<p align="center"><b>Figure 1.</b> Location of through-hole resistors and capacitor to be soldered to the PCB.</p>
 
 3) Solder female headers to the PCB
-* A tip 
+
+<p align="center"><img width="720" alt="image" src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/56e697ea-1a51-4ec6-9fa5-1ee2ca9e5146"></p>
+<p align="center"><b>Figure 1.</b> Locations of female headers to be soldered to the PCB.</p>
 
 4) Insert male headers into female headers
 
