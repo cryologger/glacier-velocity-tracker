@@ -8,7 +8,7 @@ The components required to assemble a Cryologger GNSS system are split into two 
 1) Components required for the assembly of the Cryologger (e.g., PCB, GNSS receiver, microcontroller, etc.)
 2) Components required for the mounting, power and deployment of the complete system (e.g., tripod, solar panel, battery, etc.).
 
-This guide will focuses exclusively on first group, the assembly of the Cryologger itself.
+This guide focuses exclusively on first group, the assembly of the Cryologger.
 
 **Table 1.** Required tools for asssembly of Cryologger GNSS v2.21 system.
 | Tool | Recommended Product |
@@ -20,7 +20,7 @@ This guide will focuses exclusively on first group, the assembly of the Cryologg
 | Hot-air rework station | [Quick 957DW+](https://www.adafruit.com/product/1869) |
 | Screw driver | Phillips head screw driver |
 | PCB cleaning brush | [ESD-Safe PCB Cleaning Brush](https://www.adafruit.com/product/1209) |
-| PCB cleaning solution | De-ionized (DI) water |
+| PCB cleaning solution | Deionized (DI) water |
 
 **Table 2.** Components required for asssembly of Cryologger GNSS v2.21 system.
 | Component | Product | Quantity |
@@ -29,11 +29,8 @@ This guide will focuses exclusively on first group, the assembly of the Cryologg
 | Processor | [SparkFun MicroMod Artemis Processor](https://www.sparkfun.com/products/16401) | 1 |
 | Carrier Board | [SparkFun MicroMod Data Logging Carrier Board](https://www.sparkfun.com/products/16829) | 1 |
 | GNSS Receiver | [SparkFun GPS-RTK-SMA Breakout - ZED-F9P](https://www.sparkfun.com/products/16481) | 1 |
-| GNSS Antenna | [SparkFun GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106](https://www.sparkfun.com/products/17751) | 1 | 
 | Display | [SparkFun Qwiic OLED Display](https://www.sparkfun.com/products/17153) | 1 |
 | Qwiic Cable | [Qwiic Cable - 50mm](https://www.sparkfun.com/products/14426) | 1 |
-| GNSS Antenna Cable | [SparkFun Interface Cable - SMA Female to SMA Male (25cm)](https://www.sparkfun.com/products/12861) | 1 |
-| GNSS Antenna Cable | [SparkFun Interface Cable - SMA Male to TNC Male (300mm)](https://www.sparkfun.com/products/17833) | 1 | 
 | Voltage Regulator | [Pololu 5V, 600mA Step-Down Voltage Regulator D36V6F5](https://www.pololu.com/product/3792) | 1 |
 | microSD Card| [SanDisk MAX Endurance 64 GB microSD](https://www.amazon.com/SanDisk-Endurance-microSDXC-Adapter-Security/dp/B084CJ96GT) | 1 |
 | Resistor | [1 Mohms 1% MBB02070C1004FRP00](https://octopart.com/mbb02070c1004frp00-vishay-42819429?r=sp) | 1 |
@@ -49,6 +46,9 @@ This guide will focuses exclusively on first group, the assembly of the Cryologg
 | Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x12-Pin, Straight](https://www.pololu.com/product/1030) | 1 |
 | Standoff | [SparkFun Standoff - Nylon (4-40; 3/4"; 10 pack)](https://www.sparkfun.com/products/11796) | 4 |
 | Screw | [SparkFun Screw - Phillips Head (1/4", 4-40, 10 pack)](https://www.sparkfun.com/products/10453) | 8 |
+| GNSS Antenna | [SparkFun GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106](https://www.sparkfun.com/products/17751) | 1 | 
+| GNSS Antenna Cable | [SparkFun Interface Cable - SMA Female to SMA Male (25cm)](https://www.sparkfun.com/products/12861) | 1 |
+| GNSS Antenna Cable | [SparkFun Interface Cable - SMA Male to TNC Male (300mm)](https://www.sparkfun.com/products/17833) | 1 | 
 | Enclosure | [Hammond Manufacturing 1554Q2GYCL](https://octopart.com/1554q2gycl-hammond-99088964?r=sp) | 1 |
 | Enclosure Inner Panel | [Hammond Manufacturing 1554QPL](https://octopart.com/1554qpl-hammond-97562074?r=sp) | 1 |
 | Power Panel Mount Connector | Bulgin<sup>1</sup> | 1 |
@@ -58,10 +58,11 @@ This guide will focuses exclusively on first group, the assembly of the Cryologg
 
 ## 3.0 Assembly
 
-1) Collect all necessary components
-* It is suggested to first gather all of the components listed in the bill of materials (Table 2), which are required for the assembly of the Cryologger. Remove the components from their packaging and inspect them for obvious damage.
+### 3.1 Cryologger PCB Assembly
+Step 1) Collect all required components
+* It is suggested to first gather all of the components listed in the bill of materials (Table 2), required for the assembly of the Cryologger. Remove the components from their packaging and inspect them for any signs of damage.
 
-2) Solder through-hole resistors and capacitor
+Step 2) Solder through-hole resistors and capacitor
 * The first components recommended to be soldered to the Cryologger PCB are the through-hole resistors and capacitor (Figure 1). 
 * Both the capacitor and resistors can be inserted into the PCB in any orientation.
 * It is important to pay attention to the placement of the resistors, as they differ in resistance. 
@@ -86,6 +87,7 @@ This guide will focuses exclusively on first group, the assembly of the Cryologg
 * The Pololu step-down voltage regulator will also need to be soldered, but is more tricky.
 
 8) Clean solder flux residue
+* It is important that all solder flux residue is properly cleaned, as it can change the resistance of pins and cause issues with the normal operation of the system.
 * Pour a small amount of deionized water into a clean container. 
 * Dip the PCB cleaning brush into the water and then gently scrub all of the soldered connections on the bottom of the PCB and on the top components.
 * If available, compressed air can be used to blow off the water.
@@ -94,9 +96,8 @@ This guide will focuses exclusively on first group, the assembly of the Cryologg
   * Be careful around the following locations:
     * The microSD card of the MicroMod Data Logging Carrier Board.
   
-
 9) Cut I2C jumpers 
-See section 3.1 for instructions on cutting the I2C jumpers and verifying operation of the system.
+See section 3.1.1 for instructions on cutting the I2C jumpers and verifying the resistance values of the system.
 
 10) Connect SparkFun Qwiic OLED Display
 * Attach two 3/8" nylon standoffs to the PCB with 1/4" 4-40 Phillips Head screws. 
@@ -105,35 +106,25 @@ See section 3.1 for instructions on cutting the I2C jumpers and verifying operat
 11) Upload code and test system
 * Please see https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/blob/main/Documentation/INSTALLATION.md
 
-### 3.1 I2C Jumpers
+#### 3.1.1 I2C Jumpers
 
-When working with the Artemis Processor, I2C jumpers must be cut for all components in the system (i.e., MicroMod Data Logging Carrier Board, u-blox ZED-F9P and OLED display) for normal operation. The u-blox ZED-F9P is sensitive to the resistance on the I2C bus and a too high I2C bus resistance will result in erratic behaviour of the system (e.g., initialization failures, intermittent logging, degraded data quality).
+When working with the Artemis Processor, I2C jumpers must be cut for all components in the system (i.e., MicroMod Data Logging Carrier Board, u-blox ZED-F9P and OLED display). The u-blox ZED-F9P is sensitive to the resistance on the I2C bus and a too high resistance can result in erratic behaviour of the system (e.g., initialization failures, intermittent logging, degraded data quality).
+
+All I2C connections are part of the same bus, so each jumper will affect resistance of all connected components. 
 
 For additional background information on this I2C pull-up resistor problem, see the following GitHub issue:
 https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library/issues/40
 
-Measure the resistance of following connections before and after cutting the I2C jumpers:
+Step 1) Measure the resistance of following connections listed below before cutting the I2C jumpers. The resistance measurements should read approximately 2.2 kOhm.
 
-MicroMod Data Logging Carrier Board:
-* G2-3V3 and SDA
-* G2-3V3 and SCL
+Table x. Connections to measure resistance and expected resistance values.
+| Component | Connection 1| Connection 2 | Resistance Uncut | Resistance Cut |
+| --- | :---: | :---: | :---: | :---: | 
+| MicroMod Data Logging Carrier Board | G2-3V3 | SDA | ~2.2 kOhm | ~600 kOhm |
+| MicroMod Data Logging Carrier Board | G2-3V3 | SCL | ~2.2 kOhm | ~600 kOhm |
+| u-blox ZED-F9P | 3V3 | SDA | ~2.2 kOhm | ~250 kOhm |
+| u-blox ZED-F9P | 3V3 | SDA | ~2.2 kOhm | ~250 kOhm |
 
-u-blox ZED-F9P
-* 3V3 and SDA
-* 3V3 and SCL
+After the I2C jumpers are cut, very high resistance values should be measured. Please note the resistance values may differ slightly depending on the quality of the digital multimeter (DMM) that is used. 
 
-All I2C connections are part of the same bus, so each jumper will affect resistance of all connected components. 
-
-Prior to cutting the I2C jumpers, the resistance measurement should read approximately 2.2 kOhm. 
-
-After the I2C jumpers are cut, very high resistance values should be measured. If the reading is lower then it means there's likely a jumper that still has a connection.
-
-MicroMod Data Logging Carrier Board:
-G2-3V3 and SDA: ~0.6 MOhm
-G2-3V3 and SCL:  ~0.6 MOhm
-
-u-blox ZED-F9P
-3V3 and SDA: ~250 kOhm
-3V3 and SCL: ~250 kOhm
-
-In addition, it is important that all solder flux residue is properly cleaned, as it can change the resistance of pins and cause issues with the normal operation of the components.
+If the reading is lower then it means there's likely a jumper that still has a connection.
