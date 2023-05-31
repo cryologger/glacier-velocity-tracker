@@ -117,7 +117,7 @@ All I2C connections are part of the same bus, so each jumper will affect resista
 For additional background information on this I2C pull-up resistor problem, see the following GitHub issue:
 https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library/issues/40
 
-**1) Measure I2C bus resistance **
+**1) Measure I2C bus resistance**
 * Measure the resistance of following connections listed below in Table 3 before cutting the I2C jumpers. The values of the expected resistance measurements are also included.
 
 **Table 3.** Connections to measure resistance and expected resistance values.
@@ -133,9 +133,21 @@ https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library/issues/40
 * A good strategy is to make two cuts, along each of the pads so that the middle thin part of the PCB trace is removed entirely
 * A digital multimeter can be used to confirm the jumper is "open" by measuring each side of the pads.
 
+* MicroMod Data Logging Carrier Board
+
+![mmdlcb](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/a21e962e-63e8-4500-91b4-5244dc133dde)
+
+* GNSS
+
+![gnss](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/6300da4a-9dee-48d5-8fb2-9f9f70ec7991)
+
+* OLED
+
+![oled](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/1c616bb3-eff6-4900-bb15-cba3e535c43e)
 
 
 **3) Measure I2C bus resistance (again)**
+
 After the I2C jumpers are cut, very high resistance values should be measured (see Table 3). Please note the resistance values may differ slightly depending on the quality of the digital multimeter (DMM) that is used. 
 
 If the resistance measurement is lower than expected, it likely means there's still a jumper that has a connection. This can be troubleshooted by removing each component and measureing the I2C jumpers directly.
