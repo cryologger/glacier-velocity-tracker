@@ -59,10 +59,10 @@ This guide focuses exclusively on first group, the assembly of the Cryologger.
 ## 3.0 Assembly
 
 ### 3.1 Cryologger PCB Assembly
-Step 1) Collect all required components
+**1) Collect all required components**
 * It is suggested to first gather all of the components listed in the bill of materials (Table 2), required for the assembly of the Cryologger. Remove the components from their packaging and inspect them for any signs of damage.
 
-Step 2) Solder through-hole resistors and capacitor
+**2) Solder through-hole resistors and capacitor**
 * The first components recommended to be soldered to the Cryologger PCB are the through-hole resistors and capacitor (Figure 1). 
 * Both the capacitor and resistors can be inserted into the PCB in any orientation.
 * It is important to pay attention to the placement of the resistors, as they differ in resistance. 
@@ -73,20 +73,22 @@ Step 2) Solder through-hole resistors and capacitor
 <p align="center"><img width="720" alt="image" src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/8fa15e3c-aedc-4379-ada3-3029dafc1340"></p>
 <p align="center"><b>Figure 1.</b> Location of through-hole resistors and capacitor to be soldered to the PCB.</p>
 
-3) Solder female headers to the PCB
+**3) Solder female headers to the PCB**
 * A tip when soldering the female headers is to do two at a time and use a couple of uncut rows of male headers to keep them in their position. The PCB can then be turned upside down and the contacts easily soldered. 
 <p align="center"><img width="720" alt="image" src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/56e697ea-1a51-4ec6-9fa5-1ee2ca9e5146"></p>
-<p align="center"><b>Figure 1.</b> Locations of female headers to be soldered to the PCB.</p>
+<p align="center"><b>Figure 2.</b> Locations of female headers to be soldered to the PCB.</p>
 
-6) Solder screw terminal
+**6) Solder screw terminal**
 * Once the female headers are soldered , insert the screw terminal into the PCB, which can then be turned upside down for easy access to soldering the contacts.
+<p align="center"><img width="720" alt="image" src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/9cda10ee-1666-4f16-8e5e-f8e86fa08617"></p>
+<p align="center"><b>Figure 3.</b> Location of screw terminal to be soldered to the PCB.</p>
 
-7) Solder components
+**7) Solder components**
 * Insert male headers into female headers shown in Figure 2.
 * Place the SparkFun MicroMod Data Logging Carrier Board and GPS-RTK2 boards onto the male header pins and solder the contacts.
 * The Pololu step-down voltage regulator will also need to be soldered, but is more tricky.
 
-8) Clean solder flux residue
+**8) Clean solder flux residue**
 * It is important that all solder flux residue is properly cleaned, as it can change the resistance of pins and cause issues with the normal operation of the system.
 * Pour a small amount of deionized water into a clean container. 
 * Dip the PCB cleaning brush into the water and then gently scrub all of the soldered connections on the bottom of the PCB and on the top components.
@@ -96,14 +98,14 @@ Step 2) Solder through-hole resistors and capacitor
   * Be careful around the following locations:
     * The microSD card of the MicroMod Data Logging Carrier Board.
   
-9) Cut I2C jumpers 
+**9) Cut I2C jumpers**
 See section 3.1.1 for instructions on cutting the I2C jumpers and verifying the resistance values of the system.
 
-10) Connect SparkFun Qwiic OLED Display
+**10) Connect SparkFun Qwiic OLED Display**
 * Attach two 3/8" nylon standoffs to the PCB with 1/4" 4-40 Phillips Head screws. 
 * Connect 50 mm Qwiic cable.
 
-11) Upload code and test system
+**11) Upload code and test system**
 * Please see https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/blob/main/Documentation/INSTALLATION.md
 
 #### 3.1.1 I2C Jumpers
@@ -115,16 +117,25 @@ All I2C connections are part of the same bus, so each jumper will affect resista
 For additional background information on this I2C pull-up resistor problem, see the following GitHub issue:
 https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library/issues/40
 
-Step 1) Measure the resistance of following connections listed below before cutting the I2C jumpers. The resistance measurements should read approximately 2.2 kOhm.
+**1) Measure I2C bus resistance **
+* Measure the resistance of following connections listed below in Table 3 before cutting the I2C jumpers. The values of the expected resistance measurements are also included.
 
-Table x. Connections to measure resistance and expected resistance values.
-| Component | Connection 1| Connection 2 | Resistance Uncut | Resistance Cut |
+**Table 3.** Connections to measure resistance and expected resistance values.
+| Component | Connection 1| Connection 2 | Resistance (Jumpers Uncut) | Resistance (Jumpers Cut) |
 | --- | :---: | :---: | :---: | :---: | 
-| MicroMod Data Logging Carrier Board | G2-3V3 | SDA | ~2.2 kOhm | ~600 kOhm |
-| MicroMod Data Logging Carrier Board | G2-3V3 | SCL | ~2.2 kOhm | ~600 kOhm |
-| u-blox ZED-F9P | 3V3 | SDA | ~2.2 kOhm | ~250 kOhm |
-| u-blox ZED-F9P | 3V3 | SDA | ~2.2 kOhm | ~250 kOhm |
+| MicroMod Data Logging Carrier Board | G2-3V3 | SDA | ~2.2 kΩ | ~600 kΩ |
+| MicroMod Data Logging Carrier Board | G2-3V3 | SCL | ~2.2 kΩ | ~600 kΩ |
+| u-blox ZED-F9P | 3V3 | SDA | ~2.2 kΩ | ~250 kΩ |
+| u-blox ZED-F9P | 3V3 | SDA | ~2.2 kΩ | ~250 kΩ |
 
-After the I2C jumpers are cut, very high resistance values should be measured. Please note the resistance values may differ slightly depending on the quality of the digital multimeter (DMM) that is used. 
+**2) Cut I2C jumpers**
+* Using a sharp utility knife, carefully cut each of the I2C jumpers.
+* A good strategy is to make two cuts, along each of the pads so that the middle thin part of the PCB trace is removed entirely
+* A digital multimeter can be used to confirm the jumper is "open" by measuring each side of the pads.
 
-If the reading is lower then it means there's likely a jumper that still has a connection.
+
+
+**3) Measure I2C bus resistance (again)**
+After the I2C jumpers are cut, very high resistance values should be measured (see Table 3). Please note the resistance values may differ slightly depending on the quality of the digital multimeter (DMM) that is used. 
+
+If the resistance measurement is lower than expected, it likely means there's still a jumper that has a connection. This can be troubleshooted by removing each component and measureing the I2C jumpers directly.
