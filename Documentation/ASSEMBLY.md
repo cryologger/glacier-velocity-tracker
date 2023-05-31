@@ -20,6 +20,8 @@ This guide will focuses exclusively on first group, the assembly of the Cryologg
 | Pliers | [Hakko CHP PN-2001 Pointed Nose Pliers](https://hakkousa.com/products/chp-tools/chp-hand-tools/chp-pn-2001-pointed-nose-pliers.html) |
 | Hot-air rework station | [Quick 957DW+](https://www.adafruit.com/product/1869) |
 | Screw driver | Phillips head screw driver |
+| PCB cleaning brush | [ESD-Safe PCB Cleaning Brush](https://www.adafruit.com/product/1209) |
+| PCB cleaning solution | De-ionized (DI) water |
 
 **Table 2.** Components required for asssembly of Cryologger GNSS v2.21 system.
 | Component | Product | Quantity |
@@ -77,19 +79,28 @@ This guide will focuses exclusively on first group, the assembly of the Cryologg
 <p align="center"><img width="720" alt="image" src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/56e697ea-1a51-4ec6-9fa5-1ee2ca9e5146"></p>
 <p align="center"><b>Figure 1.</b> Locations of female headers to be soldered to the PCB.</p>
 
-4) Insert male headers into female headers
-
-5) Solder male headers
-
-
 6) Solder screw terminal
-* Remove all components and insert the screw terminal. The PCB can then be turned upside for easy access to soldering the pins.
+* Once the female headers are soldered on, insert the screw terminal into the PCB, which can then be turned upside down for easy access to soldering the pins.
 
-7) Connect SparkFun Qwiic OLED Display
-* Attach two 3/8" nylon standoffs to the PCB with 1/4" 4-40 Phillips Head screws. Connect 50 mm Qwiic cable.
 
-8) Cut I2C jumpers 
+7) Solder components
+* Insert male headers into female headers shown in Figure 2.
+
+8) Clean solder flux residue
+* Pour a small amount of deionized water into a clean container. Dip the PCB cleaning brush into the water and gently clean all of the soldered connections on the botton of the PCB and on the components on top.
+* Compressed air can be used to blow off the water.
+* Use the hot-air rework station at 300°C and with a medium sized tip to evaporate the remaining water. Be careful around the following locations:
+  * The microSD card of the MicroMod Data Logging Carrier Board
+
+9) Cut I2C jumpers 
 See section 3.1 for instructions on cutting the I2C jumpers and verifying operation of the system.
+
+10) Connect SparkFun Qwiic OLED Display
+* Attach two 3/8" nylon standoffs to the PCB with 1/4" 4-40 Phillips Head screws. 
+* Connect 50 mm Qwiic cable.
+
+11) Upload code and test system
+* Please see https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/blob/main/Documentation/INSTALLATION.md
 
 ### 3.1 I2C Jumpers
 
