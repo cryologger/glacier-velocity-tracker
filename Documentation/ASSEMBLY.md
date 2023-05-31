@@ -1,5 +1,7 @@
 # Assembly
 
+![pcb](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/c99a814a-51ad-43ab-b7d6-aa136ee52781)
+
 ## 1.0 Introduction
 This guide provides detailed instructions on the assembly of a Cryologger GNSS system.
 
