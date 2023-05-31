@@ -1,15 +1,14 @@
-# Assembly
+# Cryologger GNSS - Assembly
 
 ## 1.0 Introduction
 This guide provides detailed instructions on the assembly of a Cryologger GNSS system.
 
 ## 2.0 Bill of Materials
-
 The components required to assemble a Cryologger GNSS system are split into two groups: 
 1) Components required for the assembly of the Cryologger (e.g., PCB, GNSS receiver, microcontroller, etc.)
-2) Components required for the mounting, power and deployment of the complete Cryologger GNSS system (e.g., tripod, solar panel, battery, etc.).
+2) Components required for the mounting, power and deployment of the complete system (e.g., tripod, solar panel, battery, etc.).
 
-This guide will focuses exclusively on first group, the assembly of the Cryologger PCB.
+This guide will focuses exclusively on first group, the assembly of the Cryologger itself.
 
 **Table 1.** Required tools for asssembly of Cryologger GNSS v2.21 system.
 | Tool | Recommended Product |
@@ -59,38 +58,42 @@ This guide will focuses exclusively on first group, the assembly of the Cryologg
 
 ## 3.0 Assembly
 
-
 1) Collect all necessary components
-* It is suggested to first gather all of the components required for the assembly of the Cryologger and remove them from their packaging.
+* It is suggested to first gather all of the components listed in the bill of materials (Table 2), which are required for the assembly of the Cryologger. Remove the components from their packaging and inspect them for obvious damage.
 
 2) Solder through-hole resistors and capacitor
-* The first components recommended to be soldered to the Cryologger PCB are the through-hole resistors and capacitor (Figure x). 
+* The first components recommended to be soldered to the Cryologger PCB are the through-hole resistors and capacitor (Figure 1). 
 * Both the capacitor and resistors can be inserted into the PCB in any orientation.
 * It is important to pay attention to the placement of the resistors, as they differ in resistance. 
-  * R1 is 10 MOhm and has the colour code: Brown Black Black Green Brown
-  * R2 is 1MOhm and has the color code: Brown Black Black Yellow Brown
+  * R1 = 10 MOhm. Colour code: Brown Black Black Green Brown
+  * R2 = 1 MOhm. Colour code: Brown Black Black Yellow Brown
 * For more information on resistance colour codes, please see: https://www.digikey.com/en/resources/conversion-calculators/conversion-calculator-resistor-color-code
 
 <p align="center"><img width="720" alt="image" src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/8fa15e3c-aedc-4379-ada3-3029dafc1340"></p>
 <p align="center"><b>Figure 1.</b> Location of through-hole resistors and capacitor to be soldered to the PCB.</p>
 
 3) Solder female headers to the PCB
-
+* A tip when soldering the female headers is to do two at a time and use a couple of uncut rows of male headers to keep them in their position. The PCB can then be turned upside down and the contacts easily soldered. 
 <p align="center"><img width="720" alt="image" src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/56e697ea-1a51-4ec6-9fa5-1ee2ca9e5146"></p>
 <p align="center"><b>Figure 1.</b> Locations of female headers to be soldered to the PCB.</p>
 
 6) Solder screw terminal
-* Once the female headers are soldered on, insert the screw terminal into the PCB, which can then be turned upside down for easy access to soldering the pins.
-
+* Once the female headers are soldered , insert the screw terminal into the PCB, which can then be turned upside down for easy access to soldering the contacts.
 
 7) Solder components
 * Insert male headers into female headers shown in Figure 2.
+* Place the SparkFun MicroMod Data Logging Carrier Board and GPS-RTK2 boards onto the male header pins and solder the contacts.
+* The Pololu step-down voltage regulator will also need to be soldered, but is more tricky.
 
 8) Clean solder flux residue
-* Pour a small amount of deionized water into a clean container. Dip the PCB cleaning brush into the water and gently clean all of the soldered connections on the botton of the PCB and on the components on top.
-* Compressed air can be used to blow off the water.
-* Use the hot-air rework station at 300°C and with a medium sized tip to evaporate the remaining water. Be careful around the following locations:
-  * The microSD card of the MicroMod Data Logging Carrier Board
+* Pour a small amount of deionized water into a clean container. 
+* Dip the PCB cleaning brush into the water and then gently scrub all of the soldered connections on the bottom of the PCB and on the top components.
+* If available, compressed air can be used to blow off the water.
+* Otherwise, use the hot-air rework station at 300°C and with a medium sized tip to evaporate the remaining water. 
+  * Do not leave the tip blowing on any one spot for longer than 3 seconds.
+  * Be careful around the following locations:
+    * The microSD card of the MicroMod Data Logging Carrier Board.
+  
 
 9) Cut I2C jumpers 
 See section 3.1 for instructions on cutting the I2C jumpers and verifying operation of the system.
