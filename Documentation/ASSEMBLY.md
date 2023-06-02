@@ -133,18 +133,17 @@ https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library/issues/40
 * A good strategy is to make two cuts, along each of the pads so that the middle thin part of the PCB trace is removed entirely
 * A digital multimeter can be used to confirm the jumper is "open" by measuring each side of the pads.
 
-* MicroMod Data Logging Carrier Board
+**MicroMod Data Logging Carrier Board**
 
 ![mmdlcb](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/a21e962e-63e8-4500-91b4-5244dc133dde)
 
-* GNSS
+**GNSS**
 
 ![gnss](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/6300da4a-9dee-48d5-8fb2-9f9f70ec7991)
 
-* OLED
+**OLED**
 
 ![oled](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/1c616bb3-eff6-4900-bb15-cba3e535c43e)
-
 
 **3) Measure I2C bus resistance (again)**
 
