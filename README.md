@@ -73,7 +73,7 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 | Battery Ring Terminal | [Molex Perma-Seal Ring Terminal 14-16 AWG Wire 1/4" (M6) 19164-0026](https://octopart.com/19164-0026-molex-99569?r=sp) | 2 | $1.00 |
 | Battery | Deka SOLAR Gel 48 Ah 8G40C | 1 | ~$150.00 |
 | Antenna Bulkhead Adapter | [Amphenol TNC Jk to TNC Jk 50 Ohm Str Bkhd IP67 AD-TNCJTNCJ-1](https://octopart.com/ad-tncjtncj-1-amphenol+rf-108109770?r=sp) | 1 | $42.79 |
-| Antenna Cable | [GPAC GPS Antenna Cable TNC to Right Angle TNC (3 m)](https://www.gpac-llc.com/product.php?product=10) | 1 | $83.00 |
+| Antenna Cable | [GPAC GPS Antenna Cable TNC to TNC (3 m)](https://www.gpac-llc.com/product.php?product=1) | 1 | $56.00 |
 | Enclosure | [L-Com 14x12x7 Inch Weatherproof NEMA Enclosure](https://www.l-com.com/nema-enclosures-14x12x7-inch-weatherproof-nema-enclosure-only) | 1 |  $161.99 |
 | Enclosure Panel | [L-Com Blank Aluminum Mounting Plate](https://www.l-com.com/nema-enclosures-blank-aluminum-mounting-plate-for-1412xx-series-enclosures) | 1 |  $32.39 |
 | Pole Mount | [L-Com Enclosure Pole Mounting Kit](https://www.l-com.com/nema-enclosures-enclosure-pole-mounting-kit-pole-diameters-1-1-4-to-2-inches) | 1 | $75.99 |
