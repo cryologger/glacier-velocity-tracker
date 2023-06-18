@@ -49,13 +49,13 @@ The glacier velocity measurement system requires two external libraries. These c
 
 <img src="https://user-images.githubusercontent.com/22924092/125139245-31ee6280-e0de-11eb-9bea-371367445301.png" width="480">
 
-## Step 6: Download Glacier Velocity Measurement System Program
-Code for the Cryologger GVMS is made available on the following GitHub repository:
+## Step 6: Download Glacier Velocity Tracker Software
+Code for the Cryologger GVT is made available on the following GitHub repository:
 * https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Tracker
 * Click on "Releases" and download the v2.2.1 .zip file:
 ![image](https://user-images.githubusercontent.com/22924092/235293956-19fb44e3-4aa3-4652-9721-a310398153c5.png)
 
-## Step 7: Test Program Compiliation
+## Step 7: Test Program Compilation
 * Navigate to the /Software/Arduino/cryologger_gvt folder of the downloaded repository
 * Double click on the `cryologger_gvt.ino` file
 * Click on the checkmark in the upper left corner of the Arduino IDE program window
