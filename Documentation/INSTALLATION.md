@@ -10,8 +10,8 @@ This guide provides step-by-step instructions on how to install the Arduino IDE 
 * In the Arduino IDE navigate to: Preferences
 * Add the following "Additional Boards Manager URL" as shown in the screenshot below:
 ```https://raw.githubusercontent.com/sparkfun/Arduino_Apollo3/master/package_sparkfun_apollo3_index.json```
-* Also during this step, check the "compile" and "upload" boxes for "Show verbose output during" 
-![image](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/b33cc359-42af-431e-8421-42f764a736e7)
+* Also during this step, check the "compile" and "upload" boxes for "Show verbose output during" and change "Compilier warnings" to "All"
+![image](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/3724a095-7dda-4962-ada7-1a28d6a9a971)
 
 ## Step 3: Install Board Definition
 * Navigate to: Tools > Boards > Boards Manager
