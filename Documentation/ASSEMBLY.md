@@ -79,7 +79,7 @@ This guide focuses exclusively on first group, the assembly of the Cryologger.
 <p align="center"><b>Figure 2.</b> Locations of female headers to be soldered to the PCB.</p>
 
 **6) Solder screw terminal**
-* Once the female headers are soldered , insert the screw terminal into the PCB, which can then be turned upside down for easy access to soldering the contacts.
+* Once the female headers are soldered, insert the screw terminal into the PCB, which can then be turned upside down for easy access to soldering the contacts.
 <p align="center"><img width="720" alt="image" src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/9cda10ee-1666-4f16-8e5e-f8e86fa08617"></p>
 <p align="center"><b>Figure 3.</b> Location of screw terminal to be soldered to the PCB.</p>
 
