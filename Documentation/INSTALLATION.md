@@ -66,5 +66,9 @@ Code for the Cryologger GVT is made available on the following GitHub repository
 ## Step 9: Upload Program
 * Once the code has compiled successfully, click on the right-pointed arrow to upload the code
 * Watch the output window for compilation errors and/or success messages
+* If no errors are presented, the code has now been successfully uploaded!
 ![image](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/f04429c8-bd06-4495-b4c4-73199b718b03)
 
+## Step 10: Next Steps
+* Next to be covered is the detailed operation of the Cryologger GVT, including customized logging schedules and interpreting the OLED display messages.
+* This information is made available in OPERATION.md.
