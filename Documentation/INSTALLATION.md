@@ -1,5 +1,5 @@
 # Cryologger Glacier Velocity Tracker - Installation
-This guide provides step-by-step instructions on how to install the Arduino IDE and required board definitons and libraries, which are necessary for uploading code to the Cryologger GVT.
+This guide provides step-by-step instructions on installing the Arduino IDE and required board definitions and libraries, which are necessary for uploading code to the Cryologger GVT.
 
 ## Step 1: Download Arduino IDE  
 * Navigate to https://www.arduino.cc/en/software and download the most recent version of the Arduino IDE.
@@ -26,7 +26,7 @@ The glacier velocity measurement system requires three external libraries. These
 * Search for and install the following libraries:
 
 **Table 1.** Libraries required by Cryologger GVT. Last updated 2023-06-19.
-| Library Manager                      | Version | GitHub Repository                                               |
+| Library                              | Version | GitHub Repository                                               |
 |--------------------------------------|:-------:|-----------------------------------------------------------------|
 | SparkFun u-blox GNSS v3              |  3.0.16 | https://github.com/sparkfun/SparkFun_u-blox_GNSS_v3             |
 | SdFat                                |  2.2.2  | https://github.com/greiman/SdFat                                |
