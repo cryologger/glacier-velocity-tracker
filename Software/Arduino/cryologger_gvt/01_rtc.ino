@@ -6,44 +6,65 @@ void setInitialAlarm()
   // 1: Alarm match hundredths, seconds, minutes, hour, day, month  (every year)
   // 2: Alarm match hundredths, seconds, minutes, hours, day        (every month)
   // 3: Alarm match hundredths, seconds, minutes, hours, weekday    (every week)
-  // 4: Alarm match hundredths, seconds, minute, hours              (every day)
+  // 4: Alarm match hundredths, seconds, minutes, hours             (every day)
   // 5: Alarm match hundredths, seconds, minutes                    (every hour)
   // 6: Alarm match hundredths, seconds                             (every minute)
   // 7: Alarm match hundredths                                      (every second)
 
-  // Manually set the RTC date and time
-  //rtc.setTime(14, 58, 50, 0, 24, 6, 22); // hour, minutes, seconds, hundredths, day, month, year
+  // Debugging only: Manually set the RTC date and time
+  //rtc.setTime(23, 55, 50, 0, 23, 6, 23); // hour, minutes, seconds, hundredths, day, month, year
 
-  if (operationMode == 1)
+  // Check for operation mode
+  if (operationMode == 1) // Daily mode
   {
-    // Set initial alarm
-    rtc.setAlarm(startTime, 0, 0, 0, 0, 0);
+    // Set alarm mode
+    initialAlarmMode = 4; // Alarm match hundredths, seconds, minutes, hours
+
+    // Set initial alarm for specified hour
+    rtc.setAlarm(startHour % 24, startMinute % 60, 0, 0, 0, 0);
+
+    // Set the alarm mode
+    rtc.setAlarmMode(initialAlarmMode);
+
+    // Clear flag
+    alarmFlag = false;
   }
-  else
+  else if (operationMode == 2) // Rolling mode
   {
-    // Set initial alarm
+    // Set alarm mode
+    initialAlarmMode = 5;  // Alarm match hundredths, seconds, minutes
+
+    // Set initial alarm for rollover of next hour
     rtc.setAlarm(0, 0, 0, 0, 0, 0);
-  }
 
-  // Set the alarm mode
-  rtc.setAlarmMode(initialAlarmMode);
+    // Set the alarm mode
+    rtc.setAlarmMode(initialAlarmMode);
+
+    // Clear flag
+    alarmFlag = false;
+  }
+  else if (operationMode == 3) // Continuous mode
+  {
+    // Set alarm mode
+    initialAlarmMode = 4; // Alarm match hundredths, seconds, minutes, hours
+
+    // Set initial alarm for rollover of next day (00:00:00 UTC)
+    rtc.setAlarm(0, 0, 0, 0, 0, 0);
+
+    // Set the alarm mode
+    rtc.setAlarmMode(initialAlarmMode);
+
+    // Set flag
+    alarmFlag = true;
+  }
 
   // Attach alarm interrupt
   rtc.attachInterrupt();
 
   // Clear the RTC alarm interrupt
-  //rtc.clearInterrupt(); // Apollo3 Core v2.x
-  am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM); // Apollo3 Core v1.x
+  am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
 
-  // Initial alarm flag is dependent on logging mode
-  if (operationMode == 3)
-  {
-    alarmFlag = true; // Set flag
-  }
-  else
-  {
-    alarmFlag = false; // Clear flag
-  }
+  DEBUG_PRINT(F("Info - Initial alarm mode: "));  DEBUG_PRINTLN(initialAlarmMode);
 }
 
 // Read the RTC
@@ -72,11 +93,14 @@ void setSleepAlarm()
   {
     DEBUG_PRINTLN(F("Info - Setting daily RTC alarm"));
 
+    // Set alarm mode
+    sleepAlarmMode = 4; // Alarm match hundredths, seconds, minutes, hours
+
     // Set daily alarm
-    rtc.setAlarm(startTime, 0, 0, 0, 0, 0);
+    rtc.setAlarm(startHour, startMinute, 0, 0, 0, 0);
 
     // Set RTC alarm mode
-    rtc.setAlarmMode(sleepAlarmMode); // Alarm match
+    rtc.setAlarmMode(sleepAlarmMode); // Alarm match hundredths, seconds, minute, hours
 
     // Clear alarm flag
     alarmFlag = false;
@@ -84,12 +108,22 @@ void setSleepAlarm()
   else if (operationMode == 2) // Rolling mode
   {
     DEBUG_PRINTLN(F("Info - Setting rolling RTC alarm"));
-    
+
     // Set rolling RTC alarm
     rtc.setAlarm((rtc.hour + sleepAlarmHours) % 24, (rtc.minute + sleepAlarmMinutes) % 60, 0, 0, rtc.dayOfMonth, rtc.month);
 
+    // Adjust alarm mode based on duration of rolling alarm
+    if (sleepAlarmHours > 0)
+    {
+      sleepAlarmMode = 4; // Alarm match on hundredths, seconds, minutes, hours
+    }
+    else
+    {
+      sleepAlarmMode = 5; // Alarm match on hundredths, seconds, minutes
+    }
+
     // Set RTC alarm mode
-    rtc.setAlarmMode(sleepAlarmMode); // Alarm match on hundredths, seconds, minutes, hours
+    rtc.setAlarmMode(sleepAlarmMode);
 
     // Clear alarm flag
     alarmFlag = false;
@@ -102,7 +136,6 @@ void setSleepAlarm()
   else
   {
     alarmFlag = true; // Default if no logging mode set
-    return; // Skip setting alarm
   }
 
   // Print the next RTC alarm date and time
@@ -114,16 +147,16 @@ void setSleepAlarm()
 void setAwakeAlarm()
 {
   // Clear the RTC alarm interrupt
-  am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM); // Apollo3 Core v1.x
+  am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
 
   // Check for logging mode
   if (operationMode == 1) // Daily mode
   {
     // Set daily RTC alarm
-    rtc.setAlarm(stopTime, 0, 0, 0, 0, 0);
+    rtc.setAlarm(stopHour, stopMinute, 0, 0, 0, 0);
 
     // Set RTC alarm mode
-    rtc.setAlarmMode(loggingAlarmMode); // Alarm match on hundredths, seconds,  minutes, hours
+    rtc.setAlarmMode(4); // Alarm match on hundredths, seconds,  minutes, hours
   }
   else if (operationMode == 2) // Rolling mode
   {
@@ -135,11 +168,8 @@ void setAwakeAlarm()
   }
   else if (operationMode == 3) // Continuous mode
   {
-    // Set continuous RTC alarm
-    rtc.setAlarm(0, 0, 0, 0, 0, 0); // hours, minutes, seconds, microseconds, day, month
-
-    // Set RTC alarm mode
-    rtc.setAlarmMode(4); // Alarm match hundredths, seconds, minute, hours (00:00:00 UTC)
+    DEBUG_PRINTLN(F("Info - Continuous logging enabled"));
+    return; // Skip setting alarm
   }
 
   // Clear alarm flag

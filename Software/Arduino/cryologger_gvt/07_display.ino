@@ -143,8 +143,8 @@ void displayLoggingMode()
     {
       char displayBuffer1[32];
       char displayBuffer2[32];
-      sprintf(displayBuffer1, "Start time: %d:00", startTime);
-      sprintf(displayBuffer2, "End time: %d:00", stopTime);
+      sprintf(displayBuffer1, "Start time: %d:%d", startHour, startMinute);
+      sprintf(displayBuffer2, "End time: %d:%d", stopHour, stopMinute);
       oled.print("Daily");
       oled.text(0, 10, displayBuffer1);
       oled.text(0, 20, displayBuffer2);
@@ -153,13 +153,12 @@ void displayLoggingMode()
     {
       char displayBuffer1[32];
       char displayBuffer2[32];
-      sprintf(displayBuffer1, "Log: %d hrs %d min", awakeAlarmHours, awakeAlarmMinutes);
-      sprintf(displayBuffer2, "Sleep: %d hrs %d min", sleepAlarmHours, sleepAlarmMinutes);
+      sprintf(displayBuffer1, "Log: %02d hrs %02d min", awakeAlarmHours, awakeAlarmMinutes);
+      sprintf(displayBuffer2, "Sleep: %02d hrs %02d min", sleepAlarmHours, sleepAlarmMinutes);
 
       oled.print("Rolling");
       oled.text(0, 10, displayBuffer1);
       oled.text(0, 20, displayBuffer2);
-
     }
     else if (operationMode == 3)
     {
@@ -171,7 +170,7 @@ void displayLoggingMode()
     }
     oled.display();
     disablePullups();
-    myDelay(2000);
+    myDelay(8000);
   }
 }
 
@@ -260,7 +259,6 @@ void displayErrorMicrosd2()
   oled.erase();
   oled.text(0, 0, "Error: microSD");
   oled.text(0, 10, "second attempt failed!");
-  oled.text(0, 20, "Freezing!");
   oled.display();
   disablePullups();
   myDelay(4000);

@@ -26,8 +26,8 @@ void printLoggingSettings()
   if (operationMode == 1)
   {
     DEBUG_PRINTLN("Daily");
-    DEBUG_PRINT("Start: "); printTab(4);  DEBUG_PRINTLN(startTime);
-    DEBUG_PRINT("Stop: "); printTab(4);  DEBUG_PRINTLN(stopTime);
+    DEBUG_PRINT("Start: "); printTab(4);  DEBUG_PRINT(startHour); DEBUG_PRINT(":"); DEBUG_PRINTLN(startMinute);
+    DEBUG_PRINT("Stop: "); printTab(4);  DEBUG_PRINT(stopHour); DEBUG_PRINT(":"); DEBUG_PRINTLN(stopMinute);
   }
   if (operationMode == 2)
   {
@@ -39,9 +39,6 @@ void printLoggingSettings()
   {
     DEBUG_PRINTLN("Continuous");
   }
-  DEBUG_PRINT("Logging alarm mode: "); printTab(2);  DEBUG_PRINTLN(loggingAlarmMode);
-  DEBUG_PRINT("Sleep alarm mode: "); printTab(2);  DEBUG_PRINTLN(sleepAlarmMode);
-  DEBUG_PRINT("Initial alarm mode: "); printTab(2);  DEBUG_PRINTLN(initialAlarmMode);
   printLine();
 }
 
@@ -111,7 +108,7 @@ void printGnssSettings()
     bool uart1Enabled;
     if (gnss.extractConfigValueByKey(&customCfg, UBLOX_CFG_UART1_ENABLED, &uart1Enabled, sizeof(uart1Enabled)))
     {
-      DEBUG_PRINT("UBLOX_CFG_UART1_ENABLED: "); printTab(1); DEBUG_PRINTLN(uart1Enabled);
+      DEBUG_PRINT("UBLOX_CFG_UART1_ENABLED: "); printTab(2); DEBUG_PRINTLN(uart1Enabled);
     }
     else
     {
@@ -121,7 +118,7 @@ void printGnssSettings()
     bool uart2Enabled;
     if (gnss.extractConfigValueByKey(&customCfg, UBLOX_CFG_UART2_ENABLED, &uart2Enabled, sizeof(uart2Enabled)))
     {
-      DEBUG_PRINT("UBLOX_CFG_UART2_ENABLED: ");  printTab(1); DEBUG_PRINTLN(uart2Enabled);
+      DEBUG_PRINT("UBLOX_CFG_UART2_ENABLED: ");  printTab(2); DEBUG_PRINTLN(uart2Enabled);
     }
     else
     {
@@ -334,7 +331,7 @@ void printTimers()
   DEBUG_PRINT("readRtc: ");     printTab(1);  DEBUG_PRINTLN(timer.rtc);
   DEBUG_PRINT("microSD: ");     printTab(1);  DEBUG_PRINTLN(timer.microSd);
   DEBUG_PRINT("voltage: ");     printTab(1);  DEBUG_PRINTLN(timer.voltage);
-  DEBUG_PRINT("gnss: ");        printTab(2);  DEBUG_PRINTLN(timer.gnss);
+  DEBUG_PRINT("gnss: ");        printTab(1);  DEBUG_PRINTLN(timer.gnss);
   DEBUG_PRINT("syncRtc: ");     printTab(1);  DEBUG_PRINTLN(timer.syncRtc);
   DEBUG_PRINT("logDebug: ");    printTab(1);  DEBUG_PRINTLN(timer.logDebug);
   DEBUG_PRINT("logGnss: ");     printTab(1);  DEBUG_PRINTLN(timer.logGnss);

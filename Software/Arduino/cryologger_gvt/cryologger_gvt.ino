@@ -1,24 +1,22 @@
 /*
     Title:    Cryologger - Glacier Velocity Tracker (GVT)
-    Version:  2.2.1
-    Date:     April 29, 2023
+    Version:  2.2.2
+    Date:     June 23, 2023
     Author:   Adam Garbo
 
     Components:
     - SparkFun Artemis Processor
     - SparkFun MicroMod Data Logging Carrier Board
     - SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic)
+    - SparkFun Qwiic OLED Display
     - Pololu 5V 600mA Step-Down Voltage Regulator D36V6F5
+    
 
     Dependencies:
     - Apollo3 Core v1.2.3
-    - SparkFun u-blox GNSS v3 v3.0.6
+    - SparkFun u-blox GNSS v3 v3.0.16
     - SparkFun Qwiic OLED Arduino Library v1.0.5
-    - SdFat v2.2.0
-
-    Comments:
-    - Code configured for sea ice monitoring in Arctic Bay, Nunavut.
-    - Operation mode: Rolling 10 minutes ON & 20 minutes OFF.
+    - SdFat v2.2.2
 */
 
 // ----------------------------------------------------------------------------
@@ -85,23 +83,20 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // Logging operation modes
 // 1: Daily (e.g., 3 hours each day between 19:00-22:00)
 // 2: Rolling (e.g., 2 hours awake, 3 hours asleep, repeat)
-// 3: Continuous (e.g., new log file created each day at 00:00)
+// 3: Continuous (e.g., constant logging with new log file created every day at 00:00 UTC)
 byte          operationMode       = 2;    // 1: daily, 2: rolling, 3: 24-hour
 
 // Daily alarm
-byte          startTime           = 19;   // Logging start hour (UTC)
-byte          stopTime            = 22;   // Logging end hour (UTC)
+byte          startHour           = 16;   // Logging start hour (UTC)
+byte          startMinute         = 0;    // Logging start minute (UTC)
+byte          stopHour            = 19;   // Logging end hour (UTC)
+byte          stopMinute          = 0;    // Logging end minute (UTC)
 
 // Rolling alarm
-byte          awakeAlarmMinutes   = 10;    // Rolling minutes alarm
-byte          awakeAlarmHours     = 0;    // Rolling hours alarm
-byte          sleepAlarmMinutes   = 20;    // Rolling minutes alarm
-byte          sleepAlarmHours     = 0;    // Rolling hours alarm
-
-// Manual alarm modes (debugging only)
-byte          loggingAlarmMode    = 5;    // Logging alarm mode
-byte          sleepAlarmMode      = 5;    // Sleep alarm mode
-byte          initialAlarmMode    = 5;    // Initial alarm mode
+byte          awakeAlarmHours     = 0;    // Rolling hour alarm
+byte          awakeAlarmMinutes   = 5;    // Rolling minute alarm
+byte          sleepAlarmHours     = 0;    // Rolling hour alarm
+byte          sleepAlarmMinutes   = 5;    // Rolling minute alarm
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -113,16 +108,19 @@ volatile int  wdtCounterMax       = 0;        // Counter for max WDT interrupts
 bool          gnssConfigFlag      = true;     // Flag to indicate whether to configure the u-blox module
 bool          rtcSyncFlag         = false;    // Flag to indicate if RTC has been synced with GNSS
 bool          firstTimeFlag       = true;     // Flag to indicate if program running for the first time
+byte          loggingAlarmMode    = 4;        // Default logging alarm mode (daily)
+byte          sleepAlarmMode      = 4;        // Default sleep alarm mode (daily)
+byte          initialAlarmMode    = 4;        // Default initial alarm mode (daily)
 char          logFileName[30]     = "";       // Log file name
 char          debugFileName[20]   = "";       // Debug log file name
 char          dateTimeBuffer[25]  = "";       // Buffer to store datetime information
 const int     sdWriteSize         = 512;      // Write data to SD in blocks of 512 bytes
-const int     fileBufferSize      = 16384;    // Allocate 16 KB RAM for UBX message storage
+const int     fileBufferSize      = 16384;    // Buffer size to allocate 16 KB RAM for UBX message storage
 unsigned int  debugCounter        = 0;        // Counter to track number of recorded debug messages
-unsigned int  gnssTimeout         = 5;        // Timeout for GNSS signal acquisition (in minutes)
+unsigned int  gnssTimeout         = 5;        // Timeout for GNSS signal acquisition (minutes)
 unsigned int  maxBufferBytes      = 0;        // Maximum file buffer size
 unsigned int  reading             = 0;        // Battery voltage analog reading
-unsigned int  fixCounter          = 0;
+unsigned int  fixCounter          = 0;        // GNSS fix counter
 unsigned long previousMillis      = 0;        // millis() timer
 unsigned long bytesWritten        = 0;        // Counter for tracking bytes written to microSD
 unsigned long syncFailCounter     = 0;        // microSD logfile synchronize failure counter
@@ -229,7 +227,7 @@ void loop()
 
     // Configure logging
     readRtc();            // Get the RTC's alarm date and time
-    setAwakeAlarm();    // Set logging alarm
+    setAwakeAlarm();      // Set logging alarm
     getLogFileName();     // Get timestamped log file name
 
     // Configure devices
