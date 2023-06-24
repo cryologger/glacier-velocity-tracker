@@ -126,7 +126,7 @@ https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library/issues/40
 | MicroMod Data Logging Carrier Board | G2-3V3 | SDA | ~2.2 kΩ | ~600 kΩ |
 | MicroMod Data Logging Carrier Board | G2-3V3 | SCL | ~2.2 kΩ | ~600 kΩ |
 | u-blox ZED-F9P | 3V3 | SDA | ~2.2 kΩ | ~250 kΩ |
-| u-blox ZED-F9P | 3V3 | SDA | ~2.2 kΩ | ~250 kΩ |
+| u-blox ZED-F9P | 3V3 | SCL | ~2.2 kΩ | ~250 kΩ |
 
 **2) Cut I2C jumpers**
 * Using a sharp utility knife, carefully cut each of the I2C jumpers.
