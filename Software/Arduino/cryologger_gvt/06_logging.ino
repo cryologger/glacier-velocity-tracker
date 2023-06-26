@@ -1,9 +1,19 @@
+// Create timestamped log file name
+void getLogFileName()
+{
+  sprintf(logFileName, "%s_%d_20%02d%02d%02d_%02d%02d%02d.ubx",
+          ID, UNIT, rtc.year, rtc.month, rtc.dayOfMonth,
+          rtc.hour, rtc.minute, rtc.seconds);
+
+  DEBUG_PRINT("Info - logFileName: "); DEBUG_PRINTLN(logFileName);
+}
+
 // Create debugging log file
 void createDebugFile()
 {
   // Debug log file name
   sprintf(debugFileName, "%s_%d_debug.csv", ID, UNIT);
-  
+
   // Create debug log file
   // O_CREAT - Create the file if it does not exist
   // O_APPEND - Seek to the end of the file prior to each write
@@ -107,7 +117,7 @@ void logDebug()
     DEBUG_PRINTLN("Warning - Failed to close debug file.");
     closeFailCounter++; // Count number of failed file closes
   }
-                   
+
   // Print debugging information
   DEBUG_PRINT(dateTime);          DEBUG_PRINT(",");
   DEBUG_PRINT(readVoltage());     DEBUG_PRINT(",");
@@ -130,7 +140,7 @@ void logDebug()
   DEBUG_PRINT(syncFailCounter);   DEBUG_PRINT(",");
   DEBUG_PRINT(closeFailCounter);  DEBUG_PRINT(",");
   DEBUG_PRINTLN(debugCounter);
-  
+
   // Stop the loop timer
   timer.logDebug = millis() - loopStartTime;
 }

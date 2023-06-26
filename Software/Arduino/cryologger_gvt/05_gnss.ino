@@ -126,10 +126,12 @@ void configureGnss()
   else
   {
     DEBUG_PRINTLN("Info - GNSS already initialized.");
-    return;
   }
+
   // Stop the loop timer
   timer.gnss = millis() - loopStartTime;
+
+  //DEBUG_PRINT("Debug - configureGnss(): "); DEBUG_PRINTLN(timer.gnss);
 }
 
 // Acquire valid GNSS fix and sync RTC
@@ -152,7 +154,7 @@ void syncRtc()
     DEBUG_PRINTLN("Info - Attempting to sync RTC with GNSS...");
 
     // Attempt to acquire a valid GNSS position fix for up to 5 minutes
-    while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 60UL * 1000UL)
+    while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 1000UL)
     {
       petDog(); // Reset WDT
 
@@ -194,6 +196,9 @@ void syncRtc()
             rtcDrift = gnssEpoch - rtcEpoch;                // Calculate RTC drift
             rtcSyncFlag = true;                             // Set flag
 
+            DEBUG_PRINT("Info - RTC time synced to "); printDateTime();
+            DEBUG_PRINT("Info - RTC drift: "); DEBUG_PRINTLN(rtcDrift);
+
             // Update logfile timestamp if more than 30 seconds of drift
             if (abs(rtcDrift) > 30)
             {
@@ -201,9 +206,6 @@ void syncRtc()
               rtc.getTime(); // Get the RTC's date and time
               getLogFileName(); // Update logfile timestamp
             }
-
-            DEBUG_PRINT("Info - RTC drift: "); DEBUG_PRINTLN(rtcDrift);
-            DEBUG_PRINT("Info - RTC time synced to "); printDateTime();
 
             // Display OLED messages(s)
             displayRtcOffset(rtcDrift);
@@ -214,7 +216,7 @@ void syncRtc()
     if (!rtcSyncFlag)
     {
       DEBUG_PRINTLN("Warning - Unable to sync RTC!");
-      
+
       // Display OLED messages(s)
       displayRtcFailure();
     }
@@ -229,13 +231,7 @@ void syncRtc()
   timer.syncRtc = millis() - loopStartTime;
 }
 
-// Create timestamped log file name
-void getLogFileName()
-{
-  sprintf(logFileName, "%s_%d_20%02d%02d%02d_%02d%02d%02d.ubx",
-          ID, UNIT, rtc.year, rtc.month, rtc.dayOfMonth,
-          rtc.hour, rtc.minute, rtc.seconds);
-}
+
 
 // Log UBX-RXM-RAWX/SFRBX data
 void logGnss()
@@ -327,7 +323,7 @@ void logGnss()
       }
 
       // Periodically print number of bytes written
-      if (millis() - previousMillis > 5000)
+      if (millis() - previousMillis > 10000)
       {
         // Sync the log file
         if (!logFile.sync())
@@ -353,7 +349,7 @@ void logGnss()
         if (online.oled && displayDebug)
         {
           // After a specified number of cycles put OLED to sleep (1.2 uA)
-          if (displayCounter <= 100)
+          if (displayCounter >= 0) //<= 100)
           {
             displayCounter++;
             if (!displayToggle)
