@@ -1,7 +1,7 @@
 /*
     Title:    Cryologger - Glacier Velocity Tracker (GVT)
-    Version:  2.2.2
-    Date:     June 23, 2023
+    Version:  2.3.0
+    Date:     June 26, 2023
     Author:   Adam Garbo
 
     Components:
@@ -10,7 +10,7 @@
     - SparkFun GPS-RTK-SMA Breakout - ZED-F9P (Qwiic)
     - SparkFun Qwiic OLED Display
     - Pololu 5V 600mA Step-Down Voltage Regulator D36V6F5
-    
+
 
     Dependencies:
     - Apollo3 Core v1.2.3
@@ -81,22 +81,22 @@ SFE_UBLOX_GNSS    gnss;       // I2C address: 0x42
 // ----------------------------------------------------------------------------
 
 // Logging operation modes
-// 1: Daily (e.g., 3 hours each day between 19:00-22:00)
+// 1: Daily (e.g., 3 hours each day between 16:00-19:00)
 // 2: Rolling (e.g., 2 hours awake, 3 hours asleep, repeat)
 // 3: Continuous (e.g., constant logging with new log file created every day at 00:00 UTC)
-byte          operationMode       = 2;    // 1: daily, 2: rolling, 3: 24-hour
+byte          operationMode       = 1;        // 1: daily, 2: rolling, 3: 24-hour/day
 
-// Daily alarm
-byte          startHour           = 16;   // Logging start hour (UTC)
-byte          startMinute         = 0;    // Logging start minute (UTC)
-byte          stopHour            = 19;   // Logging end hour (UTC)
-byte          stopMinute          = 0;    // Logging end minute (UTC)
+// 1: Daily alarm configuration
+byte          alarmStartHour      = 16;       // Daily logging start hour (UTC)
+byte          alarmStartMinute    = 0;        // Daily logging start minute (UTC)
+byte          alarmStopHour       = 19;       // Daily logging end hour (UTC)
+byte          alarmStopMinute     = 0;        // Daily logging end minute (UTC)
 
-// Rolling alarm
-byte          awakeAlarmHours     = 0;    // Rolling hour alarm
-byte          awakeAlarmMinutes   = 5;    // Rolling minute alarm
-byte          sleepAlarmHours     = 0;    // Rolling hour alarm
-byte          sleepAlarmMinutes   = 5;    // Rolling minute alarm
+// 2: Rolling alarm configuration
+byte          alarmAwakeHours     = 1;        // Rolling hour alarm
+byte          alarmAwakeMinutes   = 0;        // Rolling minute alarm
+byte          alarmSleepHours     = 1;        // Rolling hour alarm
+byte          alarmSleepMinutes   = 0;        // Rolling minute alarm
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -108,16 +108,18 @@ volatile int  wdtCounterMax       = 0;        // Counter for max WDT interrupts
 bool          gnssConfigFlag      = true;     // Flag to indicate whether to configure the u-blox module
 bool          rtcSyncFlag         = false;    // Flag to indicate if RTC has been synced with GNSS
 bool          firstTimeFlag       = true;     // Flag to indicate if program running for the first time
-byte          loggingAlarmMode    = 4;        // Default logging alarm mode (daily)
-byte          sleepAlarmMode      = 4;        // Default sleep alarm mode (daily)
-byte          initialAlarmMode    = 4;        // Default initial alarm mode (daily)
+byte          alarmModeInitial    = 4;        // Default initial alarm mode (daily)
+byte          alarmModeLogging    = 4;        // Default logging alarm mode (daily)
+byte          alarmModeSleep      = 4;        // Default sleep alarm mode (daily)
+byte          dateCurrent         = 0;        // Variable for tracking when the date changes
+byte          dateNew             = 0;        // Variable for tracking when the date changes
 char          logFileName[30]     = "";       // Log file name
 char          debugFileName[20]   = "";       // Debug log file name
 char          dateTimeBuffer[25]  = "";       // Buffer to store datetime information
 const int     sdWriteSize         = 512;      // Write data to SD in blocks of 512 bytes
 const int     fileBufferSize      = 16384;    // Buffer size to allocate 16 KB RAM for UBX message storage
 unsigned int  debugCounter        = 0;        // Counter to track number of recorded debug messages
-unsigned int  gnssTimeout         = 5;        // Timeout for GNSS signal acquisition (minutes)
+unsigned int  gnssTimeout         = 300;      // Timeout for GNSS signal acquisition (seconds)
 unsigned int  maxBufferBytes      = 0;        // Maximum file buffer size
 unsigned int  reading             = 0;        // Battery voltage analog reading
 unsigned int  fixCounter          = 0;        // GNSS fix counter
@@ -184,6 +186,9 @@ void setup()
   blinkLed(2, 1000);      // Delay to allow user to open Serial Monitor
 #endif
 
+  // Configure real-time clock (RTC)
+  configureRtc();
+
   // Configure OLED display
   configureOled();
 
@@ -201,12 +206,13 @@ void setup()
   displayLoggingMode();
 
   // Configure devices
-  configureWdt();         // Configure and start Watchdog Timer (WDT)
-  configureSd();          // Configure microSD
-  configureGnss();        // Configure u-blox GNSS receiver
-  syncRtc();              // Acquire GNSS fix and sync RTC with GNSS
-  createDebugFile();      // Create debug log file
-  setInitialAlarm();      // Configure RTC and set initial alarm
+  configureWdt();     // Configure and start Watchdog Timer (WDT)
+  configureSd();      // Configure microSD
+  configureGnss();    // Configure u-blox GNSS receiver
+  syncRtc();          // Acquire GNSS fix and sync RTC with GNSS
+  checkDate();        // Get current day of month
+  createDebugFile();  // Create debug log file
+  setInitialAlarm();  // Configure RTC and set initial alarm
 
   DEBUG_PRINT("Info - Datetime "); printDateTime();
   DEBUG_PRINT("Info - Initial alarm "); printAlarm();
@@ -226,23 +232,37 @@ void loop()
     DEBUG_PRINT("Info - Alarm trigger "); printDateTime();
 
     // Configure logging
-    readRtc();            // Get the RTC's alarm date and time
-    setAwakeAlarm();      // Set logging alarm
-    getLogFileName();     // Get timestamped log file name
+    readRtc();        // Get the RTC's alarm date and time
+    setAwakeAlarm();  // Set alarm to stop logging and go to sleep
+    getLogFileName(); // Get timestamped log file name
 
-    // Configure devices
-    qwiicPowerOn();       // Enable power to Qwiic connector
-    peripheralPowerOn();  // Enable power to peripherals
-    resetOled();          // Configure OLED display
-    configureSd();        // Configure microSD
-    configureGnss();      // Configure u-blox GNSS
-    syncRtc();            // Synchronize RTC
+    // Check opeation mode
+    if (operationMode != 3) // Skip if in continuous mode
+    {
+      // Configure devices
+      qwiicPowerOn();       // Enable power to Qwiic connector
+      peripheralPowerOn();  // Enable power to peripherals
+      resetOled();          // Configure OLED display
+      configureSd();        // Configure microSD
+      configureGnss();      // Configure u-blox GNSS
+    }
+
+    // Synchronize RTC only if date changed (daily)
+    checkDate();
+    if (dateCurrent != dateNew)
+    {
+      DEBUG_PRINTLN(F("Info - Daily RTC sync required..."));
+      syncRtc();
+      dateCurrent = dateNew;
+      checkDate();
+    }
 
     // Log data
-    logGnss();            // Log raw data from u-blox GNSS receiver
-    logDebug();           // Log system debug information
-    setSleepAlarm();      // Set sleep alarm
-    printTimers();        // Log timers to debug file
+    logGnss();        // Log raw data from u-blox GNSS receiver
+    logDebug();       // Log system debug information
+    setSleepAlarm();  // Set alarm to wake from sleep and start logging
+    printTimers();    // Display global function timers
+    clearTimers();    // Clear global function timers
   }
 
   // Check for watchdog interrupt
@@ -284,8 +304,11 @@ extern "C" void am_watchdog_isr(void)
     wdt.restart(); // Restart the WDT timer
   }
 
-  wdtFlag = true; // Set the WDT flag
-  wdtCounter++; // Increment WDT interrupt counter
+  // Set the WDT flag
+  wdtFlag = true;
+
+  // Increment WDT interrupt counter
+  wdtCounter++;
 
   if (wdtCounter > wdtCounterMax)
   {
