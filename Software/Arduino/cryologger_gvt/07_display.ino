@@ -17,7 +17,6 @@ void configureOled()
     {
       online.oled = false;
       DEBUG_PRINTLN("Warning - OLED failed to initialize.");
-      return;
     }
     else
     {
@@ -143,8 +142,8 @@ void displayLoggingMode()
     {
       char displayBuffer1[32];
       char displayBuffer2[32];
-      sprintf(displayBuffer1, "Start time: %d:%d", startHour, startMinute);
-      sprintf(displayBuffer2, "End time: %d:%d", stopHour, stopMinute);
+      sprintf(displayBuffer1, "Start time: %d:%d", alarmStartHour, alarmStartMinute);
+      sprintf(displayBuffer2, "End time: %d:%d", alarmStopHour, alarmStopMinute);
       oled.print("Daily");
       oled.text(0, 10, displayBuffer1);
       oled.text(0, 20, displayBuffer2);
@@ -153,8 +152,8 @@ void displayLoggingMode()
     {
       char displayBuffer1[32];
       char displayBuffer2[32];
-      sprintf(displayBuffer1, "Log: %02d hrs %02d min", awakeAlarmHours, awakeAlarmMinutes);
-      sprintf(displayBuffer2, "Sleep: %02d hrs %02d min", sleepAlarmHours, sleepAlarmMinutes);
+      sprintf(displayBuffer1, "Log: %02d hrs %02d min", alarmAwakeHours, alarmAwakeMinutes);
+      sprintf(displayBuffer2, "Sleep: %02d hrs %02d min", alarmSleepHours, alarmSleepMinutes);
 
       oled.print("Rolling");
       oled.text(0, 10, displayBuffer1);

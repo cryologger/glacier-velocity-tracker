@@ -54,8 +54,8 @@ void configureSd()
   else
   {
     DEBUG_PRINTLN("Info - microSD already initialized.");
-    return;
   }
+  
   // Stop the loop timer
   timer.microSd = millis() - loopStartTime;
 }

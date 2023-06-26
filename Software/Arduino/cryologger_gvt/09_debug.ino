@@ -26,14 +26,14 @@ void printLoggingSettings()
   if (operationMode == 1)
   {
     DEBUG_PRINTLN("Daily");
-    DEBUG_PRINT("Start: "); printTab(4);  DEBUG_PRINT(startHour); DEBUG_PRINT(":"); DEBUG_PRINTLN(startMinute);
-    DEBUG_PRINT("Stop: "); printTab(4);  DEBUG_PRINT(stopHour); DEBUG_PRINT(":"); DEBUG_PRINTLN(stopMinute);
+    DEBUG_PRINT("Start: "); printTab(4);  DEBUG_PRINT(alarmStartHour); DEBUG_PRINT(":"); DEBUG_PRINTLN(alarmStartMinute);
+    DEBUG_PRINT("Stop: "); printTab(4);  DEBUG_PRINT(alarmStopHour); DEBUG_PRINT(":"); DEBUG_PRINTLN(alarmStopMinute);
   }
   if (operationMode == 2)
   {
     DEBUG_PRINTLN("Rolling");
-    DEBUG_PRINT("Logging duration: "); printTab(2);  DEBUG_PRINT(awakeAlarmHours); DEBUG_PRINT(" hours "); DEBUG_PRINT(awakeAlarmMinutes); DEBUG_PRINTLN(" minutes ");
-    DEBUG_PRINT("Sleep duration: "); printTab(2);  DEBUG_PRINT(sleepAlarmHours); DEBUG_PRINT(" hours "); DEBUG_PRINT(sleepAlarmMinutes); DEBUG_PRINTLN(" minutes ");
+    DEBUG_PRINT("Logging duration: "); printTab(2);  DEBUG_PRINT(alarmAwakeHours); DEBUG_PRINT(" hours "); DEBUG_PRINT(alarmAwakeMinutes); DEBUG_PRINTLN(" minutes ");
+    DEBUG_PRINT("Sleep duration: "); printTab(2);  DEBUG_PRINT(alarmSleepHours); DEBUG_PRINT(" hours "); DEBUG_PRINT(alarmSleepMinutes); DEBUG_PRINTLN(" minutes ");
   }
   if (operationMode == 3)
   {
@@ -108,7 +108,7 @@ void printGnssSettings()
     bool uart1Enabled;
     if (gnss.extractConfigValueByKey(&customCfg, UBLOX_CFG_UART1_ENABLED, &uart1Enabled, sizeof(uart1Enabled)))
     {
-      DEBUG_PRINT("UBLOX_CFG_UART1_ENABLED: "); printTab(2); DEBUG_PRINTLN(uart1Enabled);
+      DEBUG_PRINT("UBLOX_CFG_UART1_ENABLED: "); printTab(1); DEBUG_PRINTLN(uart1Enabled);
     }
     else
     {
@@ -118,7 +118,7 @@ void printGnssSettings()
     bool uart2Enabled;
     if (gnss.extractConfigValueByKey(&customCfg, UBLOX_CFG_UART2_ENABLED, &uart2Enabled, sizeof(uart2Enabled)))
     {
-      DEBUG_PRINT("UBLOX_CFG_UART2_ENABLED: ");  printTab(2); DEBUG_PRINTLN(uart2Enabled);
+      DEBUG_PRINT("UBLOX_CFG_UART2_ENABLED: ");  printTab(1); DEBUG_PRINTLN(uart2Enabled);
     }
     else
     {
@@ -322,6 +322,13 @@ void printGnssSettings()
   printLine();
 }
 
+void clearTimers()
+{
+  // Clear timer structure
+  memset(&timer, 0x00, sizeof(timer));
+}
+
+
 void printTimers()
 {
   printLine();
@@ -331,7 +338,7 @@ void printTimers()
   DEBUG_PRINT("readRtc: ");     printTab(1);  DEBUG_PRINTLN(timer.rtc);
   DEBUG_PRINT("microSD: ");     printTab(1);  DEBUG_PRINTLN(timer.microSd);
   DEBUG_PRINT("voltage: ");     printTab(1);  DEBUG_PRINTLN(timer.voltage);
-  DEBUG_PRINT("gnss: ");        printTab(1);  DEBUG_PRINTLN(timer.gnss);
+  DEBUG_PRINT("gnss: ");        printTab(2);  DEBUG_PRINTLN(timer.gnss);
   DEBUG_PRINT("syncRtc: ");     printTab(1);  DEBUG_PRINTLN(timer.syncRtc);
   DEBUG_PRINT("logDebug: ");    printTab(1);  DEBUG_PRINTLN(timer.logDebug);
   DEBUG_PRINT("logGnss: ");     printTab(1);  DEBUG_PRINTLN(timer.logGnss);

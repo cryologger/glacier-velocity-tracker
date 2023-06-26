@@ -37,12 +37,13 @@ void goToSleep()
   if (operationMode == 3)
   {
     //alarmFlag = true; // Set flag
+    DEBUG_PRINTLN("Info - Continuous mode. Skipping sleep...");
     return;
   }
   else
   {
     alarmFlag = false; // Clear flag
-    //DEBUG_PRINTLN("Info - Entering deep sleep.");
+    //DEBUG_PRINTLN("Info - Entering deep sleep...");
     //DEBUG_PRINT("Info - Sleeping until "); printAlarm();
   }
 
