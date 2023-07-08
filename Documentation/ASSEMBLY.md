@@ -1,16 +1,16 @@
-# Cryologger GNSS - Assembly
+# Cryologger Glacier Velocity Tracker - Assembly
 
 ## 1.0 Introduction
-This guide provides detailed instructions on the assembly of a Cryologger GNSS system.
+This guide provides detailed instructions on the assembly of a Cryologger GVT system.
 
 ## 2.0 Bill of Materials
-The components required to assemble a Cryologger GNSS system are split into two groups: 
+The components required to assemble a Cryologger GVT system are split into two groups: 
 1) Components required for the assembly of the Cryologger (e.g., PCB, GNSS receiver, microcontroller, etc.)
 2) Components required for the mounting, power and deployment of the complete system (e.g., tripod, solar panel, battery, etc.).
 
 This guide focuses exclusively on first group, the assembly of the Cryologger.
 
-**Table 1.** Required tools for asssembly of Cryologger GNSS v2.21 system.
+**Table 1.** Required tools for asssembly of Cryologger GVT v2.21 system.
 | Tool | Recommended Product |
 | --- | --- | 
 | Soldering iron | [Hakko FX-888D Digital Soldering Station](https://hakkousa.com/fx-888d-digital-soldering-station.html) |
@@ -22,7 +22,7 @@ This guide focuses exclusively on first group, the assembly of the Cryologger.
 | PCB cleaning brush | [ESD-Safe PCB Cleaning Brush](https://www.adafruit.com/product/1209) |
 | PCB cleaning solution | Deionized (DI) water |
 
-**Table 2.** Components required for asssembly of Cryologger GNSS v2.21 system.
+**Table 2.** Components required for asssembly of Cryologger GVT v2.21 system.
 | Component | Product | Quantity |
 | --- | --- | :---: |
 | PCB | [Cryologger Printed Circuit Board (PCB)](https://jlcpcb.com) | 1 |
