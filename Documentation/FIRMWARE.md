@@ -28,9 +28,9 @@ Before upgrading the firmware, it is necessary to reset the u-blox module to its
 
 ## Step 3: Upgrade firmware
 
-* Download the most recent u-blox ZED-F9P firmware (v1.32) from:
+* Download the most recent u-blox ZED-F9P firmware (v1.32):
   * https://content.u-blox.com/sites/default/files/2022-05/UBX_F9_100_HPG132.df73486d99374142f3aabf79b7178f48.bin
-* Download the SparkFun RTK u-blox Firmware Update Tool from:
+* Download the SparkFun RTK u-blox Firmware Update Tool:
   * https://github.com/sparkfun/SparkFun_RTK_Firmware_Binaries/raw/main/u-blox_Update_GUI/Windows_exe/RTK_u-blox_Update_GUI.exe
 * Run the SparkFun RTK u-blox Firmware Update Tool
 * Connect directly to the USB-C port of the u-blox ZED-F9P
