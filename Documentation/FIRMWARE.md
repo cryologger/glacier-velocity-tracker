@@ -32,18 +32,17 @@ Before upgrading the firmware, it is necessary to reset the u-blox module to its
   * https://content.u-blox.com/sites/default/files/2022-05/UBX_F9_100_HPG132.df73486d99374142f3aabf79b7178f48.bin
 * Download the SparkFun RTK u-blox Firmware Update Tool from:
   * https://github.com/sparkfun/SparkFun_RTK_Firmware_Binaries/raw/main/u-blox_Update_GUI/Windows_exe/RTK_u-blox_Update_GUI.exe
-
-
-
-* Connect directly to the USB-C port of the u-blox ZED-F9P
-* Confirm which COM port the device is operating on (e.g., using Device Manager)
 * Run the SparkFun RTK u-blox Firmware Update Tool
+* Connect directly to the USB-C port of the u-blox ZED-F9P
+* Confirm which COM port is in use (i.e., using Device Manager)
 * Click the Firmware File Browse and select the binary file for the v1.32 firmware update
-* Select the appropriate COM port
+* Select the appropriate COM port (click Refresh if necessary)
 * Click Update Firmware
   * Once complete, the u-blox module will restart.
 * Additional documentation on how to use the SparkFun RTK u-blox Firmware Update Tool can be found on SparkFun's website:
   * https://docs.sparkfun.com/SparkFun_RTK_Firmware/firmware_update/#updating-u-blox-firmware
+
+![image](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/4edc5a68-b6f0-41b8-bcbb-4b9fb00b1c14)
 
 ## Step 4: Confirm firmware version
 Once the firmware is successfully upgraded, confirm the version using the same program as in Step 1.
@@ -62,10 +61,8 @@ Unique chip ID: 0xA44C228CDD
 Unique chip ID: 0xA44C228CDD
 ```
 ## Step 5: Upload Cryologger software
-
-
 After confirming the firmware version, the Cryologger glacier velocity tracker software can be reinstalled.
-* 
+* See Steps 6-9 of Installation.md
 
 
 
