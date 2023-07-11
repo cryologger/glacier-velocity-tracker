@@ -38,34 +38,38 @@ The glacier velocity measurement system requires three external libraries. These
 ## Step 5: Download Software
 Code for the Cryologger GVT is made available on the following GitHub repository:
 * https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Tracker
-* Click on "Releases" and download the v2.2.1 .zip file:
-![image](https://user-images.githubusercontent.com/22924092/235293956-19fb44e3-4aa3-4652-9721-a310398153c5.png)
+* Click on "Releases" and download the v2.3.1 .zip file:
+![image](/Images/github-release.png)
 
 ## Step 6: Connect Hardware & Configure Port Settings
-* Connect the MicroMod Artemis Data Logging Carrier board via a USB C cable. 
-* In the Arduino IDE click on "Select Board" and then "SparkFun Artemis MicroMod".
-* If the board is not auto-populated, click on "Select other board and port..." and search for "SparkFun Artemis MicroMod":
-* Be sure to select the appropriate serial port that is connected to the Arduino.
-![image](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/ff301dea-9a29-4b84-a85e-f16959d3a2e7)
-* Then click on "Tools", navigate to "SVL Baud Rate" and select 460800 baud.
-![image](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/3d287a82-0d1c-4205-ae10-62b192580b16)
-![image](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/c38d0f96-3262-4d27-9d40-69c1cd489383)
+* Connect the MicroMod Artemis Data Logging Carrier board via a USB-C cable. 
+* In the Arduino IDE click on Tools > Board: >   
+![image](/Images/arduino-ide-board-1.png)
+![image](/Images/arduino-ide-board-2.png)
+![image](/Images/arduino-ide-board-3.png)
 
-## Step 7: Test Program Compilation
+* Then click on "Tools", navigate to "SVL Baud Rate" and select 460800 baud.
+![image](/Images/arduino-ide-baud-1.png)
+![image](/Images/arduino-ide-baud-2.png)
+
+## Step 7: Verify Program
 * Navigate to the /Software/Arduino/cryologger_gvt folder of the downloaded repository
 * Double click on the `cryologger_gvt.ino` file
 * Click on the checkmark in the upper left corner of the Arduino IDE program window
 * Watch the output window for any compilation errors
-![image](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/958a64de-168c-4bcc-8089-40b354d04dbe)
+![image](/Images/arduino-ide-verify.png)
 
 ## Step 8: Upload Program
 * Once the code has compiled successfully, click on the right-pointed arrow to upload the code
 * Watch the output window for compilation errors and/or success messages
-* If no errors are presented, the code has now been successfully uploaded!
-![image](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/f04429c8-bd06-4495-b4c4-73199b718b03)
+* If no errors are presented, the code has been successfully uploaded.
+![image](/Images/arduino-ide-upload.png)
 
-## Step 9: Observe Serial Monitor Output
-
+## Step 9: Observe Serial Monitor
+* After successfully uploading the program, click on the magnifying glass in the top right-hand corner to open the Serial Monitor
+* Click on the baud dropdown and select 115200 baud
+![image](/Images/arduino-ide-serial-monitor-1.png)
+![image](/Images/arduino-ide-serial-monitor-2.png)
 
 ## Step 10: Next Steps
 * Next to be covered is the detailed operation of the Cryologger GVT, including customized logging schedules and interpreting the OLED display messages.
