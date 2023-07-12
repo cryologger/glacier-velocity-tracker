@@ -68,6 +68,7 @@ Code for the Cryologger GVT is made available on the following GitHub repository
 ## Step 9: Observe Serial Monitor
 * After successfully uploading the program, click on the magnifying glass in the top right-hand corner to open the Serial Monitor
 * Click on the baud dropdown and select 115200 baud
+* Ensure the data logging mode and settings are correct
 ![image](/Images/arduino-ide-serial-monitor-1.png)
 ![image](/Images/arduino-ide-serial-monitor-2.png)
 
