@@ -6,7 +6,7 @@ The current version of firmware on the u-blox module can be determined by upload
 * Ensure the Arduino IDE v1.8.19 and SparkFun GNSS v3 library are installed (see Steps 1-4 in [INSTALLATION.md](/Documentation/INSTALLATION.md)
 * In the Arduino IDE, navigate to:
   * File > Examples > SparkFun u-blox GNSS v3 > Basics > Example8_GetModuleInfo
-* Upload program (see Step 9 in [INSTALLATION.md])
+* Upload program (see Step 9 in [INSTALLATION.md](/Documentation/INSTALLATION.md))
 * In the output (shown below), note the value of FWVER
   * If the firmware version is less than 1.30, it is necessary to perform an upgrade
 ```
@@ -24,7 +24,7 @@ Unique chip ID: 0xA44C228CDD
 Before upgrading the firmware, it is necessary to reset the u-blox module to its factory settings.
 * In the Arduino IDE, navigate to:
   * File > SparkFun u-blox GNSS v3 > Basics > Example11_ResetModule > Example1_FactoryDefaultviaI2C
-* Upload program (see Step 8 in [INSTALLATION.md])
+* Upload program (see Step 8 in [INSTALLATION.md](/Documentation/INSTALLATION.md))
 
 ## Step 3: Upgrade firmware
 * Download the most recent u-blox ZED-F9P firmware (v1.32):
@@ -34,14 +34,14 @@ Before upgrading the firmware, it is necessary to reset the u-blox module to its
 * Run the SparkFun RTK u-blox Firmware Update Tool
 * Connect directly to u-blox ZED-F9P USB-C port 
 * Confirm the COM port in use (i.e., using Device Manager)
-* Click the "Firmware File Browse" and select the binary file for the v1.32 firmware update
-* Select the appropriate COM port (click Refresh if necessary)
+* Click the Firmware File "Browse" button and select the binary file for the v1.32 firmware update
+* Select the appropriate COM port from the dropdown (click Refresh if necessary)
 * Click "Update Firmware"
   * Once complete, the u-blox module will restart
 * Additional documentation on how to use the SparkFun RTK u-blox Firmware Update Tool can be found on SparkFun's website:
   * https://docs.sparkfun.com/SparkFun_RTK_Firmware/firmware_update/#updating-u-blox-firmware
 
-![image](https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/4edc5a68-b6f0-41b8-bcbb-4b9fb00b1c14)
+![image](/Images/sparkfun-rtk-update-tool.png)
 
 ## Step 4: Confirm firmware version
 Once the firmware is successfully upgraded, confirm its version using the same program as in Step 1.
@@ -61,4 +61,4 @@ Unique chip ID: 0xA44C228CDD
 ```
 ## Step 5: Upload Cryologger software
 After confirming the firmware version, the latest version of Cryologger GVT software can then be reinstalled.
-* See Steps 5-9 in [INSTALLATION.md]
+* See Steps 5-9 in [INSTALLATION.md](/Documentation/INSTALLATION.md)
