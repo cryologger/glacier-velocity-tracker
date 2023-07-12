@@ -6,8 +6,8 @@ The current version of firmware on the u-blox module can be determined by upload
 * Ensure the Arduino IDE v1.8.19 and SparkFun GNSS v3 library are installed (see Steps 1-4 in [INSTALLATION.md](/Documentation/INSTALLATION.md)
 * In the Arduino IDE, navigate to:
   * File > Examples > SparkFun u-blox GNSS v3 > Basics > Example8_GetModuleInfo
-* Upload program (see Step 9 in [INSTALLATION.md](/Documentation/INSTALLATION.md))
-* In the output (shown below), note the value of FWVER
+* Upload program (see Steps 7-9 in [INSTALLATION.md](/Documentation/INSTALLATION.md))
+* In the Serial Monitor output (shown below), note the value of FWVER
   * If the firmware version is less than 1.30, it is necessary to perform an upgrade
 ```
 SparkFun u-blox Example
@@ -24,13 +24,14 @@ Unique chip ID: 0xA44C228CDD
 Before upgrading the firmware, it is necessary to reset the u-blox module to its factory settings.
 * In the Arduino IDE, navigate to:
   * File > SparkFun u-blox GNSS v3 > Basics > Example11_ResetModule > Example1_FactoryDefaultviaI2C
-* Upload program (see Step 8 in [INSTALLATION.md](/Documentation/INSTALLATION.md))
+* Upload the program (see Steps 7-9 in [INSTALLATION.md](/Documentation/INSTALLATION.md))
 
 ## Step 3: Upgrade firmware
-* Download the most recent u-blox ZED-F9P firmware (v1.32):
-  * https://content.u-blox.com/sites/default/files/2022-05/UBX_F9_100_HPG132.df73486d99374142f3aabf79b7178f48.bin
+Upgrading of the u-blox firmware will be accomplished using the SparkFun RTK u-blox Firmware Update Tool.
 * Download the SparkFun RTK u-blox Firmware Update Tool:
   * https://github.com/sparkfun/SparkFun_RTK_Firmware_Binaries/raw/main/u-blox_Update_GUI/Windows_exe/RTK_u-blox_Update_GUI.exe
+* Download the most recent u-blox ZED-F9P firmware (v1.32):
+  * https://content.u-blox.com/sites/default/files/2022-05/UBX_F9_100_HPG132.df73486d99374142f3aabf79b7178f48.bin
 * Run the SparkFun RTK u-blox Firmware Update Tool
 * Connect directly to u-blox ZED-F9P USB-C port 
 * Confirm the COM port in use (i.e., using Device Manager)
