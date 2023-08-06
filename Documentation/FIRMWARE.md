@@ -7,7 +7,8 @@ The current version of firmware on the u-blox module can be determined by upload
 * In the Arduino IDE, navigate to:
   * File > Examples > SparkFun u-blox GNSS v3 > Basics > Example8_GetModuleInfo
 * Upload program (see Steps 7-9 in [INSTALLATION.md](/Documentation/INSTALLATION.md))
-* In the Serial Monitor output (shown below), note the value of FWVER
+* In the Serial Monitor output (shown below), note the value of FWVER.
+  * ***Record this information in your notes for each system***
   * If the firmware version is less than 1.30, it is necessary to perform an upgrade
 ```
 SparkFun u-blox Example
@@ -50,6 +51,7 @@ Once the firmware is successfully upgraded, confirm its version using the same p
   * File > Examples > SparkFun u-blox GNSS v3 > Basics > Example8_GetModuleInfo
 * Upload the program
 * In the output (shown below), confirm the value for FWVER has changed to v1.32
+  * ***Record this information in your notes for each system***
 ```
 SparkFun u-blox Example
 FWVER: 1.32
