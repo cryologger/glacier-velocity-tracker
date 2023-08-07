@@ -38,7 +38,7 @@ The glacier velocity measurement system requires three external libraries. These
 ## Step 5: Download Software
 Code for the Cryologger GVT is made available on the following GitHub repository:
 * https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Tracker
-* Click on "Releases" and download the v2.3.1 .zip file:
+* Click on "Releases" and download the v2.3.0 .zip file:
 ![image](/Images/github-release.png)
 
 ## Step 6: Connect Hardware & Configure Port Settings
