@@ -26,6 +26,11 @@ Before upgrading the firmware, it is necessary to reset the u-blox module to its
 * In the Arduino IDE, navigate to:
   * File > SparkFun u-blox GNSS v3 > Basics > Example11_ResetModule > Example1_FactoryDefaultviaI2C
 * Upload the program (see Steps 7-9 in [INSTALLATION.md](/Documentation/INSTALLATION.md))
+* When prompted, press a key to reset the module
+```
+Press a key to reset module to factory defaults
+Unit has now been factory reset. Freezing...
+```
 
 ## Step 3: Upgrade firmware
 Upgrading of the u-blox firmware will be accomplished using the SparkFun RTK u-blox Firmware Update Tool.
