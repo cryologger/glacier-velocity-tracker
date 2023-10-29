@@ -1,14 +1,14 @@
 # Cryologger Glacier Velocity Tracker - Assembly
 
 ## 1.0 Introduction
-This guide provides detailed instructions on the assembly of a Cryologger GVT system.
+This guide provides detailed instructions on the assembly of a Cryologger GVT v2.2.1.
 
 ## 2.0 Bill of Materials
 The components required to assemble a Cryologger GVT system are split into two groups: 
 1) Components required for the assembly of the Cryologger (e.g., PCB, GNSS receiver, microcontroller, etc.)
 2) Components required for the mounting, power and deployment of the complete system (e.g., tripod, solar panel, battery, etc.).
 
-This guide is focused on the assembly of the Cryologger (i.e., group 1), however a bill of materials for the main components of group 2 is also provided.
+This guide is focused on the assembly of the Cryologger (i.e., group 1), however a bill of materials for the components pertaining to the mounting and power (i.e., group 2) is also provided.
 
 **Table 1.** Recommended tools required for the asssembly of a Cryologger GVT v2.21.
 | Tool | Recommended Product |
