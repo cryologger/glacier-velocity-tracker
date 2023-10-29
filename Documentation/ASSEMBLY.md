@@ -8,7 +8,7 @@ The components required to assemble a Cryologger GVT system are split into two g
 1) Components required for the assembly of the Cryologger (e.g., PCB, GNSS receiver, microcontroller, etc.)
 2) Components required for the mounting, power and deployment of the complete system (e.g., tripod, solar panel, battery, etc.).
 
-This guide is focused on the group #1, the assembly of the Cryologger, however a bill of materials for the main components of group #2 is also provided.
+This guide is focused on the assembly of the Cryologger (group 1), however a bill of materials for the main components of group 2 is also provided.
 
 **Table 1.** Required tools for asssembly of Cryologger GVT v2.21 system.
 | Tool | Recommended Product |
