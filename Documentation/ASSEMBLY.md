@@ -8,7 +8,7 @@ The components required to assemble a Cryologger GVT system are split into two g
 1) Components required for the assembly of the Cryologger (e.g., PCB, GNSS receiver, microcontroller, etc.)
 2) Components required for the mounting, power and deployment of the complete system (e.g., tripod, solar panel, battery, etc.).
 
-This guide focuses exclusively on first group, the assembly of the Cryologger.
+This guide is focused on the group #1, the assembly of the Cryologger, however a bill of materials for the main components of group #2 is also provided.
 
 **Table 1.** Required tools for asssembly of Cryologger GVT v2.21 system.
 | Tool | Recommended Product |
@@ -23,38 +23,55 @@ This guide focuses exclusively on first group, the assembly of the Cryologger.
 | PCB cleaning solution | Deionized (DI) water |
 
 **Table 2.** Components required for asssembly of Cryologger GVT v2.21 system.
-| Component | Product | Quantity |
-| --- | --- | :---: |
-| PCB | [Cryologger Printed Circuit Board (PCB)](https://jlcpcb.com) | 1 |
-| Processor | [SparkFun MicroMod Artemis Processor](https://www.sparkfun.com/products/16401) | 1 |
-| Carrier Board | [SparkFun MicroMod Data Logging Carrier Board](https://www.sparkfun.com/products/16829) | 1 |
-| GNSS Receiver | [SparkFun GPS-RTK-SMA Breakout - ZED-F9P](https://www.sparkfun.com/products/16481) | 1 |
-| Display | [SparkFun Qwiic OLED Display](https://www.sparkfun.com/products/17153) | 1 |
-| Qwiic Cable | [Qwiic Cable - 50mm](https://www.sparkfun.com/products/14426) | 1 |
-| Voltage Regulator | [Pololu 5V, 600mA Step-Down Voltage Regulator D36V6F5](https://www.pololu.com/product/3792) | 1 |
-| microSD Card| [SanDisk MAX Endurance 64 GB microSD](https://www.amazon.com/SanDisk-Endurance-microSDXC-Adapter-Security/dp/B084CJ96GT) | 1 |
-| Resistor | [1 Mohms 1% MBB02070C1004FRP00](https://octopart.com/mbb02070c1004frp00-vishay-42819429?r=sp) | 1 |
-| Resistor | [10Mohm 1% 50ppm MBB02070C1005FRP00](https://octopart.com/mbb02070c1005frp00-vishay-42881138?r=sp) | 1 |
-| Capacitor | [0.1 uF K104K15X7RF53L2](https://octopart.com/k104k15x7rf53l2-vishay-39696446?r=sp) | 1 |
-| Power Connector	| [PCB terminal block - MKDS 1,5/ 2-5,08 1715721](https://octopart.com/1715721-phoenix+contact-12533?r=sp) | 1 |
-| Male Header | [SparkFun Break Away Headers - Straight](https://www.sparkfun.com/products/116) | 2 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x2-Pin, Straight](https://www.pololu.com/product/1012) | 1 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x4-Pin, Straight](https://www.pololu.com/product/1014) | 1 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x6-Pin, Straight](https://www.pololu.com/product/1016) | 1 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x9-Pin, Straight](https://www.pololu.com/product/1019) | 2 | 
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x10-Pin, Straight](https://www.pololu.com/product/1020) | 1 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x12-Pin, Straight](https://www.pololu.com/product/1030) | 1 |
-| Standoff | [SparkFun Standoff - Nylon (4-40; 3/4"; 10 pack)](https://www.sparkfun.com/products/11796) | 4 |
-| Screw | [SparkFun Screw - Phillips Head (1/4", 4-40, 10 pack)](https://www.sparkfun.com/products/10453) | 8 |
-| GNSS Antenna | [SparkFun GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106](https://www.sparkfun.com/products/17751) | 1 | 
-| GNSS Antenna Cable | [SparkFun Interface Cable - SMA Female to SMA Male (25cm)](https://www.sparkfun.com/products/12861) | 1 |
-| GNSS Antenna Cable | [SparkFun Interface Cable - SMA Male to TNC Male (300mm)](https://www.sparkfun.com/products/17833) | 1 | 
-| Enclosure | [Hammond Manufacturing 1554Q2GYCL](https://octopart.com/1554q2gycl-hammond-99088964?r=sp) | 1 |
-| Enclosure Inner Panel | [Hammond Manufacturing 1554QPL](https://octopart.com/1554qpl-hammond-97562074?r=sp) | 1 |
-| Power Panel Mount Connector | Bulgin<sup>1</sup> | 1 |
-| Power Cable Connector | Bulgin<sup>1</sup> | 1 |
-| Battery Ring Terminal | [Molex Perma-Seal Ring Terminal 14-16 AWG Wire 1/4" (M6) 19164-0026](https://octopart.com/19164-0026-molex-99569?r=sp) | 2 |
+| Component | Product | Quantity | Cost (USD) |
+| --- | --- | :---: | :---: | 
+| PCB | [Cryologger Printed Circuit Board (PCB)](https://jlcpcb.com) | 1 |  |
+| Processor | [SparkFun MicroMod Artemis Processor](https://www.sparkfun.com/products/16401) | 1 |  |
+| Carrier Board | [SparkFun MicroMod Data Logging Carrier Board](https://www.sparkfun.com/products/16829) | 1 |  |
+| GNSS Receiver | [SparkFun GPS-RTK-SMA Breakout - ZED-F9P](https://www.sparkfun.com/products/16481) | 1 |  |
+| Display | [SparkFun Qwiic OLED Display](https://www.sparkfun.com/products/17153) | 1 |  |
+| Qwiic Cable | [Qwiic Cable - 50mm](https://www.sparkfun.com/products/14426) | 1 |  |
+| Voltage Regulator | [Pololu 5V, 600mA Step-Down Voltage Regulator D36V6F5](https://www.pololu.com/product/3792) | 1 |  |
+| microSD Card| [SanDisk MAX Endurance 64 GB microSD](https://www.amazon.com/SanDisk-Endurance-microSDXC-Adapter-Security/dp/B084CJ96GT) | 1 |  |
+| Resistor | [1 Mohms 1% MBB02070C1004FRP00](https://octopart.com/mbb02070c1004frp00-vishay-42819429?r=sp) | 1 |  |
+| Resistor | [10Mohm 1% 50ppm MBB02070C1005FRP00](https://octopart.com/mbb02070c1005frp00-vishay-42881138?r=sp) | 1 |  |
+| Capacitor | [0.1 uF K104K15X7RF53L2](https://octopart.com/k104k15x7rf53l2-vishay-39696446?r=sp) | 1 |  |
+| Power Connector	| [PCB terminal block - MKDS 1,5/ 2-5,08 1715721](https://octopart.com/1715721-phoenix+contact-12533?r=sp) | 1 |  |
+| Male Header | [SparkFun Break Away Headers - Straight](https://www.sparkfun.com/products/116) | 2 |  |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x2-Pin, Straight](https://www.pololu.com/product/1012) | 1 |  |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x4-Pin, Straight](https://www.pololu.com/product/1014) | 1 |  |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x6-Pin, Straight](https://www.pololu.com/product/1016) | 1 |  |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x9-Pin, Straight](https://www.pololu.com/product/1019) | 2 |   |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x10-Pin, Straight](https://www.pololu.com/product/1020) | 1 |  |
+| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x12-Pin, Straight](https://www.pololu.com/product/1030) | 1 |  |
+| Standoff | [SparkFun Standoff - Nylon (4-40; 3/4"; 10 pack)](https://www.sparkfun.com/products/11796) | 4 |  |
+| Screw | [SparkFun Screw - Phillips Head (1/4", 4-40, 10 pack)](https://www.sparkfun.com/products/10453) | 8 |  |
+| GNSS Antenna | [SparkFun GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106](https://www.sparkfun.com/products/17751) | 1 |   |
+| GNSS Antenna Cable | [SparkFun Interface Cable - SMA Female to SMA Male (25cm)](https://www.sparkfun.com/products/12861) | 1 |  |
+| GNSS Antenna Cable | [SparkFun Interface Cable - SMA Male to TNC Male (300mm)](https://www.sparkfun.com/products/17833) | 1 |  |
+| Enclosure | [Hammond Manufacturing 1554Q2GYCL](https://octopart.com/1554q2gycl-hammond-99088964?r=sp) | 1 |  |
+| Enclosure Inner Panel | [Hammond Manufacturing 1554QPL](https://octopart.com/1554qpl-hammond-97562074?r=sp) | 1 |  |
+| Power Panel Mount Connector | Bulgin<sup>1</sup> | 1 |  |
+| Power Cable Connector | Bulgin<sup>1</sup> | 1 |  |
+| Battery Ring Terminal | [Molex Perma-Seal Ring Terminal 14-16 AWG Wire 1/4" (M6) 19164-0026](https://octopart.com/19164-0026-molex-99569?r=sp) | 2 |  |
 
+**Table 3.** Components making up the enclosure, mounting and power systems for Cryologger GVT version 2.0. <sup>1</sup>Denotes optional component. <sup>2</sup>Denotes educational pricing.
+| Component | Product | Quantity | Cost (USD) | 
+| --- | --- | :---: | :---: | 
+| Solar Panel | [Ameresco Solar 20 Watt Solar Panel 20J<sup>2</sup>](https://www.amerescosolar.com/20j-ameresco-solar-20-watt-solar-panel) | 1 |  $99.00 |
+| Solar Panel Bracket | [Ameresco Solar HPM18-30 Solar Panel Pole Mount<sup>2</sup>](https://www.amerescosolar.com/hpm18-30solar-panel-pole-mount) | 1 |  $39.00 
+| Solar Charge Controller | [Genasun GV-4 4A MPPT Solar Charge Controller](https://www.altestore.com/store/charge-controllers/solar-charge-controllers/mppt-solar-charge-controllers/genasun-gv-4-pb-12v-4a-mppt-controller-for-12v-lead-acid-batteries-p10622/) | 1 |  $63.00 |
+| Solar Panel Power Cable | [Polarwire Arctic Ultraflex Blue Twin Trailer Cable AUF-TC162](https://store.polarwire.com/arctic-trailer-cable-16-2-gray-16ga-2-conductors/) | Variable | $0.55/ft |
+| Solar Panel Cable Gland | [Heyco M4340 M20 Cable Gland](https://octopart.com/m4340-heyco-2298364?r=sp) | 2 | $5.94 |
+| Battery Ring Terminal | [Molex Perma-Seal Ring Terminal 14-16 AWG Wire 1/4" (M6) 19164-0026](https://octopart.com/19164-0026-molex-99569?r=sp) | 2 | $1.00 |
+| Battery | Deka SOLAR Gel 48 Ah 8G40C | 1 | ~$150.00 |
+| Antenna Bulkhead Adapter | [Amphenol TNC Jk to TNC Jk 50 Ohm Str Bkhd IP67 AD-TNCJTNCJ-1](https://octopart.com/ad-tncjtncj-1-amphenol+rf-108109770?r=sp) | 1 | $42.79 |
+| Antenna Cable | [GPAC GPS Antenna Cable TNC to TNC (3 m)](https://www.gpac-llc.com/product.php?product=1) | 1 | $56.00 |
+| Enclosure | [L-Com 14x12x7 Inch Weatherproof NEMA Enclosure](https://www.l-com.com/nema-enclosures-14x12x7-inch-weatherproof-nema-enclosure-only) | 1 |  $161.99 |
+| Enclosure Panel | [L-Com Blank Aluminum Mounting Plate](https://www.l-com.com/nema-enclosures-blank-aluminum-mounting-plate-for-1412xx-series-enclosures) | 1 |  $32.39 |
+| Pole Mount | [L-Com Enclosure Pole Mounting Kit](https://www.l-com.com/nema-enclosures-enclosure-pole-mounting-kit-pole-diameters-1-1-4-to-2-inches) | 1 | $75.99 |
+| Tripod | [Onset HOBO Weather Station m 3m Tripod M-TPA](https://www.onsetcomp.com/products/mounting/m-tpa/) | 1 |  $200.00 | 
+| | | **Total** | **~$1,000** |
 
 ## 3.0 Assembly
 
