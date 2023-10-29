@@ -100,10 +100,10 @@ When initially powered on, the system will attempt to establish a GNSS fix and s
 While the system is in deep sleep, the Watchdog Timer (WDT) will wake the system to check the program has not frozen once every 10 seconds. The LED will blink briefly (100 ms) during this time. 
 
 #### 2.3.1 OLED Display Messages
-Version 2.x of the Cryologger GVT is equipped with an OLED display, which is used to provided detailed information to the end user. These messages will indicate the status of the Cryologger at each stage of system operation, including booting up, initializing of components, acquiring of GNSS fix, and logging of data. 
+Version 2.2.1 of the Cryologger GVT is equipped with an OLED display, which is used to provided detailed information to the end user. These messages will indicate the status of the Cryologger at each stage of system operation, including boot-up, initialization of components, acquisition of GNSS fix, and logging of data. 
 
 #### 2.3.2 LED Blink Patterns
-In addition to the OLED display messages, a series of LED blink patterns is also used to indicate system operation. The following table can be used to determine the status of the system, as well as any possible troubleshooting steps that should be attempted if an error is encountered.
+In addition to the OLED display messages, a series of LED blink patterns can also be used to indicate system operation. The following table can be used to determine the status of the system, as well as any possible troubleshooting steps that should be attempted if an error is encountered.
 
 **Table 1.** LED blink patterns, associated description and troubleshooting guide.
 | Blinks | Interval (s)  |   Pattern   | Description                     | Troubleshooting Steps                                 |
@@ -121,16 +121,18 @@ In addition to the OLED display messages, a series of LED blink patterns is also
 Data is logged in u-blox's proprietary .ubx format. Log files can be converted to RINEX using RTKLIB or Emlid Studio and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
 
 ## 3.0 Deployments
-A total of five deployments were made in the summer of 2021. Two on the Lowell Glacier in Kluane National Park, Yukon (Figure 5) and three on the Belcher and Southeast 2 glaciers, Devon Island, Nunavut, Canada (Figure 5).
+Between 2021 and 2023, a total of 28 Cryologger GVT deployments have been made by several of different academic institutions, including Univerity of Ottawa, Carleton University, and University of Waterloo (Canada), Carnegie Mellon University (United States), and University of Fribourg (Switzerland).
 
-<p align="center"><img src="https://user-images.githubusercontent.com/22924092/133788170-dc148b5a-be41-4dad-9bea-d87f751e8ac2.png" width="720"></p>
-<p align="left"><b>Figure 4.</b> Map of Cryologger glacier velocity system deployments on Lowell Glacier in Kluane National Park, Yukon during the summer 2021 field season. Imagery: Copernicus Sentinel 2 acquired 2021-07-28.</p>
-
-<p align="center"><img src="https://user-images.githubusercontent.com/22924092/133785308-99856546-a479-4e5f-8d66-12250404128f.png" width="720"></p>
-<p align="left"><b>Figure 5.</b> Map of Cryologger glacier velocity system deployments on Devon Island, Nunavut during the 2021 Amundsen Expedition. Imagery: Copernicus Sentinel 2 acquired 2021-08-28.</p>
+<p align="center"><img src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/053d6037-26ce-4e87-b219-ee7988b21e0c" width="720"></p>
+<p align="left"><b>Figure 4.</b> Map of Cryologger GVT deployments made between 2021 and 2023.</p>
 
 ## 4.0 Results
-Servicing of systems deployed on Devon Island and  Lowell Glacier  are planned for spring and summer 2022, respectively.
+
+
+
+
+## 5.0 Conclusion
+
 
 ## Repository Contents
 * **/Software** - Contains the Arduino code.
