@@ -10,7 +10,7 @@
 ![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Images/DSC_6546.JPG)
 
 ## 1.0 Introduction
-The Cryologger glacier velocity tracker (GVT) is a low-cost, open-source multi-frequency GNSS receiver and data logger designed to measure the daily displacement and annual velocities of glaciers in the Canadian Arctic. It is based on the u-blox ZED-F9P GNSS receiver and powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board.
+The Cryologger glacier velocity tracker (GVT) is a low-cost, open-source, multi-frequency GNSS receiver and data logger designed to measure the daily displacement and annual velocities of glaciers in the Canadian Arctic. It is based on the u-blox ZED-F9P GNSS receiver and powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board.
 
 ## 2.0 Methods
 
@@ -18,17 +18,18 @@ The Cryologger glacier velocity tracker (GVT) is a low-cost, open-source multi-f
 
 The Cryologger GVT is constructed using off-the-shelf components, and is intended for deployments of one year or more. Emphasis is placed on a number of design principles, including:
 * Inexpensive
-* Off-the-shelf components
+* Off-the-shelf
 * Modular
 * Extensible
 * Power-efficient
 * Open-source
 * User friendly
-* Robust
+* Rugged
 
 #### 2.1.1 Bill of materials 
+A brief list of the main components required to assembly a Cryologger GVT is listed below. For a more detailed bill of materials, please see the [ASSEMBLY.md](/Documentation/ASSEMBLY.md) guide.
 
-**Table 1.** Components making up version 2.0 of the Cryologger GVT. Prices current as of October, 2022 and do not include taxes and/or shipping. <sup>1</sup>Denotes optional component.
+**Table 1.** Components making up Cryologger GVT v2.2.1. Prices current as of October, 2022 and do not include taxes and/or shipping. <sup>1</sup>Denotes optional component.
 | Component | Product | Quantity | Cost (USD) |
 | --- | --- | :---: | :---: |
 | PCB | [Custom Cryologger Printed Circuit Board](https://jlcpcb.com) | 1 | $5.00 | 
@@ -61,24 +62,6 @@ The Cryologger GVT is constructed using off-the-shelf components, and is intende
 | Power Cable Connector | Bulgin<sup>1</sup> | 1 | $25.00 |
 | Battery Ring Terminal | [Molex Perma-Seal Ring Terminal 14-16 AWG Wire 1/4" (M6) 19164-0026](https://octopart.com/19164-0026-molex-99569?r=sp) | 2 | $1.00 |
 | | | **Total** | **~$600** |
-
-**Table 2.** Components making up the enclosure, mounting and power systems for Cryologger GVT version 2.0. <sup>1</sup>Denotes optional component. <sup>2</sup>Denotes educational pricing.
-| Component | Product | Quantity | Cost (USD) | 
-| --- | --- | :---: | :---: | 
-| Solar Panel | [Ameresco Solar 20 Watt Solar Panel 20J<sup>2</sup>](https://www.amerescosolar.com/20j-ameresco-solar-20-watt-solar-panel) | 1 |  $99.00 |
-| Solar Panel Bracket | [Ameresco Solar HPM18-30 Solar Panel Pole Mount<sup>2</sup>](https://www.amerescosolar.com/hpm18-30solar-panel-pole-mount) | 1 |  $39.00 
-| Solar Charge Controller | [Genasun GV-4 4A MPPT Solar Charge Controller](https://www.altestore.com/store/charge-controllers/solar-charge-controllers/mppt-solar-charge-controllers/genasun-gv-4-pb-12v-4a-mppt-controller-for-12v-lead-acid-batteries-p10622/) | 1 |  $63.00 |
-| Solar Panel Power Cable | [Polarwire Arctic Ultraflex Blue Twin Trailer Cable AUF-TC162](https://store.polarwire.com/arctic-trailer-cable-16-2-gray-16ga-2-conductors/) | Variable | $0.55/ft |
-| Solar Panel Cable Gland | [Heyco M4340 M20 Cable Gland](https://octopart.com/m4340-heyco-2298364?r=sp) | 2 | $5.94 |
-| Battery Ring Terminal | [Molex Perma-Seal Ring Terminal 14-16 AWG Wire 1/4" (M6) 19164-0026](https://octopart.com/19164-0026-molex-99569?r=sp) | 2 | $1.00 |
-| Battery | Deka SOLAR Gel 48 Ah 8G40C | 1 | ~$150.00 |
-| Antenna Bulkhead Adapter | [Amphenol TNC Jk to TNC Jk 50 Ohm Str Bkhd IP67 AD-TNCJTNCJ-1](https://octopart.com/ad-tncjtncj-1-amphenol+rf-108109770?r=sp) | 1 | $42.79 |
-| Antenna Cable | [GPAC GPS Antenna Cable TNC to TNC (3 m)](https://www.gpac-llc.com/product.php?product=1) | 1 | $56.00 |
-| Enclosure | [L-Com 14x12x7 Inch Weatherproof NEMA Enclosure](https://www.l-com.com/nema-enclosures-14x12x7-inch-weatherproof-nema-enclosure-only) | 1 |  $161.99 |
-| Enclosure Panel | [L-Com Blank Aluminum Mounting Plate](https://www.l-com.com/nema-enclosures-blank-aluminum-mounting-plate-for-1412xx-series-enclosures) | 1 |  $32.39 |
-| Pole Mount | [L-Com Enclosure Pole Mounting Kit](https://www.l-com.com/nema-enclosures-enclosure-pole-mounting-kit-pole-diameters-1-1-4-to-2-inches) | 1 | $75.99 |
-| Tripod | [Onset HOBO Weather Station m 3m Tripod M-TPA](https://www.onsetcomp.com/products/mounting/m-tpa/) | 1 |  $200.00 | 
-| | | **Total** | **~$1,000** |
 
 #### 2.1.2 Carrier board
 A carrier board was designed to simplify assembly and deployment of the Cryologger GVT. It provides 5.08 mm, 2-pin screw terminals for wiring the battery connection, and a resistor divider to measure battery voltage.
@@ -127,7 +110,6 @@ Between 2021 and 2023, a total of 28 Cryologger GVT deployments have been made b
 <p align="left"><b>Figure 4.</b> Map of Cryologger GVT deployments made between 2021 and 2023.</p>
 
 ## 4.0 Results
-
 
 
 
