@@ -116,6 +116,7 @@ This guide is focused on the assembly of the Cryologger (i.e., group 1), however
     * The microSD card of the MicroMod Data Logging Carrier Board.
   
 **9) Cut I2C jumpers**
+
 See section 3.1.1 for instructions on cutting the I2C jumpers and verifying the resistance values of the system.
 
 **10) Connect SparkFun Qwiic OLED Display**
@@ -167,3 +168,5 @@ https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library/issues/40
 After the I2C jumpers are cut, very high resistance values should be measured (see Table 3). Please note the resistance values may differ slightly depending on the quality of the digital multimeter (DMM) that is used. 
 
 If the resistance measurement is lower than expected, it likely means there's still a jumper that has a connection. This can be troubleshooted by removing each component and measureing the I2C jumpers directly.
+
+
