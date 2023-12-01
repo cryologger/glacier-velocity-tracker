@@ -10,26 +10,22 @@
 ![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Images/DSC_6546.JPG)
 
 ## 1.0 Introduction
-The Cryologger glacier velocity tracker (GVT) is a low-cost, open-source, multi-frequency GNSS receiver and data logger designed to measure the daily displacement and annual velocities of glaciers in the Canadian Arctic. It is based on the u-blox ZED-F9P GNSS receiver and powered by the SparkFun MicroMod Artemis Processor and Data Logging Carrier Board.
+
+Reliance on expensive and proprietary commercial data acquisition and telemetry systems can present a barrier to monitoring remote polar environments. The development of low-cost, open-source instrumentation can greatly reduce the cost of research in remote locations, improve the spatiotemporal resolution of collected data, and provide new ways to observe and monitor the cryosphere. 
+
+Here, we present the **Cryologger Glacier Velocity Tracker (GVT)**, a new design configuration intended to collect high temporal resolution velocity measurements to assess glacier dynamics on daily timescales in the Canadian Arctic. The system is based on the Arduino electronics platform, and harnesses the u-blox ZED-F9P multi-frequency Global Navigation Satellite System (GNSS) receiver.
+
 
 ## 2.0 Methods
 
 ### 2.1 Design
 
-The Cryologger GVT is constructed using off-the-shelf components, and is intended for deployments of one year or more. Emphasis is placed on a number of design principles, including:
-* Inexpensive
-* Off-the-shelf
-* Modular
-* Extensible
-* Power-efficient
-* Open-source
-* User friendly
-* Rugged
+The design of the Cryologger GVT takes into consideration several key principles, including cost effectiveness, power efficiency, modularity, ruggedness, and ease of use. It is comprised of off-the-shelf components that do not require specialized tools or training, making it accessible to researchers, citizen scientists, and hobbyists alike. These selected components are also resistant to harsh environmental conditions, ensuring year-round continuous cold-weather operation.
 
 #### 2.1.1 Bill of materials 
-A brief list of the main components required to assembly a Cryologger GVT is listed below. For a more detailed bill of materials, please see the [ASSEMBLY.md](/Documentation/ASSEMBLY.md) guide.
+A list of the main components required to assembly a Cryologger GVT is listed below. For a more detailed bill of materials for the complete system, please see the [ASSEMBLY.md](/Documentation/ASSEMBLY.md) guide.
 
-**Table 1.** Components making up Cryologger GVT v2.2.1. Prices current as of October, 2022 and do not include taxes and/or shipping. <sup>1</sup>Denotes optional component.
+**Table 1.** Components making up Cryologger GVT v2.2.1. Prices are listed in USD and are current as of October 2022. Taxes and/or shipping are not included. <sup>1</sup>Denotes optional component.
 | Component | Product | Quantity | Cost (USD) |
 | --- | --- | :---: | :---: |
 | PCB | [Custom Cryologger Printed Circuit Board](https://jlcpcb.com) | 1 | $5.00 | 
@@ -72,48 +68,40 @@ A carrier board was designed to simplify assembly and deployment of the Cryologg
 #### 2.1.3 Mock-up
 ![L-Com v16](https://user-images.githubusercontent.com/22924092/113727907-9525be80-96c3-11eb-9db5-a16260b8cdfe.png)
 
-### 2.2 Data Logging
-
-The system is programmed to wake daily and log UBX RAWX/SFRBX messages at 1 Hz from both GPS and GLONASS constellations for a period of 3 hours. Messages are streamed processed through the SparkFun u-blox GNSS library and written to a microSD card in UBX format. 
 
 ### 2.3 Operation
 
-When initially powered on, the system will attempt to establish a GNSS fix and sychronize the real-time clock (RTC) of the MicroMod Artemis Processor for up to 5 minutes. Once the RTC is synchronized, the system will set an alarm to wake at the user-specified time and then enter a low-power deep sleep. 
+When initially powered on, the Cryologger GVT will attempt to establish a GNSS fix and sychronize the real-time clock (RTC) of the MicroMod Artemis Processor for up to 5 minutes. Once the RTC is synchronized, the system will set an alarm to wake at the user-specified time and then enter a low-power deep sleep.  Nominally, the system will wake daily and log data from the u-blox GNSS receiver to a microSD card for a period of 3 hours. There are three different logging modes available to the end end-user, which can be tailored to the data collection requirements and available power.
 
-While the system is in deep sleep, the Watchdog Timer (WDT) will wake the system to check the program has not frozen once every 10 seconds. The LED will blink briefly (100 ms) during this time. 
+Versions 2.2.1 and above of the Cryologger GVT are equipped with an OLED display. This display is used to provided detailed information to the end user about the status of the Cryologger at each stage of operation, including boot-up, initialization of components, acquisition of GNSS fix, and logging of data. 
 
-#### 2.3.1 OLED Display Messages
-Version 2.2.1 of the Cryologger GVT is equipped with an OLED display, which is used to provided detailed information to the end user. These messages will indicate the status of the Cryologger at each stage of system operation, including boot-up, initialization of components, acquisition of GNSS fix, and logging of data. 
+In addition to the OLED display messages, a series of LED blink patterns can also be used to indicate system operation and guide possible troubleshooting steps that should be attempted if any errors is encountered. A detailed table of the LED blink patterns can be found in the [DEPLOYMENT.md](/Documentation/DEPLOYMET.md) documentation. 
 
-#### 2.3.2 LED Blink Patterns
-In addition to the OLED display messages, a series of LED blink patterns can also be used to indicate system operation. The following table can be used to determine the status of the system, as well as any possible troubleshooting steps that should be attempted if an error is encountered.
-
-**Table 1.** LED blink patterns, associated description and troubleshooting guide.
-| Blinks | Interval (s)  |   Pattern   | Description                     | Troubleshooting Steps                                 |
-|:------:|:-------------:|:-----------:|---------------------------------|-------------------------------------------------------|
-|    1   |      10       |   Single    | System is in deep sleep         | None                                                  |
-|   10   |      0.1      |   Single    | Initialization complete         | None                                                  | 
-|    2   |      2        |   Repeating | microSD failure                 | Reseat microSD card and reboot system                 |
-|    3   |      2        |   Repeating | GNSS receiver failure           | Ensure components are firmly seated and reboot system |
-|    1   |      1        |   Single    | GNSS signal acquisition         | None                                                  |
-|    5   |      1        |   Single    | GNSS fix found & RTC synced     | None                                                  |
-|    5   |      0.5      |   Single    | GNSS fix not found              | Ensure antenna cables are connected and reboot system |
-| Random |      Random   |   Random    | Logging data to microSD card    | None                                                  |
+While the system is in deep sleep, a Watchdog Timer (WDT) will wake the system to check the program has not frozen every 10 seconds. This helps to ensure the long-term reliability of the system.
 
 ### 2.4 Data Processing
 Data is logged in u-blox's proprietary .ubx format. Log files can be converted to RINEX using RTKLIB or Emlid Studio and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
 
 ## 3.0 Deployments
-Between 2021 and 2023, a total of 28 Cryologger GVT deployments have been made by several of different academic institutions, including Univerity of Ottawa, Carleton University, and University of Waterloo (Canada), Carnegie Mellon University (United States), and University of Fribourg (Switzerland).
+Between 2021 and 2023, a total of 28 Cryologger GVT deployments have been made by several of different academic institutions, including Carleton University, Univerity of Ottawa, and University of Waterloo (Canada), Carnegie Mellon University (United States), and University of Fribourg (Switzerland).
 
-<p align="center"><img src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/053d6037-26ce-4e87-b219-ee7988b21e0c" width="720"></p>
+<p align="center"><img src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/053d6037-26ce-4e87-b219-ee7988b21e0c" width="640"></p>
 <p align="left"><b>Figure 4.</b> Map of Cryologger GVT deployments made between 2021 and 2023.</p>
 
 ## 4.0 Results
 
+Initial results from the Cryologger GVTs deployed on Lowell Glacier in Kluane National Park, Yukon and Belcher Glacier on Devon Island, Nunavut in 2021 are presented below.
+
+
+Data processed with Precise Point Positioning (PPP) techniques revealed the Cryologger GVTs deployed on Lowell Glacier were able to achieve daily position measurements with accuracies of <3 cm and capture periods of marked glacier velocity that corresponded to local rainfall events and enhanced basal sliding.
+
 
 
 ## 5.0 Conclusion
+
+These promising results demonstrate that inexpensive, open-source hardware and software can provide a reliable, and cost-effective alternative to commercially available equipment for use in glaciological monitoring.
+
+More importantly, this research demonstrates to the scientific community that inexpensive, open-source hardware and software can provide a viable solution for the monitoring of glaciers at daily timescales in harsh Arctic environments. The hope is the technology developed by this project will lower the cost of research, encourage the adoption of open-source technologies for scientific research and enable innovation in the polar science community.
 
 
 ## Repository Contents
