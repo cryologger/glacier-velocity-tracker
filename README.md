@@ -6,15 +6,13 @@
 
 
 # Cryologger - Glacier Velocity Tracker (GVT)
-
-![Image](https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Images/DSC_6546.JPG)
+<p align="center"><img src="https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Images/DSC_6546.JPG" ></p>
 
 ## 1.0 Introduction
 
 Reliance on expensive and proprietary commercial data acquisition and telemetry systems can present a barrier to monitoring remote polar environments. The development of low-cost, open-source instrumentation can greatly reduce the cost of research in remote locations, improve the spatiotemporal resolution of collected data, and provide new ways to observe and monitor the cryosphere. 
 
 The [Cryologger Glacier Velocity Tracker (GVT)](https://github.com/cryologger/glacier-velocity-tracker) is a novel [Cryologger](https://github.com/cryologger) design configuration intended to collect high temporal resolution velocity measurements to assess glacier dynamics on daily timescales in the Canadian Arctic. The system is based on the Arduino electronics platform, and harnesses the u-blox ZED-F9P multi-frequency Global Navigation Satellite System (GNSS) receiver.
-
 
 ## 2.0 Methods
 
@@ -62,12 +60,14 @@ A list of the main components required to assembly a Cryologger GVT is listed be
 In version 2.0, a carrier board was designed to simplify assembly and deployment. It provides 5.08 mm, 2-pin screw terminals for wiring the battery connection, and a resistor divider to measure battery voltage.
 
 <p align="center"><img width="640" alt="image" src="https://user-images.githubusercontent.com/22924092/186201944-ff52a2b9-d714-46c5-bb36-c9115895dd63.png"></p>
-<p align="center"><b>Figure 5.</b> Open-source carrier board design.</p>
+<p align="center"><b>Figure 1.</b> Open-source carrier board design.</p>
 
 #### 2.1.3 Mock-up
 The Cryologger GVT was originally intended to be installed in a small electronics enclosure that is mounted in a larger enclosure for deployment outdoors.
 
-![L-Com v16](https://user-images.githubusercontent.com/22924092/113727907-9525be80-96c3-11eb-9db5-a16260b8cdfe.png)
+<p align="center"><img width="640" alt="image" src="https://user-images.githubusercontent.com/22924092/113727907-9525be80-96c3-11eb-9db5-a16260b8cdfe.png"></p>
+<p align="center"><b>Figure 2.</b> Open-source carrier board design.</p>
+
 
 ### 2.2 Operation
 
@@ -87,21 +87,29 @@ Data is logged in u-blox's proprietary .ubx format. Log files can be converted t
 
 Between 2021 and 2023, a total of 28 Cryologger GVT deployments have been made by several of different academic institutions, including Carleton University, Univerity of Ottawa, and University of Waterloo (Canada), Carnegie Mellon University (United States), and University of Fribourg (Switzerland).
 
-<p align="center"><img src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/053d6037-26ce-4e87-b219-ee7988b21e0c" width="640"></p>
-<p align="left"><b>Figure 4.</b> Map of Cryologger GVT deployments made between 2021 and 2023.</p>
+<p align="center"><img src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/053d6037-26ce-4e87-b219-ee7988b21e0c" width="480"></p>
+<p align="left"><b>Figure 3.</b> Map of Cryologger GVT deployments made between 2021 and 2023.</p>
+
+<p align="left"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/4bc646a5-447c-4fad-b1d1-11d9234cead3" width="720"></p>
+<p align="left"><b>Figure 4.</b> Map of Lowell Glacier Cryologger GVT deployments made in 2021.</p>
+
+<p align="left"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/bedc9e69-e742-4c28-83a1-577907ddc525" width="720"></p>
+<p align="left"><b>Figure 5.</b> Map of Belcher Glacier Cryologger GVT deployments made in 2021.</p>
 
 ## 4.0 Results
 
-Initial results from the Cryologger GVTs deployed on Lowell Glacier in Kluane National Park, Yukon and Belcher Glacier on Devon Island, Nunavut in 2021 are presented below.
+Prelimnary results from the Cryologger GVTs deployed on Lowell Glacier in Kluane National Park, Yukon and Belcher Glacier on Devon Island, Nunavut in 2021 are presented below.
 
 ### 4.1 Lowell Glacier, Yukon
-<p align="center"><img src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/053d6037-26ce-4e87-b219-ee7988b21e0c" width="640"></p>
-<p align="left"><b>Figure 4.</b> Map of Cryologger GVT deployments made between 2021 and 2023.</p>
-
-### 4.2 Belcher Glacier, Devon Island, Nunavut
 
 Data processed with Precise Point Positioning (PPP) techniques revealed the Cryologger GVTs deployed on Lowell Glacier were able to achieve daily position measurements with accuracies of <3 cm and capture periods of marked glacier velocity that corresponded to local rainfall events and enhanced basal sliding.
 
+<p align="center"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/a395eb78-2677-4056-a3be-a7efc64793f5" width="480"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/a6510e11-2bd1-4351-ab14-6b0e19e49312" width="480"></p>
+<p align="left"><b>Figure 6.</b> Cumulative distance and daily displacement of Lowell Glacier, Yukon recorded between between 2021 and 2022.</p>
+
+### 4.2 Belcher Glacier, Devon Island, Nunavut
+<p align="center"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/681f6bb6-02ef-4884-b190-5a7af0607280" width="480"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/3efcf414-432b-4bdb-b325-65d84687d052" width="480"></p>
+<p align="left"><b>Figure 7.</b> Cumulative distance and daily displacement of Belcher Glacier, Devon Island recorded between between 2021 and 2022.</p>
 
 ## 5.0 Conclusions
 
@@ -110,7 +118,7 @@ These promising results demonstrate that inexpensive, open-source hardware and s
 ## Repository Contents
 
 * **/Documentation** - Various assembly, troubleshooting and deployment guides.
-* 
+
 * **/Software** - Contains the Arduino code.
 
 * **/Hardware** - KiCad PCB schematic and board design files.
