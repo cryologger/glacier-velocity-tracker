@@ -24,7 +24,7 @@ The design of the Cryologger GVT takes into consideration several key principles
 
 The Cryologger GVT is built using almost exclusively using components from [SparkFun](https://www.sparkfun.com/), with a list of the main components shown below.  
 
-For a more detailed bill of materials, including requirements for power and mounting for a complete deployable system, please see [ASSEMBLY.md](/Documentation/ASSEMBLY.md).
+For a more detailed bill of materials, including requirements for power and mounting of a complete deployable system, please see [ASSEMBLY.md](/Documentation/ASSEMBLY.md).
 
 **Table 1.** Components making up Cryologger GVT v2.2.1. Prices are listed in USD and are current as of December 2023. Taxes and/or shipping are not included. <sup>1</sup>Denotes optional component.
 | Component | Product | Quantity | Cost (USD) |
@@ -59,7 +59,9 @@ For a more detailed bill of materials, including requirements for power and moun
 | Power Cable Connector | Bulgin<sup>1</sup> | 1 | $25.00 |
 | | | **Total** | **~$600** |
 
-#### Carrier board
+#### 2.1.2 Design Evolution 
+
+Carrier board
 In version 2.0, a carrier board was designed to simplify assembly and deployment. It provides 5.08 mm, 2-pin screw terminals for wiring the battery connection, and a resistor divider to measure battery voltage.
 
 <p align="center"><img width="640" alt="image" src="https://user-images.githubusercontent.com/22924092/186201944-ff52a2b9-d714-46c5-bb36-c9115895dd63.png"></p>
@@ -86,36 +88,43 @@ While the system is in deep sleep, a Watchdog Timer (WDT) will wake the system t
 
 Data is logged in u-blox's proprietary .ubx format. Log files can be converted to RINEX using RTKLIB or Emlid Studio and submitted to NRCan's Precise Point Positioning (PPP) tool: https://webapp.geod.nrcan.gc.ca/geod/tools-outils/ppp.php
 
+For a more detailed guide on the processing of data, please see "[PROCESSING.md](/Documentation/PROCESSING.md).
+
 ## 3.0 Deployments
 
-Between 2021 and 2023, a total of 28 Cryologger GVT deployments have been made by several of different academic institutions, including Carleton University, Univerity of Ottawa, and University of Waterloo (Canada), Carnegie Mellon University (United States), and University of Fribourg (Switzerland).
+Between 2021 and 2023, a total of 28 Cryologger GVT deployments were made by several different academic institutions, including Carleton University, Univerity of Ottawa, and University of Waterloo (Canada), Carnegie Mellon University (United States), and University of Fribourg (Switzerland). These deployments were made on glaciers in several geographically distinct locations, including Canada, the United States and Kyrgyzstan. Two case studies of deployments made by the Universities of Ottawa and Waterloo on glaciers in the Yukon and Nunvaut, Canada are explored in more detail below.
 
-<p align="center"><img src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/053d6037-26ce-4e87-b219-ee7988b21e0c" width="480"></p>
+<p align="center"><img src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/053d6037-26ce-4e87-b219-ee7988b21e0c" width="640"></p>
 <p align="left"><b>Figure 3.</b> Map of Cryologger GVT deployments made between 2021 and 2023.</p>
 
-<p align="left"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/4bc646a5-447c-4fad-b1d1-11d9234cead3" width="480"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/bedc9e69-e742-4c28-83a1-577907ddc525" width="480"></p>
-<p align="left"><b>Figure 4.</b> Map of Cryologger GVT deployments made in 2021 on the Lowell Glacier, Yukon and Belcher Glacier, Devon Island, Nunavut.</p>
+### 3.1 Lowell Glacier, Yukon, Canada
 
-<p align="left"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/4bc646a5-447c-4fad-b1d1-11d9234cead3" width="480"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/bedc9e69-e742-4c28-83a1-577907ddc525" width="480"></p>
-<p align="left"><b>Figure 4.</b> Map of Cryologger GVT deployments made in 2021 on the Lowell Glacier, Yukon and Belcher Glacier, Devon Island, Nunavut.</p>
+<p align="left"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/4bc646a5-447c-4fad-b1d1-11d9234cead3" width="640"></p>
+<p align="left"><b>Figure 4.</b> Map of Cryologger GVT deployments made in 2021 on the Lowell Glacier, Yukon.</p>
 
-<p align="center"><img src="https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Images/DSC_6546.JPG" width="480"></p>
+### 3.2 Belcher Glacier, Devon Island, Nunavut, Canada
+
+<p align="left"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/bedc9e69-e742-4c28-83a1-577907ddc525" width="640"></p>
+<p align="left"><b>Figure 4.</b> Map of Cryologger GVT deployments made in 2021 on the Lowell Glacier, Yukon and Belcher Glacier, Devon Island, Nunavut.</p>
 
 ## 4.0 Results
 
 Preliminary results from the 2021 deployments of Cryologger GVTs on Lowell Glacier, Kluane National Park, Yukon and Belcher Glacier, Devon Island, Nunavut are presented below.
 
-### 4.1 Lowell Glacier, Yukon
+### 4.1 Lowell Glacier, Yukon, Canada
 
 The Cryologger GVTs deployed on Lowell Glacier were both able to achieve successful operation throughout the entire year. 
 
-Colleceted data that was PPP-processed revealed the GBTs deployed on Lowell Glacier were able to achieve daily position measurements with accuracies of <3 cm. Daily displacements ranged between 0.25 – 4.4 m d<sup>-1</sup> and annual cumulative distances were between 200 – 700 m y<sup>-1</sup>. Both systems showed evidence of ongoing glacier surge cycles, and excitingly were also able to capture periods of marked glacier velocity correspondeding to local rainfall events and enhanced basal sliding.
+Colleceted data that was PPP-processed revealed the GVTs deployed on Lowell Glacier were able to achieve daily position measurements with accuracies of <3 cm. Daily displacements ranged between 0.25 – 4.4 m d<sup>-1</sup> and annual cumulative distances were between 200 – 700 m y<sup>-1</sup>. Both systems showed evidence of ongoing glacier surge cycles, and excitingly were also able to capture periods of marked glacier velocity correspondeding to local rainfall events and enhanced basal sliding.
 
 <p align="center"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/a395eb78-2677-4056-a3be-a7efc64793f5" width="480"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/a6510e11-2bd1-4351-ab14-6b0e19e49312" width="480"></p>
 <p align="left"><b>Figure 6.</b> Cumulative distance and daily displacement of Lowell Glacier, Yukon recorded between between 2021 and 2022.</p>
 
-### 4.2 Belcher Glacier, Devon Island, Nunavut
+### 4.2 Belcher Glacier, Devon Island, Nunavut, Canada
 
+Cryologger GVT deployments made on Belcher Glacier were also able to achieve successful operation throughout the entire year. In fact, it is believed the data collected between 2021-2022 represents the first uninterrupted annual velocity record of the Belcher Glacier ever recorded.
+
+PPP-processed data showed the GVTs deployed on Belcher Glacier were also able to achieve daily position measurements with accuracies of <3 cm. Daily displacements ranged between 0.18 – 0.45 m d<sup>-1</sup> and annual cumulative distances were between 75 – 150 m y<sup>-1</sup>. These results are also in good agreement with velocities derived from synthetic-aperture radar (SAR) remote sensing data.
 
 <p align="center"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/681f6bb6-02ef-4884-b190-5a7af0607280" width="480"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/3efcf414-432b-4bdb-b325-65d84687d052" width="480"></p>
 <p align="left"><b>Figure 7.</b> Cumulative distance and daily displacement of Belcher Glacier, Devon Island recorded between between 2021 and 2022.</p>
