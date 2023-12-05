@@ -105,7 +105,12 @@ Between 2021 and 2023, a total of 28 Cryologger GVT deployments were made by sev
 ### 3.2 Belcher Glacier, Devon Island, Nunavut, Canada
 
 <p align="left"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/bedc9e69-e742-4c28-83a1-577907ddc525" width="640"></p>
-<p align="left"><b>Figure 4.</b> Map of Cryologger GVT deployments made in 2021 on the Lowell Glacier, Yukon and Belcher Glacier, Devon Island, Nunavut.</p>
+<p align="left"><b>Figure 5.</b> Map of Cryologger GVT deployments made in 2021 on the Lowell Glacier, Yukon and Belcher Glacier, Devon Island, Nunavut.</p>
+
+
+<p align="center"><img src="https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Images/DSC_5133.JPG" width="480">&nbsp;&nbsp;<img src="https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Images/DSC_5144.JPG" width="480"></p>
+<p align="left"><b>Figure 6.</b> Deployment of the "Belcher Lower" Cryologger GVT on the Belcher Glacier, Devon Island, Nunavut.</p>
+
 
 ## 4.0 Results
 
@@ -118,16 +123,16 @@ The Cryologger GVTs deployed on Lowell Glacier were both able to achieve success
 Colleceted data that was PPP-processed revealed the GVTs deployed on Lowell Glacier were able to achieve daily position measurements with accuracies of <3 cm. Daily displacements ranged between 0.25 – 4.4 m d<sup>-1</sup> and annual cumulative distances were between 200 – 700 m y<sup>-1</sup>. Both systems showed evidence of ongoing glacier surge cycles, and excitingly were also able to capture periods of marked glacier velocity correspondeding to local rainfall events and enhanced basal sliding.
 
 <p align="center"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/a395eb78-2677-4056-a3be-a7efc64793f5" width="480"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/a6510e11-2bd1-4351-ab14-6b0e19e49312" width="480"></p>
-<p align="left"><b>Figure 6.</b> Cumulative distance and daily displacement of Lowell Glacier, Yukon recorded between between 2021 and 2022.</p>
+<p align="left"><b>Figure 7.</b> Cumulative distance and daily displacement of Lowell Glacier, Yukon recorded between between 2021 and 2022.</p>
 
 ### 4.2 Belcher Glacier, Devon Island, Nunavut, Canada
 
-Cryologger GVT deployments made on Belcher Glacier were also able to achieve successful operation throughout the entire year. In fact, it is believed the data collected between 2021-2022 represents the first uninterrupted annual velocity record of the Belcher Glacier ever recorded.
+Cryologger GVT deployments made on Belcher Glacier were also able to achieve successful operation throughout the entire year. The data collected between 2021-2022 represents the first uninterrupted annual velocity record of the Belcher Glacier ever recorded.
 
 PPP-processed data showed the GVTs deployed on Belcher Glacier were also able to achieve daily position measurements with accuracies of <3 cm. Daily displacements ranged between 0.18 – 0.45 m d<sup>-1</sup> and annual cumulative distances were between 75 – 150 m y<sup>-1</sup>. These results are also in good agreement with velocities derived from synthetic-aperture radar (SAR) remote sensing data.
 
 <p align="center"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/681f6bb6-02ef-4884-b190-5a7af0607280" width="480"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/3efcf414-432b-4bdb-b325-65d84687d052" width="480"></p>
-<p align="left"><b>Figure 7.</b> Cumulative distance and daily displacement of Belcher Glacier, Devon Island recorded between between 2021 and 2022.</p>
+<p align="left"><b>Figure 8.</b> Cumulative distance and daily displacement of Belcher Glacier, Devon Island recorded between between 2021 and 2022.</p>
 
 ## 5.0 Conclusions
 
