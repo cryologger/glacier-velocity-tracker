@@ -26,7 +26,7 @@ The Cryologger GVT is built using almost exclusively using components from [Spar
 
 For a more detailed bill of materials, including requirements for power and mounting of a complete deployable system, please see [ASSEMBLY.md](/Documentation/ASSEMBLY.md).
 
-**Table 1.** Components making up Cryologger GVT v2.2.1. Prices are listed in USD and are current as of December 2023. Taxes and/or shipping are not included. <sup>1</sup>Denotes optional component.
+**Table 1.** Components making up Cryologger GVT v2.2.1. Prices are listed in USD and are current as of December 2023. Taxes and shipping are not included. <sup>1</sup>Denotes optional component.
 | Component | Product | Quantity | Cost (USD) |
 | --- | --- | :---: | :---: |
 | PCB | [Custom Cryologger Printed Circuit Board](https://jlcpcb.com) | 1 | $5.00 | 
@@ -72,7 +72,6 @@ The Cryologger GVT was originally intended to be installed in a small electronic
 
 <p align="center"><img width="640" alt="image" src="https://user-images.githubusercontent.com/22924092/113727907-9525be80-96c3-11eb-9db5-a16260b8cdfe.png"></p>
 <p align="center"><b>Figure 2.</b> Open-source carrier board design.</p>
-
 
 ### 2.2 Operation
 
@@ -135,6 +134,7 @@ PPP-processed data showed the GVTs deployed on Belcher Glacier were also able to
 <p align="left"><b>Figure 8.</b> Cumulative distance and daily displacement of Belcher Glacier, Devon Island recorded between between 2021 and 2022.</p>
 
 ## 5.0 Conclusions
+
 
 These promising results demonstrate that inexpensive, open-source hardware and software can provide a reliable, and cost-effective alternative to commercially available equipment for use in glaciological monitoring.
 
