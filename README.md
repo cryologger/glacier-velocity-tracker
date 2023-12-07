@@ -141,18 +141,14 @@ These promising results demonstrate that inexpensive, open-source hardware and s
 
 ## Repository Contents
 
-* **/Documentation** - Various assembly, troubleshooting and deployment guides.
+* **/Documentation** - Assembly, deployment and troubleshoting guides, as well as information of components used and associated costs.
 
-* **/Software** - Contains the Arduino code.
+* **/Hardware** - KiCad PCB schematic and design files.
 
-* **/Hardware** - KiCad PCB schematic and board design files.
-
-* **/Bill of Materials** - Information on components and their associated costs.
-
-* **/Archive** - Previous design versions.
+* **/Software** -  Arduino code and Python data analysis scripts.
 
 ## License Information
-This project is released under the GNU General Public License v3.0 (https://www.gnu.org/licenses/gpl-3.0.en.html)
+This project is released under the GNU General Public License v3.0 (https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 Cheers,
 
