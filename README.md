@@ -17,6 +17,7 @@ The [Cryologger Glacier Velocity Tracker (GVT)](https://github.com/cryologger/gl
 ## 2.0 Methods
 
 ### 2.1 Design
+The Cryologger GVT is based on the open-source Arduino platform (www.arduino.cc). Code is written using the Arduino Integrated Development Environment (IDE) and benefits from the availability of community-generated libraries.
 
 The design of the Cryologger GVT takes into consideration several key principles, including cost effectiveness, power efficiency, modularity, ruggedness, and ease of use. It is comprised of off-the-shelf components that do not require specialized tools or training, making it accessible to researchers, citizen scientists, and hobbyists alike. These selected components are also resistant to harsh environmental conditions, ensuring year-round continuous cold-weather operation.
 
