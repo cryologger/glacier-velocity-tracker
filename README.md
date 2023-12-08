@@ -92,9 +92,9 @@ For a more detailed guide on the processing of data, please see "[PROCESSING.md]
 
 ## 3.0 Deployments
 
-Between 2021 and 2023, a total of 28 Cryologger GVT deployments were made by several different academic institutions, including Carleton University, Univerity of Ottawa, and University of Waterloo (Canada), Carnegie Mellon University (United States), and University of Fribourg (Switzerland). These deployments were made on glaciers in several geographically distinct locations, including Canada, the United States and Kyrgyzstan. Two case studies of deployments made by the Universities of Ottawa and Waterloo on glaciers in the Yukon and Nunvaut, Canada are explored in more detail below.
+Between 2021 and 2023, a total of 28 Cryologger GVT deployments were made by several different academic institutions, including Carleton University, Univerity of Ottawa, and University of Waterloo (Canada), Carnegie Mellon University (United States), and University of Fribourg (Switzerland). These deployments were made on glaciers in several geographically distinct locations, including Canada, the United States and Kyrgyzstan. Two case studies of deployments made by the University of Ottawa and University of Waterloo on glaciers in the Yukon and Nunvaut, Canada are explored in more detail below.
 
-<p align="center"><img src="https://github.com/adamgarbo/cryologger-glacier-velocity-tracker/assets/22924092/053d6037-26ce-4e87-b219-ee7988b21e0c" width="640"></p>
+<p align="center"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/bef5b318-c0ab-4b35-86e6-98851041ca5d" width="640"></p>
 <p align="left"><b>Figure 3.</b> Map of Cryologger GVT deployments made between 2021 and 2023.</p>
 
 ### 3.1 Lowell Glacier, Yukon, Canada
@@ -118,7 +118,9 @@ Preliminary results from the 2021 deployments of Cryologger GVTs on Lowell Glaci
 
 ### 4.1 Lowell Glacier, Yukon, Canada
 
-The Cryologger GVTs deployed on Lowell Glacier were both able to achieve successful operation throughout the entire year. 
+The initial Cryologger GVTs deployments on Lowell Glacier were both successful, achieving continuous operation throughout the year. 
+
+
 
 Colleceted data that was PPP-processed revealed the GVTs deployed on Lowell Glacier were able to achieve daily position measurements with accuracies of <3 cm. Daily displacements ranged between 0.25 – 4.4 m d<sup>-1</sup> and annual cumulative distances were between 200 – 700 m y<sup>-1</sup>. Both systems showed evidence of ongoing glacier surge cycles, and excitingly were also able to capture periods of marked glacier velocity correspondeding to local rainfall events and enhanced basal sliding.
 
