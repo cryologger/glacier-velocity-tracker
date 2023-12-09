@@ -138,8 +138,7 @@ PPP-processed data showed the GVTs deployed on Belcher Glacier were also able to
 
 ## 5.0 Conclusions
 
-
-These promising results demonstrate that inexpensive, open-source hardware and software can provide a reliable, and cost-effective alternative to commercially available equipment for use in glaciological monitoring.
+Cryologger GVT deployments have demonstrated they are able to successfully achieve continuous year-round operation. Data processed with Precise Point Positioning techniques also reveals the systems are able to achieve daily position measurements with accuracies of <3 cm. These promising results demonstrate that open-source hardware and software can provide a reliable, and cost-effective alternative to commercially available equipment for use in glaciological monitoring.
 
 ## Repository Contents
 
