@@ -6,6 +6,7 @@
 
 
 # Cryologger - Glacier Velocity Tracker (GVT)
+### Note: This documentation is currently under development.
 <p align="center"><img src="https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Measurement_System/blob/main/Images/DSC_6546.JPG" ></p>
 
 ## 1.0 Introduction
