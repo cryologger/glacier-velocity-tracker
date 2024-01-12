@@ -147,6 +147,10 @@ This project is supported by:
 
 <p align="left"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/7180ea89-3c42-4501-a3ed-4c6816f93211" width="250">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/4ab67319-697e-42ac-972a-8859b06c2076" width="250"></p>
 
+## Acknowledgements
+
+This project would not have been possible without the designs, software and tutorials provided by the open-source community. A special thanks to the authors of and contributors to the [SparkFun u-blox GNSS Arduino Library](https://github.com/sparkfun/SparkFun_u-blox_GNSS_Arduino_Library).
+
 ## Repository Contents
 
 * **/Documentation** - Assembly, deployment and troubleshoting guides, as well as information of components used and associated costs.
