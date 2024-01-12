@@ -3,7 +3,8 @@
     Version:  2.3.0
     Date:     June 26, 2023
     Author:   Adam Garbo
-
+    License:  GPLv3. See license file for more information.
+  
     Components:
     - SparkFun Artemis Processor
     - SparkFun MicroMod Data Logging Carrier Board
