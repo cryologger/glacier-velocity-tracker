@@ -141,6 +141,12 @@ PPP-processed data showed the GVTs deployed on Belcher Glacier were also able to
 
 Cryologger GVT deployments have demonstrated they are able to successfully achieve continuous year-round operation. Data processed with Precise Point Positioning techniques also reveals the systems are able to achieve daily position measurements with accuracies of <3 cm. These promising results demonstrate that open-source hardware and software can provide a reliable, and cost-effective alternative to commercially available equipment for use in glaciological monitoring.
 
+## Funding
+
+This project is supported by:
+
+<p align="left"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/7180ea89-3c42-4501-a3ed-4c6816f93211" width="250">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/4ab67319-697e-42ac-972a-8859b06c2076" width="250"></p>
+
 ## Repository Contents
 
 * **/Documentation** - Assembly, deployment and troubleshoting guides, as well as information of components used and associated costs.
@@ -150,8 +156,8 @@ Cryologger GVT deployments have demonstrated they are able to successfully achie
 * **/Software** -  Arduino code and Python data analysis scripts.
 
 ## License Information
-This project is released under the GNU General Public License v3.0 (https://www.gnu.org/licenses/gpl-3.0.en.html).
+This project is released under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 Cheers,
 
-**Adam**
+**Adam Garbo**
