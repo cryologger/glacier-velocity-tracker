@@ -1,7 +1,7 @@
 /*
     Title:    Cryologger - Glacier Velocity Tracker (GVT)
-    Version:  2.3.0
-    Date:     June 26, 2023
+    Version:  2.3.1
+    Date:     January 17, 2024
     Author:   Adam Garbo
     License:  GPLv3. See license file for more information.
   
@@ -12,24 +12,20 @@
     - SparkFun Qwiic OLED Display
     - Pololu 5V 600mA Step-Down Voltage Regulator D36V6F5
 
-
-    Dependencies:
-    - Apollo3 Core v1.2.3
-    - SparkFun u-blox GNSS v3 v3.0.16
-    - SparkFun Qwiic OLED Arduino Library v1.0.5
-    - SdFat v2.2.2
+    Comments:
+    - Additional license information provided for libraries
 */
 
 // ----------------------------------------------------------------------------
-// Libraries
+// Libraries                            Version   License URL/Comments
 // ----------------------------------------------------------------------------
-#include <RTC.h>
-#include <SdFat.h>                    // http://librarymanager/All#SdFat
-#include <SparkFun_Qwiic_OLED.h>      // http://librarymanager/All#SparkFun_Qwiic_OLED_Arduino_Library
-#include <SparkFun_u-blox_GNSS_v3.h>  // http://librarymanager/All#SparkFun_u-blox_GNSS_v3
-#include <SPI.h>
-#include <WDT.h>
-#include <Wire.h>
+#include <RTC.h>                      // 1.2      MIT     Included in Apollo3 Core v1.2.3
+#include <SdFat.h>                    // 2.2.2    MIT     http://librarymanager/All#SdFat
+#include <SparkFun_Qwiic_OLED.h>      // 1.0.5    MIT     http://librarymanager/All#SparkFun_Qwiic_OLED_Arduino_Library
+#include <SparkFun_u-blox_GNSS_v3.h>  // 3.0.16   MIT     http://librarymanager/All#SparkFun_u-blox_GNSS_v3
+#include <SPI.h>                      //          MIT     Included in Apollo3 Core v1.2.3
+#include <WDT.h>                      // 0.1      MIT     Included in Apollo3 Core v1.2.3
+#include <Wire.h>                     //          MIT     Included in Apollo3 Core v1.2.3
 
 // ----------------------------------------------------------------------------
 // Define unique identifier
