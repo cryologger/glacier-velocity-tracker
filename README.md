@@ -2,6 +2,7 @@
 <img alt="GitHub" src="https://img.shields.io/github/license/adamgarbo/Cryologger_Glacier_Velocity_Tracker">
 <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/adamgarbo/Cryologger_Glacier_Velocity_Tracker">
 <img alt="GitHub issues" src="https://img.shields.io/github/issues/adamgarbo/Cryologger_Glacier_Velocity_Tracker">
+<img alt="DOI" src="https://zenodo.org/badge/248303047.svg">
 </p>
 
 
@@ -160,7 +161,7 @@ This project would not have been possible without the designs, software and tuto
 * **/Software** -  Arduino code and Python data analysis scripts.
 
 ## License Information
-This project is released under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html).
+This project is released under the GNU General Public License v3.0 (https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 Cheers,
 
