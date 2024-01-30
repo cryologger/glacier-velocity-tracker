@@ -146,7 +146,7 @@ Cryologger GVT deployments have demonstrated they are able to successfully achie
 
 This project is supported by:
 
-<p align="left"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/7180ea89-3c42-4501-a3ed-4c6816f93211" width="250">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/4ab67319-697e-42ac-972a-8859b06c2076" width="250"></p>
+<p align="left"><img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/4ab67319-697e-42ac-972a-8859b06c2076" width="250">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/cryologger/glacier-velocity-tracker/assets/22924092/7180ea89-3c42-4501-a3ed-4c6816f93211" width="250"></p>
 
 ## Acknowledgements
 
