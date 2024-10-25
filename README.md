@@ -25,11 +25,9 @@ The design of the Cryologger GVT takes into consideration several key principles
 
 #### 2.1.1 Bill of materials
 
-The Cryologger GVT is built using almost exclusively using components from [SparkFun](https://www.sparkfun.com/), with a list of the main components shown below.  
+The Cryologger GVT is built using almost exclusively using components from [SparkFun](https://www.sparkfun.com/), with a list of the main components shown below. For a more detailed bill of materials, including requirements for power and mounting of a complete deployable system, please see [ASSEMBLY.md](/Documentation/ASSEMBLY.md).
 
-For a more detailed bill of materials, including requirements for power and mounting of a complete deployable system, please see [ASSEMBLY.md](/Documentation/ASSEMBLY.md).
-
-**Table 1.** Components making up Cryologger GVT v2.2.1. Prices are listed in USD and are current as of December 2023. Taxes and shipping are not included. <sup>1</sup>Denotes optional component.
+**Table 1.** Main components making up Cryologger GVT. Prices are listed in USD and are current as of December 2023. Taxes and shipping are not included.
 | Component | Product | Quantity | Cost (USD) |
 | --- | --- | :---: | :---: |
 | PCB | [Custom Cryologger Printed Circuit Board](https://jlcpcb.com) | 1 | $5.00 | 
@@ -38,34 +36,11 @@ For a more detailed bill of materials, including requirements for power and moun
 | GNSS Receiver | [SparkFun GPS-RTK-SMA Breakout - ZED-F9P](https://www.sparkfun.com/products/16481) | 1 | $274.95 | 
 | GNSS Antenna | [SparkFun GNSS Multi-Band L1/L2 Surveying Antenna (TNC) - TOP106](https://www.sparkfun.com/products/17751) | 1 | $133.95 | 
 | Display | [SparkFun Qwiic OLED Display](https://www.sparkfun.com/products/17153) | 1 | $10.95 |
-| Qwiic Cable | [Flexible Qwiic Cable - 50mm](https://www.sparkfun.com/products/17260) | 1 | $1.05 |
-| GNSS Antenna Cable | [SparkFun Interface Cable - SMA Female to SMA Male (25cm)](https://www.sparkfun.com/products/12861) | 1 | $5.50 |
-| GNSS Antenna Cable | [SparkFun Interface Cable - SMA Male to TNC Male (300mm)](https://www.sparkfun.com/products/17833) | 1 |	$10.95 | 
 | Voltage Regulator | [Pololu 5V, 600mA Step-Down Voltage Regulator D36V6F5](https://www.pololu.com/product/3792) | 1 | $6.95 |
-| microSD Card| [SanDisk MAX Endurance 64 GB microSD](https://www.amazon.com/SanDisk-Endurance-microSDXC-Adapter-Security/dp/B084CJ96GT) | 1 | $15.99 | 
-| Resistor | [1 Mohms 1% MBB02070C1004FRP00](https://octopart.com/mbb02070c1004frp00-vishay-42819429?r=sp) | 1 | $0.29 |
-| Resistor | [10Mohm 1% 50ppm MBB02070C1005FRP00](https://octopart.com/mbb02070c1005frp00-vishay-42881138?r=sp) | 1 |	$0.32 |
-| Capacitor | [0.1 uF K104K15X7RF53L2](https://octopart.com/k104k15x7rf53l2-vishay-39696446?r=sp) | 1 | $0.23 |
-| Power Connector	| [PCB terminal block - MKDS 1,5/ 2-5,08 1715721](https://octopart.com/1715721-phoenix+contact-12533?r=sp) | 1 | $1.46 |
-| Male Header | [SparkFun Break Away Headers - Straight](https://www.sparkfun.com/products/116) | 2 | $3.10 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x2-Pin, Straight<sup>1</sup>](https://www.pololu.com/product/1012) | 1 | $0.39 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x4-Pin, Straight<sup>1</sup>](https://www.pololu.com/product/1014) | 1 | $0.53 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x6-Pin, Straight<sup>1</sup>](https://www.pololu.com/product/1016) | 1 | $0.66 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x9-Pin, Straight<sup>1</sup>](https://www.pololu.com/product/1019) | 2 | $0.85 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x10-Pin, Straight<sup>1</sup>](https://www.pololu.com/product/1020) | 1 | $0.46 |
-| Female Header | [Pololu 0.100" (2.54 mm) Female Header: 1x12-Pin, Straight<sup>1</sup>](https://www.pololu.com/product/1030) | 1 | $0.55 |
-| Standoff | [SparkFun Standoff - Nylon (4-40; 3/4"; 10 pack)](https://www.sparkfun.com/products/11796) | 1 | $4.50 |
-| Screw | [SparkFun Screw - Phillips Head (1/4", 4-40, 10 pack)](https://www.sparkfun.com/products/10453) | 1 | $1.60 |
-| Enclosure | [Hammond Manufacturing 1554Q2GYCL](https://octopart.com/1554q2gycl-hammond-99088964?r=sp)<sup>1</sup> | 1 | $27.78 |
-| Enclosure Inner Panel | [Hammond Manufacturing 1554QPL](https://octopart.com/1554qpl-hammond-97562074?r=sp)<sup>1</sup> | 1 | $9.00 |
-| Power Panel Mount Connector | Bulgin<sup>1</sup> | 1 | $25.00 |
-| Power Cable Connector | Bulgin<sup>1</sup> | 1 | $25.00 |
-| | | **Total** | **~$600** |
 
 #### 2.1.2 Design Evolution 
 
-Carrier board
-In version 2.0, a carrier board was designed to simplify assembly and deployment. It provides 5.08 mm, 2-pin screw terminals for wiring the battery connection, and a resistor divider to measure battery voltage.
+A carrier board was designed to simplify assembly and deployment. It provides 5.08 mm, 2-pin screw terminals for wiring the battery connection, and a resistor divider to measure battery voltage.
 
 <p align="center"><img width="640" alt="image" src="https://user-images.githubusercontent.com/22924092/186201944-ff52a2b9-d714-46c5-bb36-c9115895dd63.png"></p>
 <p align="center"><b>Figure 1.</b> Open-source carrier board design.</p>
