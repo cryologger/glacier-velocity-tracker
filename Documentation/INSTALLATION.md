@@ -17,7 +17,8 @@ This guide provides step-by-step instructions on installing the Arduino IDE and 
 ## Step 3: Install Board Definition
 * Navigate to: Tools > Boards > Boards Manager
 * Search for: SparkFun Apollo3
-* Select and install version: 1.2.3 
+* Select and install version: 1.2.3
+  * Warning: Do *not* install version 2.0.0 as it is incompatible with the software.
 ![image](/Images/arduino-ide-boards.png)
 
 ## Step 4: Install Libraries
