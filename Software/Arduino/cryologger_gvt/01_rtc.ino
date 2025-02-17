@@ -178,6 +178,24 @@ void printAlarm() {
   DEBUG_PRINTLN(alarmBuffer);
 }
 
+// Check the RTC date.
+//
+// Compares the stored date with the RTC’s current date to detect daily changes.
+void checkDate() {
+  rtc.getTime();  // Retrieve the current RTC date and time
+
+  if (firstTimeFlag) {
+    dateCurrent = rtc.dayOfMonth;
+  }
+
+  dateNew = rtc.dayOfMonth;
+
+  DEBUG_PRINT(F("[RTC] Current date: "));
+  DEBUG_PRINT(dateCurrent);
+  DEBUG_PRINT(F(" New date: "));
+  DEBUG_PRINTLN(dateNew);
+}
+
 // Check and update the operation mode.
 //
 // Evaluates if summer logging mode should be activated and adjusts
