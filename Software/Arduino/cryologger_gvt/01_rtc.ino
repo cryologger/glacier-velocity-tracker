@@ -196,6 +196,24 @@ void checkDate() {
   DEBUG_PRINTLN(dateNew);
 }
 
+// Determine if it is currently summer.
+//
+// Checks whether the current date falls within the defined summer logging period.
+bool isSummer() {
+  rtc.getTime();  // Retrieve the current RTC date
+
+  int currentMD = (rtc.month * 100) + rtc.dayOfMonth;
+  int startMD = (alarmSummerStartMonth * 100) + alarmSummerStartDay;
+  int endMD = (alarmSummerEndMonth * 100) + alarmSummerEndDay;
+  if (summerMode) {
+    DEBUG_PRINT(F("[RTC] Summer period: Start "));
+    DEBUG_PRINT(startMD);
+    DEBUG_PRINT(F(" | End "));
+    DEBUG_PRINTLN(endMD);
+  }
+  return (currentMD >= startMD && currentMD <= endMD);
+}
+
 // Check and update the operation mode.
 //
 // Evaluates if summer logging mode should be activated and adjusts
