@@ -136,9 +136,19 @@ void wakeUp() {
 #endif
 }
 
-/*
-  Power control for the Qwiic connector.
-*/
+// Restore power to all necessary peripherals.
+//
+// This function reinitializes power for I2C devices, GNSS, OLED, and the microSD card.
+void restorePeripherals() {
+  DEBUG_PRINTLN(F("[Power] Info: Restoring power to peripherals."));
+  qwiicPowerOn();       // Re-enable power to I2C devices.
+  peripheralPowerOn();  // Re-enable power to peripherals.
+  resetOled();          // Reset/reconfigure the OLED display.
+  configureSd();        // Reinitialize the microSD card.
+  configureGnss();      // Reinitialize the GNSS receiver.
+}
+
+// Power control for the Qwiic connector.
 void qwiicPowerOn() {
   digitalWrite(PIN_QWIIC_POWER, HIGH);
   myDelay(2500);  // Non-blocking delay to allow Qwiic devices time to power up.
@@ -148,9 +158,8 @@ void qwiicPowerOff() {
   digitalWrite(PIN_QWIIC_POWER, LOW);
 }
 
-/*
-  Power control for microSD and other peripherals.
-*/
+
+// Power control for microSD and other peripherals.
 void peripheralPowerOn() {
   digitalWrite(PIN_MICROSD_POWER, HIGH);
   myDelay(250);  // Non-blocking delay to allow peripherals time to power up.
