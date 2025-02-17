@@ -37,7 +37,7 @@
 // ----------------------------------------------------------------------------
 // Device Identifier
 // ----------------------------------------------------------------------------
-#define SERIAL "GVT-25-018"
+#define SERIAL "GVT-25-001" // Unique device identifer to distinguish log files
 
 // ----------------------------------------------------------------------------
 // Debugging Macros
@@ -97,10 +97,10 @@ bool summerMode = true;
 // Alarm & Logging Time Configurations
 // ----------------------------------------------------------------------------
 // Daily mode: log from 14:00 to 17:00 UTC
-byte alarmStartHour = 23;   // Logging start hour (UTC)
-byte alarmStartMinute = 50;  // Logging start minute (UTC)
-byte alarmStopHour = 23;    // Logging stop hour (UTC)
-byte alarmStopMinute = 55;   // Logging stop minute (UTC)
+byte alarmStartHour = 14;   // Logging start hour (UTC)
+byte alarmStartMinute = 0;  // Logging start minute (UTC)
+byte alarmStopHour = 17;    // Logging stop hour (UTC)
+byte alarmStopMinute = 0;   // Logging stop minute (UTC)
 
 // Rolling mode: define awake/sleep durations
 byte alarmAwakeHours = 1;    // Awake period (hours)
@@ -122,9 +122,10 @@ volatile bool wdtFlag = false;    // Set by Watchdog Timer ISR
 volatile int wdtCounter = 0;      // Count of WDT interrupts
 volatile int wdtCounterMax = 0;   // Maximum WDT interrupt count observed
 
-bool gnssConfigFlag = true;  // Indicates if GNSS module needs reconfiguration
-bool rtcSyncFlag = false;    // Indicates if RTC is synchronized with GNSS
-bool firstTimeFlag = true;   // True during the first run
+bool summerPowerInitFlag = false; // Tracks if peripherals were restored for summer mode
+bool gnssConfigFlag = true;       // Indicates if GNSS module needs reconfiguration
+bool rtcSyncFlag = false;         // Indicates if RTC is synchronized with GNSS
+bool firstTimeFlag = true;        // True during the first run
 
 // Alarm mode settings for various states
 byte alarmModeInitial = 4;  // Initial RTC alarm mode (default daily)
@@ -246,9 +247,9 @@ void setup() {
   createDebugFile();  // Create a debug log file on SD.
   setInitialAlarm();  // Set the initial RTC alarm based on operation mode.
 
-  DEBUG_PRINT(F("Info - Datetime "));
+  DEBUG_PRINT(F("[Main] Info: Datetime "));
   printDateTime();
-  DEBUG_PRINT(F("Info - Initial alarm "));
+  DEBUG_PRINT(F("[Main] Info: Initial alarm "));
   printAlarm();
 
   // Indicate that setup is complete.
@@ -261,7 +262,7 @@ void setup() {
 void loop() {
   // Process RTC alarm events.
   if (alarmFlag) {
-    DEBUG_PRINT(F("Info - Alarm trigger "));
+    DEBUG_PRINT(F("[Main] Info: Alarm trigger "));
     printDateTime();
 
     // Update RTC and logging configuration.
@@ -269,13 +270,15 @@ void loop() {
     setAwakeAlarm();   // Schedule the wake-up alarm (end of logging period).
     getLogFileName();  // Generate a new log file name with a timestamp.
 
-    // If not in continuous mode, reinitialize peripherals.
+    // If we have just transitioned to summer continuous mode, restore power
+    if (operationMode == CONTINUOUS && !summerPowerInitFlag) {
+      restorePeripherals();
+      summerPowerInitFlag = true;
+    }
+
+    // If not in continuous mode, reinitialize peripherals
     if (operationMode != CONTINUOUS) {
-      qwiicPowerOn();       // Re-enable power to I2C devices.
-      peripheralPowerOn();  // Re-enable power to peripherals.
-      resetOled();          // Reset/reconfigure the OLED display.
-      configureSd();        // Reinitialize the microSD card.
-      configureGnss();      // Reinitialize the GNSS receiver.
+      restorePeripherals();
     }
 
     // If the date has changed (daily logging), re-sync the RTC.

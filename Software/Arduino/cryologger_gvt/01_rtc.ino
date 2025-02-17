@@ -1,8 +1,8 @@
 /*
   RTC Module
 
-  This module configures the real-time clock (RTC), sets alarms, and manages 
-  timekeeping. It handles scheduled logging, sleep cycles, and periodic 
+  This module configures the real-time clock (RTC), sets alarms, and manages
+  timekeeping. It handles scheduled logging, sleep cycles, and periodic
   synchronization with GNSS timestamps.
 
   ----------------------------------------------------------------------------
@@ -22,63 +22,66 @@
 //
 // Initializes the RTC and sets the date/time manually for debugging purposes.
 void configureRtc() {
-  
-  rtc.setTime(23, 48, 30, 0, 31, 5, 25);  // Manually set the RTC date/time for debugging
+  rtc.setTime(23, 57, 30, 0, 31, 8, 25);  // Format is hour, minutes, seconds, hundredths, day, month, year
 }
 
 // Set the initial RTC alarm.
 //
 // Determines the initial alarm configuration based on the selected operation mode.
-// This function also verifies whether summer mode is active.
 void setInitialAlarm() {
-  // Store the current operation mode
-  normalOperationMode = operationMode;
+  normalOperationMode = operationMode;  // Store the current operation mode
 
-  // Check and update the operation mode (e.g., enable summer mode if applicable)
-  checkOperationMode();
+  checkOperationMode();  // Evaluate if summer mode should be enabled
 
-  // Configure the RTC alarm based on the operation mode using switch-case
   switch (operationMode) {
     case DAILY:
+      DEBUG_PRINTLN(F("[RTC] Info: Setting initial daily logging alarm."));
       alarmModeInitial = 4;
-      rtc.setAlarm(alarmStartHour % 24, alarmStartMinute % 60, 0, 0, 0, 0);
+      rtc.setAlarm(alarmStartHour, alarmStartMinute, 0, 0, rtc.dayOfMonth, rtc.month);
       break;
 
     case ROLLING:
+      DEBUG_PRINTLN(F("[RTC] Info: Setting initial rolling logging alarm."));
       alarmModeInitial = 5;
-      rtc.setAlarm(0, 0, 0, 0, 0, 0);
+      rtc.setAlarm(0, 0, 0, 0, rtc.dayOfMonth, rtc.month);
       break;
 
     case CONTINUOUS:
-      alarmModeInitial = 4;
       rtc.setAlarm(0, 0, 0, 0, 0, 0);
-      alarmFlag = true;  // Enable logging immediately
+      DEBUG_PRINTLN(F("[RTC] Info: Continuous logging mode active. No alarm set."));
+      alarmModeInitial = 4;
+      alarmFlag = true;  // Start logging immediately
       break;
   }
 
-  // Apply the configured alarm mode
   rtc.setAlarmMode(alarmModeInitial);
   rtc.attachInterrupt();
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
 
-  DEBUG_PRINT(F("[RTC] Info: Initial alarm mode: "));
+  DEBUG_PRINT(F("[RTC] Info: Initial alarm mode = "));
   DEBUG_PRINTLN(alarmModeInitial);
 }
 
 // Set the RTC logging alarm.
 //
-// Defines when the next logging session should occur based on the current
-// operation mode. Adjusts alarm behavior for summer logging.
+// Ensures normal logging behavior while properly transitioning to summer mode if applicable.
 void setAwakeAlarm() {
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);  // Clear any pending RTC alarm interrupts
 
-  checkOperationMode();  // Re-evaluate operation mode for potential summer logging adjustments
+  checkOperationMode();  // Determine the correct operation mode
 
   switch (operationMode) {
     case DAILY:
+      // If today is the last day before summer mode and logging is finished, do NOT set another awake alarm.
+      if (summerMode && isLastDayBeforeSummer() && rtc.hour >= alarmStopHour && rtc.minute >= alarmStopMinute) {
+        DEBUG_PRINTLN(F("[RTC] Info: Last logging session complete. No new logging alarms before summer mode."));
+        return;  // Let `setSleepAlarm()` handle the 00:00 wake-up alarm.
+      }
+
+      // Otherwise, set the normal daily logging alarm
       DEBUG_PRINTLN(F("[RTC] Info: Setting daily logging alarm."));
       alarmModeLogging = 4;
-      rtc.setAlarm(alarmStopHour, alarmStopMinute, 0, 0, 0, 0);
+      rtc.setAlarm(alarmStopHour, alarmStopMinute, 0, 0, rtc.dayOfMonth, rtc.month);
       break;
 
     case ROLLING:
@@ -90,7 +93,7 @@ void setAwakeAlarm() {
       break;
 
     case CONTINUOUS:
-      DEBUG_PRINTLN(F("[RTC] Info: Continuous logging enabled."));
+      DEBUG_PRINTLN(F("[RTC] Info: Continuous logging mode active. No new logging alarms required."));
       break;
   }
 
@@ -103,35 +106,41 @@ void setAwakeAlarm() {
 
 // Set the RTC sleep alarm.
 //
-// Defines when the device should wake from sleep based on the logging mode.
-// Ensures that the system conserves power efficiently between logging cycles.
+// Ensures normal sleep cycles while handling the summer mode transition correctly.
 void setSleepAlarm() {
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);  // Clear any pending RTC alarm interrupts
-
-  checkOperationMode();  // Re-evaluate operation mode for potential summer logging adjustments
+  checkOperationMode();                      // Ensure we evaluate the correct logging mode
 
   switch (operationMode) {
     case DAILY:
-      DEBUG_PRINTLN(F("[RTC] Info: Setting daily sleep alarm."));
-      alarmModeSleep = 4;
-      rtc.setAlarm(alarmStartHour, alarmStartMinute, 0, 0, 0, 0);
+      // If today is the last day before summer mode and logging is finished, set alarm for 00:00
+      if (summerMode && isLastDayBeforeSummer() && rtc.hour >= alarmStopHour && rtc.minute >= alarmStopMinute) {
+        rtc.setAlarm(0, 0, 0, 0, alarmSummerStartDay, alarmSummerStartMonth);
+        DEBUG_PRINTLN(F("[RTC] Info: Last sleep before summer mode. Sleep alarm set for 00:00 transition."));
+        alarmModeSleep = 4;
+      } else {
+        // Otherwise, set the normal daily sleep alarm
+        rtc.setAlarm(alarmStartHour, alarmStartMinute, 0, 0, rtc.dayOfMonth, rtc.month);
+        DEBUG_PRINTLN(F("[RTC] Info: Setting normal daily sleep alarm."));
+        alarmModeSleep = 4;
+      }
       break;
 
     case ROLLING:
-      DEBUG_PRINTLN(F("[RTC] Info: Setting rolling sleep alarm."));
       rtc.setAlarm((rtc.hour + alarmSleepHours) % 24,
                    (rtc.minute + alarmSleepMinutes) % 60,
                    0, 0, rtc.dayOfMonth, rtc.month);
       alarmModeSleep = (alarmSleepHours > 0) ? 4 : 5;
+      DEBUG_PRINTLN(F("[RTC] Info: Setting rolling sleep alarm."));
       break;
 
     case CONTINUOUS:
-      DEBUG_PRINTLN(F("[RTC] Info: Continuous logging enabled. No sleep alarm set."));
-      return;
+      DEBUG_PRINTLN(F("[RTC] Info: Continuous logging mode active. No sleep alarm required."));
+      break;
   }
 
   rtc.setAlarmMode(alarmModeSleep);
-
+  alarmFlag = false;
   DEBUG_PRINT(F("[RTC] Info: Sleeping until "));
   printAlarm();
 }
@@ -191,11 +200,12 @@ void checkDate() {
 
   dateNew = rtc.dayOfMonth;
 
-  DEBUG_PRINT(F("[RTC] Current date: "));
+  DEBUG_PRINT(F("[RTC] Info: Current date: "));
   DEBUG_PRINT(dateCurrent);
   DEBUG_PRINT(F(" New date: "));
   DEBUG_PRINTLN(dateNew);
 }
+
 
 // Determine if it is currently summer.
 //
@@ -206,28 +216,50 @@ bool isSummer() {
   int currentMD = (rtc.month * 100) + rtc.dayOfMonth;
   int startMD = (alarmSummerStartMonth * 100) + alarmSummerStartDay;
   int endMD = (alarmSummerEndMonth * 100) + alarmSummerEndDay;
-  if (summerMode) {
-    DEBUG_PRINT(F("[RTC] Info: Summer period Start "));
-    DEBUG_PRINT(startMD);
-    DEBUG_PRINT(F(" | End "));
-    DEBUG_PRINTLN(endMD);
-  }
+
+  DEBUG_PRINT(F("[RTC] Info: Current date = "));
+  DEBUG_PRINTLN(currentMD);
+
+  DEBUG_PRINT(F("[RTC] Info: Summer logging period = "));
+  DEBUG_PRINT(startMD);
+  DEBUG_PRINT(F("-"));
+  DEBUG_PRINTLN(endMD);
+
   return (currentMD >= startMD && currentMD <= endMD);
 }
 
+// Check if today is the last day before summer logging starts.
+bool isLastDayBeforeSummer() {
+  rtc.getTime();
+  if (alarmSummerStartDay == 1) {
+    return (rtc.dayOfMonth == getLastDayOfMonth(rtc.month, rtc.year) && rtc.month == (alarmSummerStartMonth - 1));
+  }
+  return (rtc.dayOfMonth == (alarmSummerStartDay - 1) && rtc.month == alarmSummerStartMonth);
+}
 // Check and update the operation mode.
 //
-// Evaluates if summer logging mode should be activated and adjusts
-// the operation mode accordingly.
+// This function determines the appropriate operation mode but does **not** set any alarms.
+// Alarm scheduling is handled separately in `setAwakeAlarm()`.
 void checkOperationMode() {
   DEBUG_PRINTLN(F("[RTC] Info: Checking operation mode..."));
+  rtc.getTime();
+
+  // If summer mode is enabled and the current date is within the summer period,
+  // activate continuous logging mode.
   if (summerMode && isSummer()) {
     operationMode = CONTINUOUS;
-    DEBUG_PRINT(F("[RTC] Info: Summer logging mode enabled: "));
-    DEBUG_PRINTLN(operationMode);
-  } else {
-    operationMode = normalOperationMode;
-    DEBUG_PRINT(F("[RTC] Info: Normal operation mode enabled: "));
-    DEBUG_PRINTLN(operationMode);
+    DEBUG_PRINTLN(F("[RTC] Info: Summer logging period detected. Switching to continuous logging mode."));
+    return;
   }
+
+  // Otherwise, keep the normal operation mode.
+  operationMode = normalOperationMode;
+  DEBUG_PRINT(F("[RTC] Info: Normal operation mode remains active: "));
+  DEBUG_PRINTLN(operationMode);
+}
+
+// Returns the last day of a given month (handles leap years)
+int getLastDayOfMonth(int month, int year) {
+  if (month == 2) return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) ? 29 : 28;
+  return (month == 4 || month == 6 || month == 9 || month == 11) ? 30 : 31;
 }
