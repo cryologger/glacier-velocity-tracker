@@ -1,91 +1,81 @@
-// Configure microSD
-void configureSd()
-{
-  // Start loop timer
-  unsigned long loopStartTime = millis();
+/*
+  microSD Module
 
-  // Check if microSD has been initialized
-  if (!online.microSd)
-  {
-    // Display OLED messages(s)
-    displayInitialize("microSD");
+  This module handles the initialization and management of the microSD card.
+  It ensures proper initialization, manages file timestamps, and logs errors
+  when failures occur.
+*/
 
-    // Initialize microSD
-    if (!sd.begin(PIN_SD_CS, SD_SCK_MHZ(24)))
-    {
-      DEBUG_PRINTLN("Warning - microSD failed to initialize. Reattempting...");
+// Configure and initialize the microSD card.
+//
+// This function attempts to initialize the microSD card and sets the appropriate
+// online flag. If initialization fails, it retries before shutting down power
+// to conserve energy.
+void configureSd() {
+  unsigned long loopStartTime = millis();  // Start loop timer.
 
-      // Display OLED messages(s)
-      displayErrorMicrosd1();
+  // Check if microSD is already initialized.
+  if (online.microSd) {
+    DEBUG_PRINTLN(F("[microSD] Info: Already initialized."));
+    return;
+  }
 
-      // Delay between initialization attempts
-      myDelay(2000);
+  displayInitialize("microSD");  // Display OLED message.
 
-      if (!sd.begin(PIN_SD_CS, SD_SCK_MHZ(24)))
-      {
-        DEBUG_PRINTLN("Warning - microSD failed to initialize.");
-        online.microSd = false; // Set flag
-
-        // Display OLED messages(s)
-        displayErrorMicrosd2();
-
-        // Disable power to Qwiic connector
-        qwiicPowerOff();
-
-        // Disable power to peripherals
-        peripheralPowerOff();
-      }
-      else
-      {
-        online.microSd = true; // Set flag
-        DEBUG_PRINTLN("Info - microSD initialized.");
-        // Display OLED messages(s)
-        displaySuccess();
-      }
+  // Attempt microSD initialization with a maximum of 2 retries.
+  for (int attempt = 1; attempt <= 2; attempt++) {
+    if (sd.begin(PIN_SD_CS, SD_SCK_MHZ(24))) {
+      online.microSd = true;  // Set flag.
+      DEBUG_PRINTLN(F("[microSD] Info: Initialized successfully."));
+      displaySuccess();  // Display OLED success message.
+      break;             // Exit loop on success.
     }
-    else
-    {
-      online.microSd = true; // Set flag
-      DEBUG_PRINTLN("Info - microSD initialized.");
-      // Display OLED messages(s)
-      displaySuccess();
+
+    DEBUG_PRINTLN(F("[microSD] Warning: Initialization failed. Retrying..."));
+    displayErrorMicrosd1();  // Display OLED error message.
+    myDelay(2000);           // Non-blocking delay before retry.
+
+    // On second failure, log error and disable peripherals.
+    if (attempt == 2) {
+      DEBUG_PRINTLN(F("[microSD] Error: Failed to initialize."));
+      online.microSd = false;  // Set flag.
+
+      displayErrorMicrosd2();  // Display OLED failure message.
+      qwiicPowerOff();         // Disable power to Qwiic connector.
+      peripheralPowerOff();    // Disable power to peripherals.
     }
   }
-  else
-  {
-    DEBUG_PRINTLN("Info - microSD already initialized.");
-  }
-  
-  // Stop the loop timer
-  timer.microSd = millis() - loopStartTime;
+
+  timer.microSd = millis() - loopStartTime;  // Stop loop timer.
 }
 
-// Update the file create timestamp
-void updateFileCreate(FsFile *dataFile)
-{
-  // Get the RTC's current date and time
-  rtc.getTime();
+// Update the file creation timestamp.
+//
+// This function updates the file's creation timestamp using the RTC. If
+// the update fails, a warning message is logged.
+void updateFileCreate(FsFile *dataFile) {
+  rtc.getTime();  // Get current RTC date and time.
 
-  // Update the file create timestamp
-  if (!dataFile->timestamp(T_CREATE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
-  {
-    DEBUG_PRINT("Warning - Could not update file create timestamp.");
+  if (!dataFile->timestamp(T_CREATE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth,
+                           rtc.hour, rtc.minute, rtc.seconds)) {
+    DEBUG_PRINTLN(F("[microSD] Warning: Could not update file create timestamp."));
   }
 }
 
-// Update the file access and write timestamps
-void updateFileAccess(FsFile *dataFile)
-{
-  // Get the RTC's current date and time
-  rtc.getTime();
+// Update file access and write timestamps.
+//
+// This function updates the file's last access and last write timestamps
+// using the RTC. If the update fails, a warning message is logged.
+void updateFileAccess(FsFile *dataFile) {
+  rtc.getTime();  // Get current RTC date and time.
 
-  // Update the file access and write timestamps
-  if (!dataFile->timestamp(T_ACCESS, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
-  {
-    DEBUG_PRINT("Warning - Could not update file access timestamp.");
+  if (!dataFile->timestamp(T_ACCESS, (rtc.year + 2000), rtc.month, rtc.dayOfMonth,
+                           rtc.hour, rtc.minute, rtc.seconds)) {
+    DEBUG_PRINTLN(F("[microSD] Warning: Could not update file access timestamp."));
   }
-  if (!dataFile->timestamp(T_WRITE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth, rtc.hour, rtc.minute, rtc.seconds))
-  {
-    DEBUG_PRINT("Warning - Could not update file write timestamp.");
+
+  if (!dataFile->timestamp(T_WRITE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth,
+                           rtc.hour, rtc.minute, rtc.seconds)) {
+    DEBUG_PRINTLN(F("[microSD] Warning: Could not update file write timestamp."));
   }
 }
