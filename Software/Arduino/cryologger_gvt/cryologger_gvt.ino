@@ -1,7 +1,7 @@
 /*
   Cryologger - Glacier Velocity Tracker (GVT)
   Version: 2.4.0
-  Date: February 17, 2025
+  Date: February 16, 2025
   Author: Adam Garbo
   License: GPLv3. See license file for more information.
 
