@@ -176,7 +176,7 @@ void syncRtc()
                 gnss.getLatitude(), gnss.getLongitude(), gnss.getSIV(),
                 gnss.getPDOP(), gnss.getFixType(),
                 dateValidFlag, timeValidFlag);
-        DEBUG_PRINTLN(gnssBuffer);
+        DEBUG_PRINT("[GNSS] Info: "); DEBUG_PRINTLN(gnssBuffer);
 
         // Display OLED messages(s)
         displayRtcSyncStatus();
