@@ -424,6 +424,10 @@ void logGnss()
       DEBUG_PRINTLN("[GNSS] Warning: Failed to close log file!");
       closeFailCounter++; // Count number of failed file closes
     }
+    else
+    {
+      DEBUG_PRINTLN("[GNSS] Info: Log file closed.");
+    }
   }
   else
   {

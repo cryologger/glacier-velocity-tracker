@@ -114,8 +114,8 @@ void printGnssSettings() {
     } gnssSettings[] = {
       { "UBLOX_CFG_I2C_ENABLED", UBLOX_CFG_I2C_ENABLED, 2 },
       { "UBLOX_CFG_SPI_ENABLED", UBLOX_CFG_SPI_ENABLED, 2 },
-      { "UBLOX_CFG_UART1_ENABLED", UBLOX_CFG_UART1_ENABLED, 1 },
-      { "UBLOX_CFG_UART2_ENABLED", UBLOX_CFG_UART2_ENABLED, 1 },
+      { "UBLOX_CFG_UART1_ENABLED", UBLOX_CFG_UART1_ENABLED, 2 },
+      { "UBLOX_CFG_UART2_ENABLED", UBLOX_CFG_UART2_ENABLED, 2 },
       { "UBLOX_CFG_USB_ENABLED", UBLOX_CFG_USB_ENABLED, 2 },
       { "UBLOX_CFG_UART1_BAUDRATE", UBLOX_CFG_UART1_BAUDRATE, 1 },
       { "UBLOX_CFG_UART2_BAUDRATE", UBLOX_CFG_UART2_BAUDRATE, 1 },
@@ -181,7 +181,7 @@ void printTimers() {
     { "voltage", timer.voltage, 2 },
     { "gnss", timer.gnss, 2 },
     { "syncRtc", timer.syncRtc, 2 },
-    { "logDebug", timer.logDebug, 2 },
+    { "logDebug", timer.logDebug, 1 },
     { "logGnss", timer.logGnss, 2 }
   };
 
