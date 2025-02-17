@@ -38,7 +38,7 @@ void petDog() {
   // Restart the WDT timer.
   wdt.restart();
 
-  // DEBUG_PRINT(F("[WDT] Watchdog interrupt: ")); DEBUG_PRINTLN(wdtCounter);
+  // DEBUG_PRINT(F("[WDT] Info: Watchdog interrupt = ")); DEBUG_PRINTLN(wdtCounter);
 
   // Clear the WDT flag and reset the interrupt counter.
   wdtFlag = false;

@@ -97,10 +97,10 @@ bool summerMode = true;
 // Alarm & Logging Time Configurations
 // ----------------------------------------------------------------------------
 // Daily mode: log from 14:00 to 17:00 UTC
-byte alarmStartHour = 14;   // Logging start hour (UTC)
-byte alarmStartMinute = 0;  // Logging start minute (UTC)
-byte alarmStopHour = 17;    // Logging stop hour (UTC)
-byte alarmStopMinute = 0;   // Logging stop minute (UTC)
+byte alarmStartHour = 23;   // Logging start hour (UTC)
+byte alarmStartMinute = 50;  // Logging start minute (UTC)
+byte alarmStopHour = 23;    // Logging stop hour (UTC)
+byte alarmStopMinute = 55;   // Logging stop minute (UTC)
 
 // Rolling mode: define awake/sleep durations
 byte alarmAwakeHours = 1;    // Awake period (hours)

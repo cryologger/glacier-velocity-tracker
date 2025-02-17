@@ -22,7 +22,8 @@
 //
 // Initializes the RTC and sets the date/time manually for debugging purposes.
 void configureRtc() {
-  rtc.setTime(23, 57, 30, 0, 7, 2, 25);  // Manually set the RTC date/time for debugging
+  
+  rtc.setTime(23, 48, 30, 0, 31, 5, 25);  // Manually set the RTC date/time for debugging
 }
 
 // Set the initial RTC alarm.
@@ -60,7 +61,7 @@ void setInitialAlarm() {
   rtc.attachInterrupt();
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
 
-  DEBUG_PRINT(F("[RTC] Initial alarm mode: "));
+  DEBUG_PRINT(F("[RTC] Info: Initial alarm mode: "));
   DEBUG_PRINTLN(alarmModeInitial);
 }
 
@@ -75,13 +76,13 @@ void setAwakeAlarm() {
 
   switch (operationMode) {
     case DAILY:
-      DEBUG_PRINTLN(F("[RTC] Setting daily logging alarm"));
+      DEBUG_PRINTLN(F("[RTC] Info: Setting daily logging alarm."));
       alarmModeLogging = 4;
       rtc.setAlarm(alarmStopHour, alarmStopMinute, 0, 0, 0, 0);
       break;
 
     case ROLLING:
-      DEBUG_PRINTLN(F("[RTC] Setting rolling logging alarm"));
+      DEBUG_PRINTLN(F("[RTC] Info: Setting rolling logging alarm."));
       alarmModeLogging = (alarmAwakeHours > 0) ? 4 : 5;
       rtc.setAlarm((rtc.hour + alarmAwakeHours) % 24,
                    (rtc.minute + alarmAwakeMinutes) % 60,
@@ -89,14 +90,14 @@ void setAwakeAlarm() {
       break;
 
     case CONTINUOUS:
-      DEBUG_PRINTLN(F("[RTC] Continuous logging enabled"));
+      DEBUG_PRINTLN(F("[RTC] Info: Continuous logging enabled."));
       break;
   }
 
   rtc.setAlarmMode(alarmModeLogging);
   alarmFlag = false;
 
-  DEBUG_PRINT(F("[RTC] Logging until "));
+  DEBUG_PRINT(F("[RTC] Info: Logging until "));
   printAlarm();
 }
 
@@ -111,13 +112,13 @@ void setSleepAlarm() {
 
   switch (operationMode) {
     case DAILY:
-      DEBUG_PRINTLN(F("[RTC] Setting daily sleep alarm"));
+      DEBUG_PRINTLN(F("[RTC] Info: Setting daily sleep alarm."));
       alarmModeSleep = 4;
       rtc.setAlarm(alarmStartHour, alarmStartMinute, 0, 0, 0, 0);
       break;
 
     case ROLLING:
-      DEBUG_PRINTLN(F("[RTC] Setting rolling sleep alarm"));
+      DEBUG_PRINTLN(F("[RTC] Info: Setting rolling sleep alarm."));
       rtc.setAlarm((rtc.hour + alarmSleepHours) % 24,
                    (rtc.minute + alarmSleepMinutes) % 60,
                    0, 0, rtc.dayOfMonth, rtc.month);
@@ -125,13 +126,13 @@ void setSleepAlarm() {
       break;
 
     case CONTINUOUS:
-      DEBUG_PRINTLN(F("[RTC] Continuous logging enabled. No sleep alarm set."));
+      DEBUG_PRINTLN(F("[RTC] Info: Continuous logging enabled. No sleep alarm set."));
       return;
   }
 
   rtc.setAlarmMode(alarmModeSleep);
 
-  DEBUG_PRINT(F("[RTC] Sleeping until "));
+  DEBUG_PRINT(F("[RTC] Info: Sleeping until "));
   printAlarm();
 }
 
@@ -206,7 +207,7 @@ bool isSummer() {
   int startMD = (alarmSummerStartMonth * 100) + alarmSummerStartDay;
   int endMD = (alarmSummerEndMonth * 100) + alarmSummerEndDay;
   if (summerMode) {
-    DEBUG_PRINT(F("[RTC] Summer period: Start "));
+    DEBUG_PRINT(F("[RTC] Info: Summer period Start "));
     DEBUG_PRINT(startMD);
     DEBUG_PRINT(F(" | End "));
     DEBUG_PRINTLN(endMD);
@@ -219,14 +220,14 @@ bool isSummer() {
 // Evaluates if summer logging mode should be activated and adjusts
 // the operation mode accordingly.
 void checkOperationMode() {
-  DEBUG_PRINTLN(F("[RTC] Checking operation mode..."));
+  DEBUG_PRINTLN(F("[RTC] Info: Checking operation mode..."));
   if (summerMode && isSummer()) {
     operationMode = CONTINUOUS;
-    DEBUG_PRINT(F("[RTC] Summer logging mode enabled: "));
+    DEBUG_PRINT(F("[RTC] Info: Summer logging mode enabled: "));
     DEBUG_PRINTLN(operationMode);
   } else {
     operationMode = normalOperationMode;
-    DEBUG_PRINT(F("[RTC] Normal operation mode enabled: "));
+    DEBUG_PRINT(F("[RTC] Info: Normal operation mode enabled: "));
     DEBUG_PRINTLN(operationMode);
   }
 }

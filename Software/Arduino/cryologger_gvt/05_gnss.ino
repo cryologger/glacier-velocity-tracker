@@ -25,14 +25,14 @@ void configureGnss()
       // Display OLED messages(s)
       displayFailure();
 
-      DEBUG_PRINTLN("Warning - u-blox failed to initialize. Reattempting...");
+      DEBUG_PRINTLN("[GNSS] Warning: u-blox failed to initialize. Reattempting...");
 
       // Delay between initialization attempts
       myDelay(2000);
 
       if (!gnss.begin())
       {
-        DEBUG_PRINTLN("Warning - u-blox failed to initialize! Please check wiring.");
+        DEBUG_PRINTLN("[GNSS] Warning: u-blox failed to initialize! Please check wiring.");
         online.gnss = false;
         logDebug(); // Log system debug information
 
@@ -48,7 +48,7 @@ void configureGnss()
       else
       {
         online.gnss = true;
-        DEBUG_PRINTLN("Info - u-blox initialized.");
+        DEBUG_PRINTLN("[GNSS] Info: u-blox initialized.");
 
         // Display OLED messages(s)
         displaySuccess();
@@ -57,7 +57,7 @@ void configureGnss()
     else
     {
       online.gnss = true;
-      DEBUG_PRINTLN("Info - u-blox initialized.");
+      DEBUG_PRINTLN("[GNSS] Info: u-blox initialized.");
 
       // Display OLED messages(s)
       displaySuccess();
@@ -79,11 +79,11 @@ void configureGnss()
 
       if (response)
       {
-        DEBUG_PRINTLN("Info - u-blox communication interfaces configured.");
+        DEBUG_PRINTLN("[GNSS] Info: u-blox communication interfaces configured.");
       }
       else
       {
-        DEBUG_PRINTLN("Warning - u-blox communication interfaces not configured!");
+        DEBUG_PRINTLN("[GNSS] Warning: u-blox communication interfaces not configured!");
       }
 
       // Configure satellite signals
@@ -99,11 +99,11 @@ void configureGnss()
 
       if (response)
       {
-        DEBUG_PRINTLN("Info - u-blox satellite signals configured.");
+        DEBUG_PRINTLN("[GNSS] Info: u-blox satellite signals configured.");
       }
       else
       {
-        DEBUG_PRINTLN("Warning - u-blox satellite signals not configured!");
+        DEBUG_PRINTLN("[GNSS] Warning: u-blox satellite signals not configured!");
       }
 
       // Clear flag
@@ -125,7 +125,7 @@ void configureGnss()
   }
   else
   {
-    DEBUG_PRINTLN("Info - GNSS already initialized.");
+    DEBUG_PRINTLN("[GNSS] Info: GNSS already initialized.");
   }
 
   // Stop the loop timer
@@ -151,7 +151,7 @@ void syncRtc()
     rtcDrift = 0;
     fixCounter = 0;
 
-    DEBUG_PRINTLN("Info - Attempting to sync RTC with GNSS...");
+    DEBUG_PRINTLN("[GNSS] Info: Attempting to sync RTC with GNSS...");
 
     // Attempt to acquire a valid GNSS position fix for up to 5 minutes
     while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 1000UL)
@@ -196,13 +196,13 @@ void syncRtc()
             rtcDrift = gnssEpoch - rtcEpoch;                // Calculate RTC drift
             rtcSyncFlag = true;                             // Set flag
 
-            DEBUG_PRINT("Info - RTC time synced to "); printDateTime();
-            DEBUG_PRINT("Info - RTC drift: "); DEBUG_PRINTLN(rtcDrift);
+            DEBUG_PRINT("[GNSS] Info: RTC time synced to "); printDateTime();
+            DEBUG_PRINT("[GNSS] Info: RTC drift = "); DEBUG_PRINTLN(rtcDrift);
 
             // Update logfile timestamp if more than 30 seconds of drift
             if (abs(rtcDrift) > 30)
             {
-              DEBUG_PRINTLN("Info - Updating logfile timestamp");
+              DEBUG_PRINTLN("[GNSS] Info: Updating logfile timestamp");
               rtc.getTime(); // Get the RTC's date and time
               getLogFileName(); // Update logfile timestamp
             }
@@ -215,7 +215,7 @@ void syncRtc()
     }
     if (!rtcSyncFlag)
     {
-      DEBUG_PRINTLN("Warning - Unable to sync RTC!");
+      DEBUG_PRINTLN("[GNSS] Warning: Unable to sync RTC!");
 
       // Display OLED messages(s)
       displayRtcFailure();
@@ -223,15 +223,13 @@ void syncRtc()
   }
   else
   {
-    DEBUG_PRINTLN("Warning - GNSS offline!");
+    DEBUG_PRINTLN("[GNSS] Warning: GNSS offline!");
     rtcSyncFlag = false; // Clear flag
   }
 
   // Stop the loop timer
   timer.syncRtc = millis() - loopStartTime;
 }
-
-
 
 // Log UBX-RXM-RAWX/SFRBX data
 void logGnss()
@@ -264,7 +262,7 @@ void logGnss()
     else
     {
       online.logGnss = true;
-      DEBUG_PRINT("Info - Created log file "); DEBUG_PRINTLN(logFileName);
+      DEBUG_PRINT("[GNSS] Info: Created log file "); DEBUG_PRINTLN(logFileName);
     }
 
     // Update file create timestamp
@@ -279,7 +277,7 @@ void logGnss()
     gnss.clearFileBuffer();         // Clear file buffer
     gnss.clearMaxFileBufferAvail(); // Reset max file buffer size
 
-    DEBUG_PRINTLN("Info - Starting logging...");
+    DEBUG_PRINTLN("[GNSS] Info: Starting logging...");
 
     // Log data until logging alarm triggers
     while (!alarmFlag)
@@ -328,12 +326,12 @@ void logGnss()
         // Sync the log file
         if (!logFile.sync())
         {
-          DEBUG_PRINTLN("Warning - Failed to sync log file!");
+          DEBUG_PRINTLN("[GNSS] Warning: Failed to sync log file!");
           syncFailCounter++; // Count number of failed file syncs
         }
 
         // Print number of bytes written to SD card
-        DEBUG_PRINT(bytesWritten); DEBUG_PRINT(" bytes written. ");
+        DEBUG_PRINT("[GNSS] Info: ");DEBUG_PRINT(bytesWritten); DEBUG_PRINT(" bytes written. ");
 
         // Get max file buffer size
         maxBufferBytes = gnss.getMaxFileBufferAvail();
@@ -408,12 +406,12 @@ void logGnss()
     }
 
     // Print total number of bytes written to SD card
-    DEBUG_PRINT("Info - Total bytes written is "); DEBUG_PRINTLN(bytesWritten);
+    DEBUG_PRINT("[GNSS] Info: Total bytes written is "); DEBUG_PRINTLN(bytesWritten);
 
     // Sync the log file
     if (!logFile.sync())
     {
-      DEBUG_PRINTLN("Warning - Failed to sync log file!");
+      DEBUG_PRINTLN("[GNSS] Warning: Failed to sync log file!");
       syncFailCounter++; // Count number of failed file syncs
     }
 
@@ -423,14 +421,14 @@ void logGnss()
     // Close the log file
     if (!logFile.close())
     {
-      DEBUG_PRINTLN("Warning - Failed to close log file!");
+      DEBUG_PRINTLN("[GNSS] Warning: Failed to close log file!");
       closeFailCounter++; // Count number of failed file closes
     }
   }
   else
   {
     online.logGnss = false;
-    DEBUG_PRINTLN("Warning - u-blox ofline!");
+    DEBUG_PRINTLN("[GNSS] Warning: u-blox ofline!");
   }
 
   // Stop the loop timer

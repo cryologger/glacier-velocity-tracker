@@ -20,8 +20,8 @@ float readBattery() {
   float voltage = reading / 452.89;  // Apply ADC linear gain.
   voltage += -0.13;                  // Apply ADC linear offset.
 
-  // DEBUG_PRINT(F("[POWER] ADC: ")); DEBUG_PRINTLN(reading);
-  // DEBUG_PRINT(F("[POWER] Voltage: ")); DEBUG_PRINTLN(voltage);
+  // DEBUG_PRINT(F("[POWER] Info: ADC = ")); DEBUG_PRINTLN(reading);
+  // DEBUG_PRINT(F("[POWER] Info: Voltage = ")); DEBUG_PRINTLN(voltage);
 
   timer.voltage = micros() - startTime;  // Record execution time.
   return voltage;
@@ -50,7 +50,7 @@ void goToSleep() {
 
   // Skip deep sleep if operating in continuous logging mode.
   if (operationMode == CONTINUOUS) {
-    DEBUG_PRINTLN(F("[POWER] System is in continuous mode. Skipping sleep..."));
+    DEBUG_PRINTLN(F("[POWER] Info: System is in continuous mode. Skipping sleep..."));
     return;
   } else {
     alarmFlag = false;  // Ensure the alarm flag is cleared.

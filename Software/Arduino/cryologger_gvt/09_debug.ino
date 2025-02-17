@@ -28,17 +28,17 @@ void printLoggingSettings() {
   printLine();
 
   DEBUG_PRINT("Logging mode: ");
-  printTab(3);
+  printTab(2);
 
   if (operationMode == 1) {
     DEBUG_PRINTLN("Daily");
     DEBUG_PRINT("Start: ");
-    printTab(4);
+    printTab(3);
     DEBUG_PRINT(alarmStartHour);
     DEBUG_PRINT(":");
     DEBUG_PRINTLN(alarmStartMinute);
     DEBUG_PRINT("Stop: ");
-    printTab(4);
+    printTab(3);
     DEBUG_PRINT(alarmStopHour);
     DEBUG_PRINT(":");
     DEBUG_PRINTLN(alarmStopMinute);
@@ -175,14 +175,14 @@ void printTimers() {
     uint32_t value;
     uint8_t tabCount;
   } timers[] = {
-    { "readWdt", timer.wdt, 1 },
-    { "readRtc", timer.rtc, 1 },
-    { "microSD", timer.microSd, 1 },
-    { "voltage", timer.voltage, 1 },
+    { "readWdt", timer.wdt, 2 },
+    { "readRtc", timer.rtc, 2 },
+    { "microSD", timer.microSd, 2 },
+    { "voltage", timer.voltage, 2 },
     { "gnss", timer.gnss, 2 },
-    { "syncRtc", timer.syncRtc, 1 },
-    { "logDebug", timer.logDebug, 1 },
-    { "logGnss", timer.logGnss, 1 }
+    { "syncRtc", timer.syncRtc, 2 },
+    { "logDebug", timer.logDebug, 2 },
+    { "logGnss", timer.logGnss, 2 }
   };
 
   for (const auto &t : timers) {
