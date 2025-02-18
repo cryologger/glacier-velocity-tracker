@@ -22,10 +22,29 @@
 //
 // Initializes the RTC and sets the date/time manually for debugging purposes.
 void configureRtc() {
-  rtc.setTime(23, 57, 30, 0, 31, 8, 25);  // Format: hour, minutes, seconds, hundredths, day, month, year
+  // Set the RTC to a predefined date and time.
+  // Format: rtc.setTime(hour, minutes, seconds, hundredths, day, month, year);
 
-  // Store the current operation mode
+  // Scenario 1: Power-on before the summer season
+  //rtc.setTime(23, 52, 30, 0, 1, 5, 25);  // Example: 23:57:30.00 on August 31, 2025
+
+  // Scenario 2: Power-on the day before to summer season prior to daily logging period
+  //rtc.setTime(23, 52, 30, 0, 31, 5, 25);
+
+  // Scenario 3: Power-on the day before to summer season after daily logging period
+  //rtc.setTime(23, 57, 30, 0, 31, 5, 25);
+
+  // Scenario 4: Power-on during the summer season
+  rtc.setTime(23, 57, 30, 0, 31, 7, 25);
+
+  // Scenario 5: Power-on after the summer season
+  //rtc.setTime(23, 57, 30, 0, 31, 10, 25);
+
+  // Store the current operation mode for future reference.
   normalOperationMode = operationMode;
+
+  // Attach an interrupt handler to the RTC.
+  rtc.attachInterrupt();
 }
 
 // Set the initial RTC alarm.
@@ -48,12 +67,14 @@ void setInitialAlarm() {
         alarmModeInitial = 4;
         rtc.setAlarm(alarmStartHour, alarmStartMinute, 0, 0, 0, 0);
       }
+      alarmFlag = false;
       break;
 
     case ROLLING:
       DEBUG_PRINTLN(F("[RTC] Info: Setting initial rolling logging alarm."));
       alarmModeInitial = 5;
       rtc.setAlarm(0, 0, 0, 0, 0, 0);
+      alarmFlag = false;
       break;
 
     case CONTINUOUS:
@@ -65,7 +86,6 @@ void setInitialAlarm() {
   }
 
   rtc.setAlarmMode(alarmModeInitial);
-  rtc.attachInterrupt();
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
 
   DEBUG_PRINT(F("[RTC] Info: Initial alarm mode = "));
@@ -97,7 +117,7 @@ void setAwakeAlarm() {
     case ROLLING:
       DEBUG_PRINTLN(F("[RTC] Info: Setting rolling logging alarm."));
       alarmModeLogging = (alarmAwakeHours > 0) ? 4 : 5;
-      rtc.setAlarm((rtc.hour + alarmAwakeHours) % 24,
+      rtc.setAlarm((rtc.hour + alarmAwakeHours + ((rtc.minute + alarmAwakeMinutes) / 60)) % 24,
                    (rtc.minute + alarmAwakeMinutes) % 60,
                    0, 0, rtc.dayOfMonth, rtc.month);
       break;
@@ -106,13 +126,11 @@ void setAwakeAlarm() {
       DEBUG_PRINTLN(F("[RTC] Info: Continuous logging mode active. New log file at 00:00:00"));
       rtc.setAlarm(0, 0, 0, 0, 0, 0);
       alarmModeLogging = 4;
-      alarmFlag = true;  // Continue logging
       break;
   }
 
   rtc.setAlarmMode(alarmModeLogging);
   alarmFlag = false;
-
   DEBUG_PRINT(F("[RTC] Info: Logging until "));
   printAlarm();
 }
@@ -137,23 +155,25 @@ void setSleepAlarm() {
         DEBUG_PRINTLN(F("[RTC] Info: Setting normal daily sleep alarm."));
         alarmModeSleep = 4;
       }
+      alarmFlag = false;
       break;
 
     case ROLLING:
-      rtc.setAlarm((rtc.hour + alarmSleepHours) % 24,
+      rtc.setAlarm((rtc.hour + alarmSleepHours + ((rtc.minute + alarmSleepMinutes) / 60)) % 24,
                    (rtc.minute + alarmSleepMinutes) % 60,
                    0, 0, rtc.dayOfMonth, rtc.month);
       alarmModeSleep = (alarmSleepHours > 0) ? 4 : 5;
       DEBUG_PRINTLN(F("[RTC] Info: Setting rolling sleep alarm."));
+      alarmFlag = false;
       break;
 
     case CONTINUOUS:
       DEBUG_PRINTLN(F("[RTC] Info: Continuous logging mode active. No sleep alarm required."));
-      break;
+      alarmFlag = true;
+      return;
   }
 
   rtc.setAlarmMode(alarmModeSleep);
-  alarmFlag = false;
   DEBUG_PRINT(F("[RTC] Info: Sleeping until "));
   printAlarm();
 }
@@ -271,8 +291,16 @@ void checkOperationMode() {
   DEBUG_PRINTLN(operationMode);
 }
 
-// Returns the last day of a given month (handles leap years)
 int getLastDayOfMonth(int month, int year) {
-  if (month == 2) return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) ? 29 : 28;
-  return (month == 4 || month == 6 || month == 9 || month == 11) ? 30 : 31;
+  switch (month) {
+    case 2:  // February
+      return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) ? 29 : 28;
+    case 4:
+    case 6:
+    case 9:
+    case 11:  // April, June, September, November
+      return 30;
+    default:
+      return 31;  // All other months have 31 days
+  }
 }
