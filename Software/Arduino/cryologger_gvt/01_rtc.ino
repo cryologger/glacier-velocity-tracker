@@ -281,14 +281,17 @@ void checkOperationMode() {
   // activate continuous logging mode.
   if (summerMode && isSummer()) {
     operationMode = CONTINUOUS;
-    DEBUG_PRINTLN(F("[RTC] Info: Summer logging period detected. Switching to continuous logging mode."));
+    DEBUG_PRINTLN(F("[RTC] Info: Operation mode = SUMMER."));
     return;
   }
 
   // Otherwise, keep the normal operation mode.
   operationMode = normalOperationMode;
-  DEBUG_PRINT(F("[RTC] Info: Normal operation mode remains active: "));
-  DEBUG_PRINTLN(operationMode);
+  DEBUG_PRINT(F("[RTC] Info: Operation mode = "));
+  if (operationMode == DAILY) DEBUG_PRINTLN(F("DAILY."));
+  else if (operationMode == ROLLING) DEBUG_PRINTLN(F("ROLLING."));
+  else if (operationMode == CONTINUOUS) DEBUG_PRINTLN(F("CONTINUOUS."));
+  else DEBUG_PRINTLN(F("UNKNOWN."));
 }
 
 int getLastDayOfMonth(int month, int year) {
