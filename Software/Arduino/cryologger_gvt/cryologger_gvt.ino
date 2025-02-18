@@ -90,17 +90,17 @@ enum OperationMode : uint8_t {
 OperationMode operationMode = DAILY;                // Select operation mode
 OperationMode normalOperationMode = operationMode;  // Stores initial logging mode
 
-// Summer mode flag (forces continuous logging during summer period)
+// Summer mode flag (switches to continuous logging during summer period)
 bool summerMode = true;
 
 // ----------------------------------------------------------------------------
 // Alarm & Logging Time Configurations
 // ----------------------------------------------------------------------------
 // Daily mode: log from 14:00 to 17:00 UTC
-byte alarmStartHour = 23;   // Logging start hour (UTC)
-byte alarmStartMinute = 55;  // Logging start minute (UTC)
-byte alarmStopHour = 23;    // Logging stop hour (UTC)
-byte alarmStopMinute = 57;   // Logging stop minute (UTC)
+byte alarmStartHour = 17;   // Logging start hour (UTC)
+byte alarmStartMinute = 0;  // Logging start minute (UTC)
+byte alarmStopHour = 20;    // Logging stop hour (UTC)
+byte alarmStopMinute = 0;   // Logging stop minute (UTC)
 
 // Rolling mode: define awake/sleep durations
 byte alarmAwakeHours = 1;    // Awake period (hours)
@@ -109,10 +109,10 @@ byte alarmSleepHours = 1;    // Sleep period (hours)
 byte alarmSleepMinutes = 0;  // Sleep period (minutes)
 
 // Summer logging period (e.g., June 1st to August 31st)
-byte alarmSummerStartDay = 1;
-byte alarmSummerStartMonth = 6;
-byte alarmSummerEndDay = 31;
-byte alarmSummerEndMonth = 8;
+byte alarmSummerStartDay = 19;  // Summer logging start day
+byte alarmSummerStartMonth = 2; // Summer logging start month
+byte alarmSummerEndDay = 19;    // Summer logging end day
+byte alarmSummerEndMonth = 2;   // Summer logging end month
 
 // ----------------------------------------------------------------------------
 // Global Variables for Logging & System State
@@ -147,7 +147,7 @@ const int fileBufferSize = 16384;  // Buffer size (16 KB) for UBX messages
 
 // Counters and timers
 unsigned int debugCounter = 0;    // Count of debug messages logged
-unsigned int gnssTimeout = 5;     // GNSS acquisition timeout (seconds)
+unsigned int gnssTimeout = 300;   // GNSS acquisition timeout (default = 300 seconds)
 unsigned int maxBufferBytes = 0;  // Maximum buffer size used
 unsigned int reading = 0;         // Battery voltage reading (analog)
 unsigned int fixCounter = 0;      // Count of GNSS fixes

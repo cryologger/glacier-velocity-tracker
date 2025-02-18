@@ -24,9 +24,10 @@
 void configureRtc() {
   // Set the RTC to a predefined date and time.
   // Format: rtc.setTime(hour, minutes, seconds, hundredths, day, month, year);
+  //rtc.setTime(23, 57, 30, 0, 31, 5, 25);  // Example: 23:57:30.00 on August 31, 2025
 
   // Scenario 1: Power-on before the summer season
-  //rtc.setTime(23, 52, 30, 0, 1, 5, 25);  // Example: 23:57:30.00 on August 31, 2025
+  //rtc.setTime(23, 52, 30, 0, 1, 5, 25);  
 
   // Scenario 2: Power-on the day before to summer season prior to daily logging period
   //rtc.setTime(23, 52, 30, 0, 31, 5, 25);
@@ -35,7 +36,7 @@ void configureRtc() {
   //rtc.setTime(23, 57, 30, 0, 31, 5, 25);
 
   // Scenario 4: Power-on during the summer season
-  rtc.setTime(23, 57, 30, 0, 31, 7, 25);
+  //rtc.setTime(23, 57, 30, 0, 31, 7, 25);
 
   // Scenario 5: Power-on after the summer season
   //rtc.setTime(23, 57, 30, 0, 31, 10, 25);

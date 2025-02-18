@@ -198,7 +198,7 @@ void displayRtcFailure() {
 
   enablePullups();
   oled.erase();
-  oled.text(0, 0, "Warning - RTC sync failed!");
+  oled.text(0, 0, "Warning: RTC sync failed!");
   oled.display();
   disablePullups();
   myDelay(2000);
