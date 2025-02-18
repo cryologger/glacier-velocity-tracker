@@ -229,7 +229,7 @@ void logGnss() {
     // O_APPEND - Seek to the end of the file prior to each write
     // O_WRITE  - Open the file for writing
     if (!logFile.open(logFileName, O_CREAT | O_APPEND | O_WRITE)) {
-      DEBUG_PRINT("Warning - Failed to create log file");
+      DEBUG_PRINT("[GNSS] Warning: Failed to create log file");
       DEBUG_PRINTLN(logFileName);
       return;
     } else {
@@ -276,7 +276,7 @@ void logGnss() {
 
         // Write exactly sdWriteSize bytes from myBuffer to the ubxDataFile on the SD card
         if (!logFile.write(myBuffer, sdWriteSize)) {
-          DEBUG_PRINTLN("Warning - Failed to write to log file!");
+          DEBUG_PRINTLN("[GNSS] Warning: Failed to write to log file!");
           writeFailCounter++;  // Count number of failed writes to microSD
         }
 
@@ -310,7 +310,7 @@ void logGnss() {
 
         // Warn if fileBufferSize was more than 80% full
         if (maxBufferBytes > ((fileBufferSize / 5) * 4)) {
-          DEBUG_PRINTLN("Warning - File buffer >80 % full. Data loss may have occurrred.");
+          DEBUG_PRINTLN("[GNSS] Warning: File buffer >80 % full. Data loss may have occurrred.");
         }
 
         // Display logging information to OLED display
