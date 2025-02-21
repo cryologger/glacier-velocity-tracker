@@ -1,8 +1,8 @@
 /*
   Debug Module
 
-  This module provides debugging utilities for printing system settings, 
-  logging configurations, and GNSS register values. It also includes timing 
+  This module provides debugging utilities for printing system settings,
+  logging configurations, and GNSS register values. It also includes timing
   diagnostics to measure function execution times.
 */
 
@@ -46,13 +46,13 @@ void printLoggingSettings() {
   if (operationMode == 2) {
     DEBUG_PRINTLN("Rolling");
     DEBUG_PRINT("Logging duration: ");
-    printTab(2);
+    printTab(1);
     DEBUG_PRINT(alarmAwakeHours);
     DEBUG_PRINT(" hours ");
     DEBUG_PRINT(alarmAwakeMinutes);
     DEBUG_PRINTLN(" minutes");
     DEBUG_PRINT("Sleep duration: ");
-    printTab(2);
+    printTab(1);
     DEBUG_PRINT(alarmSleepHours);
     DEBUG_PRINT(" hours ");
     DEBUG_PRINT(alarmSleepMinutes);
@@ -62,6 +62,10 @@ void printLoggingSettings() {
     DEBUG_PRINTLN("Continuous");
   }
 
+  DEBUG_PRINT("Summer mode: ");
+  printTab(2);
+  DEBUG_PRINTLN(summerMode ? "Enabled"
+                           : "Disabled");
   printLine();
 }
 
@@ -77,7 +81,8 @@ void printGnssSettings() {
   uint8_t customPayload[MAX_PAYLOAD_SIZE];
   ubxPacket customCfg = { 0, 0, 0, 0, 0, customPayload, 0, 0,
                           SFE_UBLOX_PACKET_VALIDITY_NOT_DEFINED,
-                          SFE_UBLOX_PACKET_VALIDITY_NOT_DEFINED };
+                          SFE_UBLOX_PACKET_VALIDITY_NOT_DEFINED
+                        };
 
   gnss.newCfgValget(&customCfg, MAX_PAYLOAD_SIZE, VAL_LAYER_RAM);  // Create a new VALGET construct
   gnss.addCfgValget(&customCfg, UBLOX_CFG_I2C_ENABLED);

@@ -59,7 +59,7 @@ void displayWelcome() {
   oled.erase();
   oled.setCursor(0, 0);
   oled.print("Cryologger GVT ");
-  //oled.print(SERIAL);
+  oled.print(SERIAL);
   oled.setCursor(0, 10);
   oled.print(dateTimeBuffer);
   oled.setCursor(0, 20);
