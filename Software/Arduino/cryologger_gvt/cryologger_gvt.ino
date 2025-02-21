@@ -1,7 +1,7 @@
 /*
   Cryologger - Glacier Velocity Tracker (GVT)
   Version: 2.4.0
-  Date: February 16, 2025
+  Date: February 21, 2025
   Author: Adam Garbo
   License: GPLv3. See license file for more information.
 
@@ -37,7 +37,7 @@
 // ----------------------------------------------------------------------------
 // Device Identifier
 // ----------------------------------------------------------------------------
-#define SERIAL "GVT-25-001" // Unique device identifer to distinguish log files
+#define SERIAL "GVT_25_001"  // Unique device identifer to distinguish log files
 
 // ----------------------------------------------------------------------------
 // Debugging Macros
@@ -87,32 +87,45 @@ enum OperationMode : uint8_t {
   CONTINUOUS = 3
 };
 
-OperationMode operationMode = DAILY;                // Select operation mode
-OperationMode normalOperationMode = operationMode;  // Stores initial logging mode
+enum SeasonalMode : bool {
+  DISABLED = 0,
+  ENABLED = 1,
+};
 
-// Summer mode flag (switches to continuous logging during summer period)
-bool summerMode = true;
+// Select operation mode
+//
+// Options: DAILY, ROLLING, CONTINUOUS
+OperationMode operationMode = DAILY;
+
+// Seasonal logging mode flag
+//
+// Switches to continuous logging during seasonal period
+// Options: ENABLED, DISABLED
+SeasonalMode seasonalLoggingMode = ENABLED;
+
+// Stores initial logging mode
+OperationMode normalOperationMode = operationMode;
 
 // ----------------------------------------------------------------------------
 // Alarm & Logging Time Configurations
 // ----------------------------------------------------------------------------
-// Daily mode: log from 14:00 to 17:00 UTC
-byte alarmStartHour = 17;   // Logging start hour (UTC)
+// Daily mode (e.g., log from 12:00 to 15:00 UTC)
+byte alarmStartHour = 12;   // Logging start hour (UTC)
 byte alarmStartMinute = 0;  // Logging start minute (UTC)
-byte alarmStopHour = 20;    // Logging stop hour (UTC)
+byte alarmStopHour = 15;    // Logging stop hour (UTC)
 byte alarmStopMinute = 0;   // Logging stop minute (UTC)
 
 // Rolling mode: define awake/sleep durations
-byte alarmAwakeHours = 1;    // Awake period (hours)
-byte alarmAwakeMinutes = 0;  // Awake period (minutes)
-byte alarmSleepHours = 1;    // Sleep period (hours)
-byte alarmSleepMinutes = 0;  // Sleep period (minutes)
+byte alarmAwakeHours = 0;    // Awake period (hours)
+byte alarmAwakeMinutes = 5;  // Awake period (minutes)
+byte alarmSleepHours = 0;    // Sleep period (hours)
+byte alarmSleepMinutes = 1;  // Sleep period (minutes)
 
-// Summer logging period (e.g., June 1st to August 31st)
-byte alarmSummerStartDay = 19;  // Summer logging start day
-byte alarmSummerStartMonth = 2; // Summer logging start month
-byte alarmSummerEndDay = 19;    // Summer logging end day
-byte alarmSummerEndMonth = 2;   // Summer logging end month
+// Seasonal logging period (e.g., June 1st to August 31st)
+byte alarmSeasonalStartDay = 1;    // Seasonal logging start day
+byte alarmSeasonalStartMonth = 2;  // Seasonal logging start month
+byte alarmSeasonalEndDay = 21;     // Seasonal logging end day
+byte alarmSeasonalEndMonth = 2;    // Seasonal logging end month
 
 // ----------------------------------------------------------------------------
 // Global Variables for Logging & System State
@@ -122,10 +135,10 @@ volatile bool wdtFlag = false;    // Set by Watchdog Timer ISR
 volatile int wdtCounter = 0;      // Count of WDT interrupts
 volatile int wdtCounterMax = 0;   // Maximum WDT interrupt count observed
 
-bool summerPowerInitFlag = false; // Tracks if peripherals were restored for summer mode
-bool gnssConfigFlag = true;       // Indicates if GNSS module needs reconfiguration
-bool rtcSyncFlag = false;         // Indicates if RTC is synchronized with GNSS
-bool firstTimeFlag = true;        // True during the first run
+bool seasonalPowerInitFlag = false;  // Tracks if peripherals were restored for seasonal mode
+bool gnssConfigFlag = true;          // Indicates if GNSS module needs reconfiguration
+bool rtcSyncFlag = false;            // Indicates if RTC is synchronized with GNSS
+bool firstTimeFlag = true;           // True during the first run
 
 // Alarm mode settings for various states
 byte alarmModeInitial = 4;  // Initial RTC alarm mode (default daily)
@@ -197,10 +210,10 @@ void setup() {
   peripheralPowerOn();
 
   // Initialize communication protocols.
-  Wire.begin();              // Start I2C
-  Wire.setClock(400000);     // Set I2C clock to 400 kHz
-  SPI.begin();               // Start SPI
-  analogReadResolution(14);  // Set ADC resolution to 14 bits
+  Wire.begin();              // Start I2C communications.
+  Wire.setClock(400000);     // Set I2C clock to 400 kHz.
+  SPI.begin();               // Start SPI communications.
+  analogReadResolution(14);  // Set ADC resolution to 14 bits.
 
 #if DEBUG
   Serial.begin(115200);  // Initialize Serial for debugging.
@@ -245,7 +258,7 @@ void setup() {
   syncRtc();          // Synchronize RTC with GNSS.
   checkDate();        // Update the current date.
   createDebugFile();  // Create a debug log file on SD.
-  setInitialAlarm();  // Set the initial RTC alarm based on operation mode.
+  setSleepAlarm();    // Set the RTC alarm based on operation mode.
 
   DEBUG_PRINT(F("[Main] Info: Datetime "));
   printDateTime();
@@ -266,14 +279,14 @@ void loop() {
     printDateTime();
 
     // Update RTC and logging configuration.
-    readRtc();         // Refresh current RTC time.
-    setAwakeAlarm();   // Schedule the wake-up alarm (end of logging period).
-    getLogFileName();  // Generate a new log file name with a timestamp.
+    readRtc();          // Refresh current RTC time.
+    setLoggingAlarm();  // Schedule the wake-up alarm (end of logging period).
+    getLogFileName();   // Generate a new log file name with a timestamp.
 
-    // If we have just transitioned to summer continuous mode, restore power
-    if (operationMode == CONTINUOUS && !summerPowerInitFlag) {
+    // If we have just transitioned to seasonal mode, restore power
+    if (operationMode == CONTINUOUS && !seasonalPowerInitFlag) {
       restorePeripherals();
-      summerPowerInitFlag = true;
+      seasonalPowerInitFlag = true;
     }
 
     // If not in continuous mode, reinitialize peripherals
@@ -282,17 +295,13 @@ void loop() {
     }
 
     // If the date has changed (daily logging), re-sync the RTC.
-    checkDate();
-    if (dateCurrent != dateNew) {
+    if (checkDate()) {
       DEBUG_PRINTLN(F("[Main] Info: Daily RTC sync required..."));
       syncRtc();
-      dateCurrent = dateNew;
-      checkDate();
-    }
+    };
 
-    // Log GNSS data and system debug information.
-    logGnss();
-    logDebug();
+    logGnss();        // Log GNSS data.
+    logDebug();       // Log system debug information.
     setSleepAlarm();  // Schedule the sleep alarm (for low-power mode).
     printTimers();    // Output timing metrics.
     clearTimers();    // Reset timers for the next cycle.
