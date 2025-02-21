@@ -14,7 +14,7 @@
 
 // Create a timestamped log file name.
 //
-// Generates a filename using the current RTC timestamp. This ensures that 
+// Generates a filename using the current RTC timestamp. This ensures that
 // each log session is uniquely named and avoids overwriting previous logs.
 void getLogFileName() {
   sprintf(logFileName, "%s-20%02d%02d%02d_%02d%02d%02d.ubx",
@@ -27,32 +27,35 @@ void getLogFileName() {
 
 // Create a debugging log file.
 //
-// Initializes the debug log file and writes the CSV header if the file is 
+// Initializes the debug log file and writes the CSV header if the file is
 // newly created. Ensures that debug logs persist across sessions.
 void createDebugFile() {
   // Generate debug log filename.
   sprintf(debugFileName, "%s-debug.csv", SERIAL);
 
   // Open or create the debug log file.
+  // O_CREAT - Creates the file if it does not exist.
+  // O_APPEND - Seeks to the end of the file prior to each write.
+  // O_WRITE - Open the file for writing.
   if (!debugFile.open(debugFileName, O_CREAT | O_APPEND | O_WRITE)) {
     DEBUG_PRINTLN(F("[Logging] Warning: Failed to create debug file."));
     return;
-  } else {
-    DEBUG_PRINT(F("[Logging] Info: Created debug file: "));
-    DEBUG_PRINTLN(debugFileName);
   }
+  DEBUG_PRINT(F("[Logging] Info: Created debug file: "));
+  DEBUG_PRINTLN(debugFileName);
 
   // Write CSV header if necessary.
   debugFile.println(
     "datetime,battery,online_microsd,online_gnss,online_log_gnss,online_log_debug,"
     "timer_battery,timer_microsd,timer_gnss,timer_sync_rtc,timer_log_gnss,timer_log_debug,"
     "rtc_sync_flag,rtc_drift,bytes_written,max_buffer_bytes,wdt_counter_max,"
-    "write_fail_counter,sync_fail_counter,close_fail_counter,debug_counter"
-  );
+    "write_fail_counter,sync_fail_counter,close_fail_counter,debug_counter");
 
   // Sync the debug file to ensure integrity.
   if (!debugFile.sync()) {
     DEBUG_PRINTLN(F("[Logging] Warning: Failed to sync debug file."));
+  } else {
+    DEBUG_PRINTLN(F("[Logging] Info: Synced debug file."));
   }
 
   // Update the file creation timestamp.
@@ -61,9 +64,10 @@ void createDebugFile() {
   // Close the debug file.
   if (!debugFile.close()) {
     DEBUG_PRINTLN(F("[Logging] Warning: Failed to close debug file."));
+  } else {
+    DEBUG_PRINTLN(F("[Logging] Info: Closed debug file."));
   }
 }
-
 
 // Log debugging information.
 //
@@ -77,9 +81,18 @@ void logDebug() {
   // Increment debug counter.
   debugCounter++;
 
+  // Check if debug file is open.
+  if (debugFile.isOpen()) {
+    debugFile.close();
+    DEBUG_PRINTLN(F("[Logging] Info: Debug file closed before reopening."));
+  } else {
+    DEBUG_PRINTLN(F("[Logging] Debug: Debug file is closed."));
+  }
+
   // Open debug log file.
   if (!debugFile.open(debugFileName, O_APPEND | O_WRITE)) {
-    DEBUG_PRINTLN(F("[Logging] Warning: Failed to open debug file."));
+    DEBUG_PRINT(F("[Logging] Warning: Failed to open debug file: "));
+    DEBUG_PRINTLN(debugFileName);
     online.logDebug = false;  // Set flag
     return;
   } else {
@@ -95,7 +108,7 @@ void logDebug() {
           rtc.hour, rtc.minute, rtc.seconds);
 
   // Define an array of values to log.
-  const int NUM_FIELDS = 21;
+  const int NUM_FIELDS = 20;
   long values[NUM_FIELDS] = {
     readBattery(),
     online.microSd,
@@ -140,6 +153,8 @@ void logDebug() {
   if (!debugFile.sync()) {
     DEBUG_PRINTLN(F("[Logging] Warning: Failed to sync debug file."));
     syncFailCounter++;  // Track failed sync attempts
+  } else {
+    DEBUG_PRINTLN(F("[Logging] Info: Synced debug file."));
   }
 
   // Update file access timestamps.
@@ -149,6 +164,8 @@ void logDebug() {
   if (!debugFile.close()) {
     DEBUG_PRINTLN(F("[Logging] Warning: Failed to close debug file."));
     closeFailCounter++;  // Track failed close attempts
+  } else {
+    DEBUG_PRINTLN(F("[Logging] Info: Closed debug file."));
   }
 
   // Stop loop timer and store execution time.
