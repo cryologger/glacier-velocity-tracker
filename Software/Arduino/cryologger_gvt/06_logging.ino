@@ -1,9 +1,9 @@
 /*
   Logging Module
 
-  This module handles the creation and management of log files. It generates 
-  timestamped filenames, logs debugging information, and ensures data integrity 
-  by syncing and closing files properly. 
+  This module handles the creation and management of log files. It generates
+  timestamped filenames, logs debugging information, and ensures data integrity
+  by syncing and closing files properly.
 
   ----------------------------------------------------------------------------
   Log Files:
@@ -17,7 +17,7 @@
 // Generates a filename using the current RTC timestamp. This ensures that
 // each log session is uniquely named and avoids overwriting previous logs.
 void getLogFileName() {
-  sprintf(logFileName, "%s-20%02d%02d%02d_%02d%02d%02d.ubx",
+  sprintf(logFileName, "%s_20%02d%02d%02d_%02d%02d%02d.ubx",
           SERIAL, rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 
@@ -31,7 +31,7 @@ void getLogFileName() {
 // newly created. Ensures that debug logs persist across sessions.
 void createDebugFile() {
   // Generate debug log filename.
-  sprintf(debugFileName, "%s-debug.csv", SERIAL);
+  sprintf(debugFileName, "%s_debug.csv", SERIAL);
 
   // Open or create the debug log file.
   // O_CREAT - Creates the file if it does not exist.
@@ -41,7 +41,7 @@ void createDebugFile() {
     DEBUG_PRINTLN(F("[Logging] Warning: Failed to create debug file."));
     return;
   }
-  DEBUG_PRINT(F("[Logging] Info: Created debug file: "));
+  DEBUG_PRINT(F("[Logging] Info: Created or opened debug file: "));
   DEBUG_PRINTLN(debugFileName);
 
   // Write CSV header if necessary.
@@ -86,7 +86,7 @@ void logDebug() {
     debugFile.close();
     DEBUG_PRINTLN(F("[Logging] Info: Debug file closed before reopening."));
   } else {
-    DEBUG_PRINTLN(F("[Logging] Debug: Debug file is closed."));
+    DEBUG_PRINTLN(F("[Logging] Debug: Debug file is already closed."));
   }
 
   // Open debug log file.

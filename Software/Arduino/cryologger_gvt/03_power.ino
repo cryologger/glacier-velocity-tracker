@@ -20,8 +20,8 @@ float readBattery() {
   float voltage = reading / 452.89;  // Apply ADC linear gain.
   voltage += -0.13;                  // Apply ADC linear offset.
 
-  // DEBUG_PRINT(F("[POWER] Info: ADC = ")); DEBUG_PRINTLN(reading);
-  // DEBUG_PRINT(F("[POWER] Info: Voltage = ")); DEBUG_PRINTLN(voltage);
+  //DEBUG_PRINT(F("[POWER] Info: ADC = ")); DEBUG_PRINTLN(reading);
+  //DEBUG_PRINT(F("[POWER] Info: Voltage = ")); DEBUG_PRINTLN(voltage);
 
   timer.voltage = micros() - startTime;  // Record execution time.
   return voltage;
@@ -33,9 +33,7 @@ void enablePullups() {
   Wire.setPullups(1);
 }
 
-/*
-  Disable internal I2C pull-ups to reduce leakage and potential bus errors.
-*/
+// Disable internal I2C pull-ups to reduce leakage and potential bus errors.
 void disablePullups() {
   Wire.setPullups(0);
 }
@@ -157,7 +155,6 @@ void qwiicPowerOn() {
 void qwiicPowerOff() {
   digitalWrite(PIN_QWIIC_POWER, LOW);
 }
-
 
 // Power control for microSD and other peripherals.
 void peripheralPowerOn() {
