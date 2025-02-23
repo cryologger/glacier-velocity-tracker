@@ -6,10 +6,10 @@
   disable leakage sources, and reinitialize the system upon wake-up.
 */
 
-// Read battery voltage.
-//
-// This function reads the ADC voltage from a battery voltage divider and applies
+// ----------------------------------------------------------------------------
+// Reads the ADC voltage from a battery voltage divider and applies
 // a gain/offset correction. Returns the voltage in volts.
+// ----------------------------------------------------------------------------
 float readBattery() {
   unsigned long startTime = micros();  // Record function start time.
 
@@ -38,11 +38,12 @@ void disablePullups() {
   Wire.setPullups(0);
 }
 
+// ----------------------------------------------------------------------------
 // Enter deep sleep mode to conserve power.
-//
-// This function disables peripherals (I2C, SPI, ADC, etc.), turns off unused
-// GPIO pads, powers down external devices, and configures the system to wake
-// up on an RTC or WDT interrupt.
+// Disables peripherals (I2C, SPI, ADC, etc.), turns off unused GPIO pads, 
+// powers down external devices, and configures the system to wake up on an RTC
+// or WDT interrupt.
+// ----------------------------------------------------------------------------
 void goToSleep() {
   firstTimeFlag = false;  // Clear the first-time flag.
 
@@ -81,7 +82,7 @@ void goToSleep() {
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART0);
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART1);
 
-  // Disable all GPIO pads except critical ones: G1 (33), G2 (34), A0, LED_BUILTIN (19).
+  // Disable all GPIO pads except: G1 (33), G2 (34), A0, LED_BUILTIN (19).
   for (int pin = 0; pin < 50; pin++) {
     if ((pin != 33) && (pin != 34) && (pin != A0) && (pin != 19)) {
       am_hal_gpio_pinconfig(pin, g_AM_HAL_GPIO_DISABLE);
@@ -117,7 +118,9 @@ void goToSleep() {
   wakeUp();  // Reinitialize system upon waking.
 }
 
+// ----------------------------------------------------------------------------
 // Wake up from deep sleep and reinitialize system components.
+// ----------------------------------------------------------------------------
 void wakeUp() {
   // Reconfigure system timer to use the high-frequency clock.
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
@@ -134,9 +137,10 @@ void wakeUp() {
 #endif
 }
 
+// ----------------------------------------------------------------------------
 // Restore power to all necessary peripherals.
-//
-// This function reinitializes power for I2C devices, GNSS, OLED, and the microSD card.
+// Reinitializes power for I2C devices, GNSS, OLED, and the microSD card.
+// ----------------------------------------------------------------------------
 void restorePeripherals() {
   DEBUG_PRINTLN(F("[Power] Info: Restoring power to peripherals."));
   qwiicPowerOn();       // Re-enable power to I2C devices.
@@ -146,7 +150,9 @@ void restorePeripherals() {
   configureGnss();      // Reinitialize the GNSS receiver.
 }
 
+// ----------------------------------------------------------------------------
 // Power control for the Qwiic connector.
+// ----------------------------------------------------------------------------
 void qwiicPowerOn() {
   digitalWrite(PIN_QWIIC_POWER, HIGH);
   myDelay(2500);  // Non-blocking delay to allow Qwiic devices time to power up.
@@ -156,7 +162,9 @@ void qwiicPowerOff() {
   digitalWrite(PIN_QWIIC_POWER, LOW);
 }
 
+// ----------------------------------------------------------------------------
 // Power control for microSD and other peripherals.
+// ----------------------------------------------------------------------------
 void peripheralPowerOn() {
   digitalWrite(PIN_MICROSD_POWER, HIGH);
   myDelay(250);  // Non-blocking delay to allow peripherals time to power up.
@@ -167,9 +175,10 @@ void peripheralPowerOff() {
   digitalWrite(PIN_MICROSD_POWER, LOW);
 }
 
+// ----------------------------------------------------------------------------
 // Non-blocking LED blink routine.
-//
 // Flashes the built-in LED a specified number of times with the given delay.
+// ----------------------------------------------------------------------------
 void blinkLed(byte ledFlashes, unsigned int ledDelay) {
   byte i = 0;
   while (i < ledFlashes * 2) {
@@ -183,10 +192,11 @@ void blinkLed(byte ledFlashes, unsigned int ledDelay) {
   digitalWrite(LED_BUILTIN, LOW);  // Ensure LED is off after blinking.
 }
 
+// ----------------------------------------------------------------------------
 // Non-blocking delay function that continues to service the Watchdog Timer.
-//
-// This function delays for a specified duration (in milliseconds) while calling
-// petDog() to prevent unintended WDT resets.
+// This function delays for a specified duration (in milliseconds) while 
+// calling petDog() to prevent unintended WDT resets.
+// ----------------------------------------------------------------------------
 void myDelay(unsigned long ms) {
   unsigned long start = millis();
   while (millis() - start < ms) {

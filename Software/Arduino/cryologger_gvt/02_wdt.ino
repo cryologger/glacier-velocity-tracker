@@ -15,8 +15,9 @@
   WDT_1_16HZ  : 1/16 Hz LFRC clock
 */
 
+// ----------------------------------------------------------------------------
 // Configure and enable the Watchdog Timer.
-
+// ----------------------------------------------------------------------------
 void configureWdt() {
   // Configure the Watchdog Timer (WDT)
   // Using a 1 Hz clock, 64-second interrupt period, and 128-second reset period.
@@ -27,10 +28,11 @@ void configureWdt() {
   // Start the Watchdog Timer.
   wdt.start();
 }
-
+// ----------------------------------------------------------------------------
 // Reset ("pet") the Watchdog Timer to prevent an unintended system reset. 
 // This function also resets the WDT flag and counter, while recording the 
 // service time for profiling purposes.
+// ----------------------------------------------------------------------------
 void petDog() {
   // Record the start time for profiling the WDT service routine.
   unsigned long loopStartTime = micros();

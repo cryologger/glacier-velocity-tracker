@@ -5,33 +5,33 @@
   timestamped filenames, logs debugging information, and ensures data integrity
   by syncing and closing files properly.
 
-  ----------------------------------------------------------------------------
   Log Files:
-  ----------------------------------------------------------------------------
   - UBX Log: Stores raw GNSS data with a timestamped filename.
   - Debug Log: Stores system status, timers, and errors in CSV format.
 */
 
+// ----------------------------------------------------------------------------
 // Create a timestamped log file name.
-//
 // Generates a filename using the current RTC timestamp. This ensures that
 // each log session is uniquely named and avoids overwriting previous logs.
+// ----------------------------------------------------------------------------
 void getLogFileName() {
   sprintf(logFileName, "%s_20%02d%02d%02d_%02d%02d%02d.ubx",
-          SERIAL, rtc.year, rtc.month, rtc.dayOfMonth,
+          uid, rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 
   DEBUG_PRINT(F("[Logging] Info: logFileName = "));
   DEBUG_PRINTLN(logFileName);
 }
 
+// ----------------------------------------------------------------------------
 // Create a debugging log file.
-//
 // Initializes the debug log file and writes the CSV header if the file is
 // newly created. Ensures that debug logs persist across sessions.
+// ----------------------------------------------------------------------------
 void createDebugFile() {
   // Generate debug log filename.
-  sprintf(debugFileName, "%s_debug.csv", SERIAL);
+  sprintf(debugFileName, "%s_debug.csv", uid);
 
   // Open or create the debug log file.
   // O_CREAT - Creates the file if it does not exist.
@@ -69,11 +69,12 @@ void createDebugFile() {
   }
 }
 
+// ----------------------------------------------------------------------------
 // Log debugging information.
-//
 // Collects and writes system status, timers, and operational flags to the
 // debug log file. This function provides insight into system performance
 // and potential failure points.
+// ----------------------------------------------------------------------------
 void logDebug() {
   // Start loop timer for profiling.
   unsigned long loopStartTime = millis();

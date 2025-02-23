@@ -6,7 +6,9 @@
   diagnostics to measure function execution times.
 */
 
+// ----------------------------------------------------------------------------
 // Print a horizontal separator line.
+// ----------------------------------------------------------------------------
 void printLine() {
   for (byte i = 0; i < 80; i++) {
     DEBUG_PRINT("-");
@@ -14,14 +16,18 @@ void printLine() {
   DEBUG_PRINTLN();
 }
 
+// ----------------------------------------------------------------------------
 // Print tab spacing.
+// ----------------------------------------------------------------------------
 void printTab(byte _times) {
   for (byte i = 0; i < _times; i++) {
     DEBUG_PRINT("\t");
   }
 }
 
+// ----------------------------------------------------------------------------
 // Print logging settings.
+// ----------------------------------------------------------------------------
 void printLoggingSettings() {
   printLine();
   DEBUG_PRINTLN("Logging Configuration");
@@ -30,7 +36,7 @@ void printLoggingSettings() {
   DEBUG_PRINT("Logging mode: ");
   printTab(2);
 
-  if (operationMode == 1) {
+  if (operationMode == DAILY) {
     DEBUG_PRINTLN("Daily");
     DEBUG_PRINT("Start: ");
     printTab(3);
@@ -43,7 +49,7 @@ void printLoggingSettings() {
     DEBUG_PRINT(":");
     DEBUG_PRINTLN(alarmStopMinute);
   }
-  if (operationMode == 2) {
+  if (operationMode == ROLLING) {
     DEBUG_PRINTLN("Rolling");
     DEBUG_PRINT("Logging duration: ");
     printTab(1);
@@ -58,31 +64,70 @@ void printLoggingSettings() {
     DEBUG_PRINT(alarmSleepMinutes);
     DEBUG_PRINTLN(" minutes");
   }
-  if (operationMode == 3) {
+  if (operationMode == CONTINUOUS) {
     DEBUG_PRINTLN("Continuous");
   }
 
-  DEBUG_PRINT("Summer mode: ");
+  DEBUG_PRINT("Seasonal mode: ");
   printTab(2);
-  DEBUG_PRINTLN(summerMode ? "Enabled"
-                           : "Disabled");
+  DEBUG_PRINTLN(seasonalLoggingMode ? "Enabled"
+                                    : "Disabled");
+  if (seasonalLoggingMode) {
+    DEBUG_PRINT("Start (MM/DD): ");
+    printTab(2);
+    DEBUG_PRINT(alarmSeasonalStartMonth);
+    DEBUG_PRINT("/");
+    DEBUG_PRINTLN(alarmSeasonalStartDay);
+    DEBUG_PRINT("Stop (MM/DD): ");
+    printTab(2);
+    DEBUG_PRINT(alarmSeasonalEndMonth);
+    DEBUG_PRINT("/");
+    DEBUG_PRINTLN(alarmSeasonalEndDay);
+  }
+
   printLine();
 }
 
+// ----------------------------------------------------------------------------
 // Print GNSS configuration settings.
-//
 // Queries and prints various u-blox register values.
+// ----------------------------------------------------------------------------
 void printGnssSettings() {
-  printLine();
+  //printLine();
   DEBUG_PRINTLN("u-blox Configuration");
+  printLine();
+
+  DEBUG_PRINTLN("Firmware Settings");
+  printLine();
+
+  if (gnss.getModuleInfo()) {
+    DEBUG_PRINT(F("FWVER: "));
+    DEBUG_PRINT(gnss.getFirmwareVersionHigh());  // Returns uint8_t
+    DEBUG_PRINT(F("."));
+    DEBUG_PRINTLN(gnss.getFirmwareVersionLow());  // Returns uint8_t
+
+    DEBUG_PRINT(F("Firmware: "));
+    DEBUG_PRINTLN(gnss.getFirmwareType());  // Returns HPG, SPG etc. as (const char *)
+
+    DEBUG_PRINT(F("PROTVER: "));
+    DEBUG_PRINT(gnss.getProtocolVersionHigh());  // Returns uint8_t
+    DEBUG_PRINT(F("."));
+    DEBUG_PRINTLN(gnss.getProtocolVersionLow());  // Returns uint8_t
+
+    DEBUG_PRINT(F("MOD: "));
+    DEBUG_PRINTLN(gnss.getModuleName());  // Returns ZED-F9P, MAX-M10S etc. as (const char *)
+  } else
+    DEBUG_PRINTLN(F("[GNSS] Error: Could not read module info!"));
+
+  printLine();
+  DEBUG_PRINTLN("Receiver Configuration Settings");
   printLine();
 
   // Create custom packet for retrieving GNSS settings.
   uint8_t customPayload[MAX_PAYLOAD_SIZE];
   ubxPacket customCfg = { 0, 0, 0, 0, 0, customPayload, 0, 0,
                           SFE_UBLOX_PACKET_VALIDITY_NOT_DEFINED,
-                          SFE_UBLOX_PACKET_VALIDITY_NOT_DEFINED
-                        };
+                          SFE_UBLOX_PACKET_VALIDITY_NOT_DEFINED };
 
   gnss.newCfgValget(&customCfg, MAX_PAYLOAD_SIZE, VAL_LAYER_RAM);  // Create a new VALGET construct
   gnss.addCfgValget(&customCfg, UBLOX_CFG_I2C_ENABLED);
@@ -160,16 +205,18 @@ void printGnssSettings() {
   printLine();
 }
 
+// ----------------------------------------------------------------------------
 // Clear all execution timers.
-//
 // Resets the timer structure to zero for performance diagnostics.
+// ----------------------------------------------------------------------------
 void clearTimers() {
   memset(&timer, 0x00, sizeof(timer));
 }
 
+// ----------------------------------------------------------------------------
 // Print function execution times.
-//
 // Displays recorded execution times for various system functions.
+// ----------------------------------------------------------------------------
 void printTimers() {
   printLine();
   DEBUG_PRINTLN("Function Execution Timers");

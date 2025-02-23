@@ -6,10 +6,11 @@
   mode, and RTC synchronization.
 */
 
+// ----------------------------------------------------------------------------
 // Configure the OLED display.
-//
 // Initializes the OLED screen and verifies functionality. If the first
 // attempt fails, it retries once before disabling the display.
+// ----------------------------------------------------------------------------
 void configureOled() {
   enablePullups();  // Enable internal I2C pull-ups
 
@@ -27,6 +28,7 @@ void configureOled() {
     } else {
       lineTest();
       online.oled = true;
+      DEBUG_PRINTLN(F("[Display] Info: Initialized successfully."));
     }
   } else {
     lineTest();
@@ -36,10 +38,11 @@ void configureOled() {
   disablePullups();  // Disable internal I2C pull-ups
 }
 
+// ----------------------------------------------------------------------------
 // Reset the OLED display after sleep/power cycle.
-//
 // This function resets the OLED screen after deep sleep or a power cycle
 // to ensure proper initialization.
+// ----------------------------------------------------------------------------
 void resetOled() {
 #if OLED
   myDelay(4000);
@@ -49,9 +52,9 @@ void resetOled() {
 #endif
 }
 
+// ----------------------------------------------------------------------------
 // Display the welcome message.
-//
-// Shows the Cryologger version and battery voltage.
+// ----------------------------------------------------------------------------
 void displayWelcome() {
   if (!online.oled) return;
 
@@ -59,7 +62,7 @@ void displayWelcome() {
   oled.erase();
   oled.setCursor(0, 0);
   oled.print("Cryologger GVT ");
-  oled.print(SERIAL);
+  oled.print(uid);
   oled.setCursor(0, 10);
   oled.print(dateTimeBuffer);
   oled.setCursor(0, 20);
@@ -71,9 +74,10 @@ void displayWelcome() {
   myDelay(4000);
 }
 
+// ----------------------------------------------------------------------------
 // Display initialization message.
-//
 // Shows which device is currently being initialized.
+// ----------------------------------------------------------------------------
 void displayInitialize(char *device) {
   if (!online.oled) return;
 
@@ -86,7 +90,9 @@ void displayInitialize(char *device) {
   disablePullups();
 }
 
+// ----------------------------------------------------------------------------
 // Display success message.
+// ----------------------------------------------------------------------------
 void displaySuccess() {
   if (!online.oled) return;
 
@@ -97,7 +103,9 @@ void displaySuccess() {
   myDelay(2000);
 }
 
+// ----------------------------------------------------------------------------
 // Display failure message.
+// ----------------------------------------------------------------------------
 void displayFailure() {
   if (!online.oled) return;
 
@@ -107,7 +115,9 @@ void displayFailure() {
   disablePullups();
 }
 
+// ----------------------------------------------------------------------------
 // Display reattempt message.
+// ----------------------------------------------------------------------------
 void displayReattempt() {
   if (!online.oled) return;
 
@@ -117,7 +127,9 @@ void displayReattempt() {
   disablePullups();
 }
 
+// ----------------------------------------------------------------------------
 // Display setup completion message.
+// ----------------------------------------------------------------------------
 void displaySetupComplete() {
   if (!online.oled) return;
 
@@ -129,9 +141,10 @@ void displaySetupComplete() {
   myDelay(2000);
 }
 
+// ----------------------------------------------------------------------------
 // Display logging mode information.
-//
 // Shows the logging mode and its parameters.
+// ----------------------------------------------------------------------------
 void displayLoggingMode() {
   if (!online.oled) return;
 
@@ -164,7 +177,9 @@ void displayLoggingMode() {
   myDelay(8000);
 }
 
+// ----------------------------------------------------------------------------
 // Display RTC sync status.
+// ----------------------------------------------------------------------------
 void displayRtcSyncStatus() {
   if (!online.oled) return;
 
@@ -192,7 +207,9 @@ void displayRtcSyncStatus() {
   disablePullups();
 }
 
+// ----------------------------------------------------------------------------
 // Display RTC sync failure.
+// ----------------------------------------------------------------------------
 void displayRtcFailure() {
   if (!online.oled) return;
 
@@ -204,7 +221,9 @@ void displayRtcFailure() {
   myDelay(2000);
 }
 
+// ----------------------------------------------------------------------------
 // Display RTC drift offset.
+// ----------------------------------------------------------------------------
 void displayRtcOffset(long drift) {
   if (!online.oled || !firstTimeFlag) return;
 
@@ -227,7 +246,9 @@ void displayRtcOffset(long drift) {
   myDelay(2000);
 }
 
+// ----------------------------------------------------------------------------
 // Display microSD initialization error (first attempt).
+// ----------------------------------------------------------------------------
 void displayErrorMicrosd1() {
   enablePullups();
   oled.erase();
@@ -239,7 +260,9 @@ void displayErrorMicrosd1() {
   myDelay(4000);
 }
 
+// ----------------------------------------------------------------------------
 // Display microSD initialization error (second attempt).
+// ----------------------------------------------------------------------------
 void displayErrorMicrosd2() {
   enablePullups();
   oled.erase();
@@ -250,9 +273,10 @@ void displayErrorMicrosd2() {
   myDelay(4000);
 }
 
+// ----------------------------------------------------------------------------
 // Display log file details.
-//
 // Shows the current log file name, file size, and buffer usage.
+// ----------------------------------------------------------------------------
 void displayScreen1() {
   if (!online.oled) return;
 
@@ -271,9 +295,10 @@ void displayScreen1() {
   disablePullups();
 }
 
+// ----------------------------------------------------------------------------
 // Display system status.
-//
 // Shows the current date/time, battery voltage, and logging duration.
+// ----------------------------------------------------------------------------
 void displayScreen2() {
   if (!online.oled) return;
 
@@ -295,7 +320,9 @@ void displayScreen2() {
   disablePullups();
 }
 
+// ----------------------------------------------------------------------------
 // Display deep sleep message.
+// ----------------------------------------------------------------------------
 void displayDeepSleep() {
   if (!online.oled) return;
 
@@ -307,21 +334,27 @@ void displayDeepSleep() {
   myDelay(4000);
 }
 
+// ----------------------------------------------------------------------------
 // Power off the display.
+// ----------------------------------------------------------------------------
 void displayOff() {
   if (online.oled) {
     oled.displayPower(1);
   }
 }
 
+// ----------------------------------------------------------------------------
 // Power on the display.
+// ----------------------------------------------------------------------------
 void displayOn() {
   if (online.oled) {
     oled.displayPower(0);
   }
 }
 
+// ----------------------------------------------------------------------------
 // Run OLED line test.
+// ----------------------------------------------------------------------------
 void lineTest() {
   int width = oled.getWidth();
   int height = oled.getHeight();
