@@ -1,4 +1,13 @@
+/*
+  GNSS Module
+
+  This module handles the initialization and configuration of the GNSS receiver,
+  synchronizes RTC time with GNSS, and logs raw GNSS data to microSD.
+*/
+
+// ----------------------------------------------------------------------------
 // Configure u-blox GNSS
+// ----------------------------------------------------------------------------
 void configureGnss() {
   // Start loop timer
   unsigned long loopStartTime = millis();
@@ -19,7 +28,7 @@ void configureGnss() {
 
     // Initialize u-blox GNSS
     if (!gnss.begin()) {
-      // Display OLED messages(s)
+      
       displayFailure();
 
       DEBUG_PRINTLN("[GNSS] Warning: u-blox failed to initialize. Reattempting...");
@@ -64,7 +73,7 @@ void configureGnss() {
       response &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);    // Enable I2C
       response &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);    // Disable SPI
       response &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 0);  // Disable UART1
-      response &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 1);  // Enable UART2
+      response &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);  // Enable UART2
       response &= gnss.addCfgValset8(UBLOX_CFG_USB_ENABLED, 0);    // Disable USB
       response &= gnss.sendCfgValset();                            // Send the packet using sendCfgValset
 
@@ -75,14 +84,14 @@ void configureGnss() {
       }
 
       // Configure satellite signals
-      response &= gnss.newCfgValset();                               // Defaults to configuring the setting in RAM and BBR
-      response &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, 1);   // Enable GPS
-      response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GLO_ENA, 1);   // Enable GLONASS
-      response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, 1);   // Enable Galileo
-      response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, 0);   // Disable BeiDou
-      response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_SBAS_ENA, 0);  // Disable SBAS
-      response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, 0);  // Disable QZSS
-      response &= gnss.sendCfgValset();                              // Send the packet using sendCfgValset
+      response &= gnss.newCfgValset();                                             // Defaults to configuring the setting in RAM and BBR
+      response &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, gnssGpsEnabled);    // Configure GPS
+      response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GLO_ENA, gnssGloEnabled);    // Configure GLONASS
+      response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, gnssGalEnabled);    // Configure Galileo
+      response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, gnssBdsEnabled);    // Configure Beidou
+      response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_SBAS_ENA, gnssSbasEnabled);  // Configure SBAS
+      response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, gnssQzssEnabled);  // Configure QZSS
+      response &= gnss.sendCfgValset();                                            // Send the packet using sendCfgValset
       myDelay(2000);
 
       if (response) {
@@ -94,8 +103,6 @@ void configureGnss() {
       // Clear flag
       gnssConfigFlag = false;
 
-      // Print current GNSS settings
-      printGnssSettings();
     }
 
     // Configure u-blox GNSS
@@ -117,7 +124,9 @@ void configureGnss() {
   //DEBUG_PRINT("Debug - configureGnss(): "); DEBUG_PRINTLN(timer.gnss);
 }
 
+// ----------------------------------------------------------------------------
 // Acquire valid GNSS fix and sync RTC
+// ----------------------------------------------------------------------------
 void syncRtc() {
   // Start loop timer
   unsigned long loopStartTime = millis();
@@ -207,7 +216,9 @@ void syncRtc() {
   timer.syncRtc = millis() - loopStartTime;
 }
 
+// ----------------------------------------------------------------------------
 // Log UBX-RXM-RAWX/SFRBX data
+// ----------------------------------------------------------------------------
 void logGnss() {
   // Start loop timer
   unsigned long loopStartTime = millis();
@@ -363,11 +374,11 @@ void logGnss() {
       bytesWritten += bytesToWrite;    // Update bytesWritten
       remainingBytes -= bytesToWrite;  // Decrement remainingBytes
 
-      // Turn off LED
+      // Turn off LED.
       digitalWrite(LED_BUILTIN, LOW);
     }
 
-    // Print total number of bytes written to SD card
+    // Print total number of bytes written to SD card.
     DEBUG_PRINT("[GNSS] Info: Total bytes written is ");
     DEBUG_PRINTLN(bytesWritten);
 
@@ -377,10 +388,10 @@ void logGnss() {
       syncFailCounter++;  // Count number of failed file syncs
     }
 
-    // Update file access timestamps
+    // Update file access timestamps.
     updateFileAccess(&logFile);
 
-    // Close the log file
+    // Close the log file.
     if (!logFile.close()) {
       DEBUG_PRINTLN("[GNSS] Warning: Failed to close log file!");
       closeFailCounter++;  // Count number of failed file closes
@@ -392,6 +403,6 @@ void logGnss() {
     DEBUG_PRINTLN("[GNSS] Warning: u-blox ofline!");
   }
 
-  // Stop the loop timer
+  // Stop the loop timer.
   timer.logGnss = millis() - loopStartTime;
 }
