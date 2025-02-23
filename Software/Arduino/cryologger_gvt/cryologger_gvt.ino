@@ -1,7 +1,7 @@
 /*
   Cryologger - Glacier Velocity Tracker (GVT)
-  Version: 2.4.0
-  Date: February 21, 2025
+  Version: 3.0.0
+  Date: March 1, 2025
   Author: Adam Garbo
   License: GPLv3. See license file for more information.
 
@@ -18,8 +18,52 @@
 */
 
 // ----------------------------------------------------------------------------
+// USER CONFIGURATION
+// ----------------------------------------------------------------------------
+
+// Device Identifier
+char uid[20] = "GVT_25_XXX";  // Default unique identifier (UID)
+
+// Select the default operation mode (for normal periods when NOT in seasonal)
+#define OPERATION_MODE DAILY  // Options: DAILY, ROLLING, CONTINUOUS
+
+// Daily mode parameters (only used if OPERATION_MODE == DAILY)
+#define DAILY_START_HOUR 12   // Logging start hour (UTC)
+#define DAILY_START_MINUTE 0  // Logging start minute (UTC)
+#define DAILY_STOP_HOUR 15    // Logging stop hour (UTC)
+#define DAILY_STOP_MINUTE 0   // Logging stop minute (UTC)
+
+// Rolling mode parameters (only used if OPERATION_MODE == ROLLING)
+#define ROLLING_AWAKE_HOURS 0    // Awake period (hours)
+#define ROLLING_AWAKE_MINUTES 5  // Awake period (minutes)
+#define ROLLING_SLEEP_HOURS 0    // Sleep period (hours)
+#define ROLLING_SLEEP_MINUTES 1  // Sleep period (minutes)
+
+// Seasonal logging override
+// If ENABLED and the current date is within the seasonal window,
+// we switch to CONTINUOUS mode automatically.
+#define SEASONAL_LOGGING_MODE ENABLED  // ENABLED or DISABLED
+#define SEASONAL_START_DAY 1           // Seasonal logging start day
+#define SEASONAL_START_MONTH 6         // Seasonal logging start month
+#define SEASONAL_END_DAY 31            // Seasonal logging stop day
+#define SEASONAL_END_MONTH 8           // Seasonal logging stop month
+
+// GNSS Satellite Signal configuration (0=DISABLE, 1=ENABLE)
+#define GNSS_GPS_ENABLED 1
+#define GNSS_GLO_ENABLED 1
+#define GNSS_GAL_ENABLED 1
+#define GNSS_BDS_ENABLED 0
+#define GNSS_SBAS_ENABLED 0
+#define GNSS_QZSS_ENABLED 0
+
+// ----------------------------------------------------------------------------
+//  END OF USER CONFIGURATION
+// ----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
 // Libraries                          Version     Comments
 // ----------------------------------------------------------------------------
+#include <ArduinoJson.h>              // 7.3.0
 #include <RTC.h>                      // 1.2      Apollo3 Core v1.2.3
 #include <SdFat.h>                    // 2.3.0
 #include <SparkFun_Qwiic_OLED.h>      // 1.0.13
@@ -31,13 +75,8 @@
 // ----------------------------------------------------------------------------
 // Software & Hardware Versions
 // ----------------------------------------------------------------------------
-#define SOFTWARE_VERSION "2.4.0"
+#define SOFTWARE_VERSION "3.0.0"
 #define HARDWARE_VERSION "2.21"
-
-// ----------------------------------------------------------------------------
-// Device Identifier
-// ----------------------------------------------------------------------------
-#define SERIAL "GVT_25_001"  // Unique device identifer to distinguish log files
 
 // ----------------------------------------------------------------------------
 // Debugging Macros
@@ -70,17 +109,19 @@
 // ----------------------------------------------------------------------------
 // Peripheral Object Instantiations
 // ----------------------------------------------------------------------------
-APM3_RTC rtc;          // Real-Time Clock
-APM3_WDT wdt;          // Watchdog Timer
-SdFs sd;               // SD card filesystem
-FsFile logFile;        // Log file on SD
-FsFile debugFile;      // Debug log file on SD
+APM3_RTC rtc;       // Real-Time Clock
+APM3_WDT wdt;       // Watchdog Timer
+SdFs sd;            // SD card filesystem
+FsFile configFile;  // Configuration file on SD
+FsFile logFile;     // Log file on SD
+FsFile debugFile;   // Debug log file on SD
+
 QwiicNarrowOLED oled;  // OLED display (I2C address: 0x3C)
 SFE_UBLOX_GNSS gnss;   // GNSS receiver (I2C address: 0x42)
 
-// ----------------------------------------------------------------------------
-// Operation Modes (Logging Modes)
-// ----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Operation Mode Enums
+// ---------------------------------------------------------------------------
 enum OperationMode : uint8_t {
   DAILY = 1,
   ROLLING = 2,
@@ -92,40 +133,46 @@ enum SeasonalMode : bool {
   ENABLED = 1,
 };
 
-// Select operation mode
-//
-// Options: DAILY, ROLLING, CONTINUOUS
-OperationMode operationMode = DAILY;
+// ---------------------------------------------------------------------------
+// Global Variables for Logging Modes & Times
+// ---------------------------------------------------------------------------
 
-// Seasonal logging mode flag
-//
-// Switches to continuous logging during seasonal period
-// Options: ENABLED, DISABLED
-SeasonalMode seasonalLoggingMode = ENABLED;
+// The user-chosen “normal” operation mode (DAILY/ROLLING/CONTINUOUS)
+OperationMode operationMode = (OperationMode)OPERATION_MODE;
 
-// Stores initial logging mode
+// We store a copy of that mode so we can revert after seasonal
 OperationMode normalOperationMode = operationMode;
 
-// ----------------------------------------------------------------------------
-// Alarm & Logging Time Configurations
-// ----------------------------------------------------------------------------
-// Daily mode (e.g., log from 12:00 to 15:00 UTC)
-byte alarmStartHour = 12;   // Logging start hour (UTC)
-byte alarmStartMinute = 0;  // Logging start minute (UTC)
-byte alarmStopHour = 15;    // Logging stop hour (UTC)
-byte alarmStopMinute = 0;   // Logging stop minute (UTC)
+// The seasonal override (ENABLED or DISABLED)
+SeasonalMode seasonalLoggingMode = (SeasonalMode)SEASONAL_LOGGING_MODE;
 
-// Rolling mode: define awake/sleep durations
-byte alarmAwakeHours = 0;    // Awake period (hours)
-byte alarmAwakeMinutes = 5;  // Awake period (minutes)
-byte alarmSleepHours = 0;    // Sleep period (hours)
-byte alarmSleepMinutes = 1;  // Sleep period (minutes)
+// Daily mode times
+byte alarmStartHour = DAILY_START_HOUR;
+byte alarmStartMinute = DAILY_START_MINUTE;
+byte alarmStopHour = DAILY_STOP_HOUR;
+byte alarmStopMinute = DAILY_STOP_MINUTE;
 
-// Seasonal logging period (e.g., June 1st to August 31st)
-byte alarmSeasonalStartDay = 1;    // Seasonal logging start day
-byte alarmSeasonalStartMonth = 2;  // Seasonal logging start month
-byte alarmSeasonalEndDay = 21;     // Seasonal logging end day
-byte alarmSeasonalEndMonth = 2;    // Seasonal logging end month
+// Rolling mode times
+byte alarmAwakeHours = ROLLING_AWAKE_HOURS;
+byte alarmAwakeMinutes = ROLLING_AWAKE_MINUTES;
+byte alarmSleepHours = ROLLING_SLEEP_HOURS;
+byte alarmSleepMinutes = ROLLING_SLEEP_MINUTES;
+
+// Seasonal window
+byte alarmSeasonalStartDay = SEASONAL_START_DAY;
+byte alarmSeasonalStartMonth = SEASONAL_START_MONTH;
+byte alarmSeasonalEndDay = SEASONAL_END_DAY;
+byte alarmSeasonalEndMonth = SEASONAL_END_MONTH;
+
+// ----------------------------------------------------------------------------
+// GNSS Satellite Signal Enables
+// ----------------------------------------------------------------------------
+byte gnssGpsEnabled = GNSS_GPS_ENABLED;
+byte gnssGloEnabled = GNSS_GLO_ENABLED;
+byte gnssGalEnabled = GNSS_GAL_ENABLED;
+byte gnssBdsEnabled = GNSS_BDS_ENABLED;
+byte gnssSbasEnabled = GNSS_SBAS_ENABLED;
+byte gnssQzssEnabled = GNSS_QZSS_ENABLED;
 
 // ----------------------------------------------------------------------------
 // Global Variables for Logging & System State
@@ -160,7 +207,7 @@ const int fileBufferSize = 16384;  // Buffer size (16 KB) for UBX messages
 
 // Counters and timers
 unsigned int debugCounter = 0;    // Count of debug messages logged
-unsigned int gnssTimeout = 300;   // GNSS acquisition timeout (default = 300 seconds)
+unsigned int gnssTimeout = 5;     // GNSS acquisition timeout (default = 300 seconds)
 unsigned int maxBufferBytes = 0;  // Maximum buffer size used
 unsigned int reading = 0;         // Battery voltage reading (analog)
 unsigned int fixCounter = 0;      // Count of GNSS fixes
@@ -200,6 +247,13 @@ struct Timer {
 // Setup Function
 // ----------------------------------------------------------------------------
 void setup() {
+
+#if DEBUG
+  Serial.begin(115200);  // Initialize Serial for debugging.
+  // while (!Serial);     // Optionally wait for Serial Monitor connection.
+  blinkLed(2, 1000);  // Blink LED to signal startup.
+#endif
+
   // Initialize pin modes for peripheral power control and LED indicator.
   pinMode(PIN_QWIIC_POWER, OUTPUT);
   pinMode(PIN_MICROSD_POWER, OUTPUT);
@@ -215,24 +269,28 @@ void setup() {
   SPI.begin();               // Start SPI communications.
   analogReadResolution(14);  // Set ADC resolution to 14 bits.
 
-#if DEBUG
-  Serial.begin(115200);  // Initialize Serial for debugging.
-  // while (!Serial);     // Optionally wait for Serial Monitor connection.
-  blinkLed(2, 1000);  // Blink LED to signal startup.
-#endif
-
-  // Initialize peripherals.
-  configureRtc();   // Set up the Real-Time Clock.
-  configureOled();  // Set up the OLED display.
-
   // Output startup information.
+
   DEBUG_PRINTLN();
   printLine();
   DEBUG_PRINTLN(F("Cryologger - Glacier Velocity Tracker"));
   printLine();
+  DEBUG_PRINTLN(F("[Main] Info: Initializing peripherals..."));
+
+  // Initialize peripherals.
+  configureRtc();   // Set up the Real-Time Clock.
+  configureOled();  // Set up the OLED display.
+  configureWdt();   // Set up Watchdog Timer.
+  configureSd();    // Set up microSD card.
+  configureGnss();  // Set up GNSS receiver.
+
+  // Output startup information.
+  printLine();
+  DEBUG_PRINTLN(F("System Information"));
+  printLine();
   DEBUG_PRINT(F("Serial:"));
   printTab(3);
-  DEBUG_PRINTLN(SERIAL);
+  DEBUG_PRINTLN(uid);
   DEBUG_PRINT(F("Software Version:"));
   printTab(1);
   DEBUG_PRINTLN(SOFTWARE_VERSION);
@@ -251,10 +309,9 @@ void setup() {
   printLoggingSettings();
   displayLoggingMode();
 
+  printGnssSettings();  // Print current GNSS settings
+
   // Configure additional devices and logging parameters.
-  configureWdt();     // Set up Watchdog Timer.
-  configureSd();      // Set up microSD card.
-  configureGnss();    // Set up GNSS receiver.
   syncRtc();          // Synchronize RTC with GNSS.
   checkDate();        // Update the current date.
   createDebugFile();  // Create a debug log file on SD.
@@ -262,10 +319,8 @@ void setup() {
 
   DEBUG_PRINT(F("[Main] Info: Datetime "));
   printDateTime();
-  DEBUG_PRINT(F("[Main] Info: Initial alarm "));
-  printAlarm();
 
-  // Indicate that setup is complete.
+  // Indicate setup is complete.
   displaySetupComplete();
 }
 
@@ -320,7 +375,7 @@ void loop() {
 }
 
 // ----------------------------------------------------------------------------
-// Interrupt Service Routines (ISRs)
+// Interrupt Service Routines (ISRs).
 // ----------------------------------------------------------------------------
 // RTC Alarm ISR.
 extern "C" void am_rtc_isr(void) {
