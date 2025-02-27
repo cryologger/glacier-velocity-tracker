@@ -1,7 +1,7 @@
 /*
   Cryologger - Glacier Velocity Tracker (GVT)
   Version: 3.0.0
-  Date: March 1, 2025
+  Date: February 27, 2025
   Author: Adam Garbo
   License: GPLv3. See license file for more information.
 
@@ -28,7 +28,7 @@ char uid[20] = "GVT_25_XXX";  // Default unique identifier (UID)
 #define OPERATION_MODE DAILY  // Options: DAILY, ROLLING, CONTINUOUS
 
 // Daily mode parameters (only used if OPERATION_MODE == DAILY)
-#define DAILY_START_HOUR 12   // Logging start hour (UTC)
+#define DAILY_START_HOUR 14   // Logging start hour (UTC)
 #define DAILY_START_MINUTE 0  // Logging start minute (UTC)
 #define DAILY_STOP_HOUR 15    // Logging stop hour (UTC)
 #define DAILY_STOP_MINUTE 0   // Logging stop minute (UTC)
@@ -42,11 +42,11 @@ char uid[20] = "GVT_25_XXX";  // Default unique identifier (UID)
 // Seasonal logging override
 // If ENABLED and the current date is within the seasonal window,
 // we switch to CONTINUOUS mode automatically.
-#define SEASONAL_LOGGING_MODE ENABLED  // ENABLED or DISABLED
-#define SEASONAL_START_DAY 1           // Seasonal logging start day
-#define SEASONAL_START_MONTH 6         // Seasonal logging start month
-#define SEASONAL_END_DAY 31            // Seasonal logging stop day
-#define SEASONAL_END_MONTH 8           // Seasonal logging stop month
+#define SEASONAL_LOGGING_MODE DISABLED  // ENABLED or DISABLED
+#define SEASONAL_START_DAY 1            // Seasonal logging start day
+#define SEASONAL_START_MONTH 6          // Seasonal logging start month
+#define SEASONAL_END_DAY 31             // Seasonal logging stop day
+#define SEASONAL_END_MONTH 8            // Seasonal logging stop month
 
 // GNSS Satellite Signal configuration (0=DISABLE, 1=ENABLE)
 #define GNSS_GPS_ENABLED 1
@@ -204,10 +204,14 @@ char dateTimeBuffer[30] = "";
 // SD card write configuration
 const int sdWriteSize = 512;       // Write block size (bytes)
 const int fileBufferSize = 16384;  // Buffer size (16 KB) for UBX messages
+float sdTotalMB = 0.0;
+float sdFreeMB = 0.0;
+float sdUsedMB = 0.0;
+int sdFileCount = 0;
 
 // Counters and timers
 unsigned int debugCounter = 0;    // Count of debug messages logged
-unsigned int gnssTimeout = 5;     // GNSS acquisition timeout (default = 300 seconds)
+unsigned int gnssTimeout = 180;   // GNSS acquisition timeout (default = 300 seconds)
 unsigned int maxBufferBytes = 0;  // Maximum buffer size used
 unsigned int reading = 0;         // Battery voltage reading (analog)
 unsigned int fixCounter = 0;      // Count of GNSS fixes
@@ -282,6 +286,13 @@ void setup() {
   configureOled();  // Set up the OLED display.
   configureWdt();   // Set up Watchdog Timer.
   configureSd();    // Set up microSD card.
+
+  // Load configuration from microSD card.
+  if (loadConfigFromSd()) {
+    DEBUG_PRINTLN(F("[Config] Info: Configuration loaded successfully."));
+  } else {
+    DEBUG_PRINTLN(F("[Config] Info: Using fallback defaults."));
+  }
   configureGnss();  // Set up GNSS receiver.
 
   // Output startup information.
@@ -303,12 +314,19 @@ void setup() {
   DEBUG_PRINT(F("Battery Voltage:"));
   printTab(1);
   DEBUG_PRINTLN(readBattery());
+  DEBUG_PRINT(F("Storage:"));
+  printTab(2);
+  getSdSpaceInfo();
+  DEBUG_PRINT(F("File Count:"));
+  printTab(2);
+  getSdFileCount();
 
   // Display welcome messages and logging configuration on OLED.
   displayWelcome();
   printLoggingSettings();
   displayLoggingMode();
-
+  displaySdStorageInfo();
+  displaySdFileCount();
   printGnssSettings();  // Print current GNSS settings
 
   // Configure additional devices and logging parameters.

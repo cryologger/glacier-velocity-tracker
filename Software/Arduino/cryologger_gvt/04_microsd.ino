@@ -29,6 +29,10 @@ void configureSd() {
       online.microSd = true;  // Set flag.
       DEBUG_PRINTLN(F("[microSD] Info: Initialized successfully."));
       displaySuccess();  // Display OLED success message.
+      
+      // Get storage information
+      getSdSpaceInfo();
+      getSdFileCount();
 
       // Attempt to load config from "config.json"
       bool loaded = loadConfigFromSd();
@@ -322,6 +326,73 @@ bool loadConfigFromSd() {
   }
 
   return true;
+}
+
+// ----------------------------------------------------------------------------
+// Returns the total and free space in megabytes with a single-line debug output.
+// ----------------------------------------------------------------------------
+void getSdSpaceInfo() {
+
+  // Number of clusters on the volume
+  uint32_t clusterCount = sd.clusterCount();
+  // Number of free clusters
+  int32_t freeClusterCount = sd.freeClusterCount();
+
+  if (freeClusterCount < 0) {
+    DEBUG_PRINTLN(F("[microSD] Error: freeClusterCount() failed!"));
+    return;
+  }
+
+  // Sectors per cluster
+  uint32_t spc = sd.sectorsPerCluster();  // Each sector = 512 bytes
+
+  // Compute total volume size in bytes
+  uint64_t totalBytes = (uint64_t)clusterCount * spc * 512ULL;
+  // Compute free space in bytes
+  uint64_t freeBytes = (uint64_t)freeClusterCount * spc * 512ULL;
+  // Compute used space in bytes
+  uint64_t usedBytes = totalBytes - freeBytes;
+
+  // Convert to MB (1 MB = 1,000,000 bytes)
+  sdTotalMB = (double)totalBytes / 1000000.0;
+  sdFreeMB = (double)freeBytes / 1000000.0;
+  sdUsedMB = sdTotalMB - sdFreeMB;
+
+  // Print single-line debug message: "Used / Total MB"
+  DEBUG_PRINT_DEC(sdUsedMB, 1);
+  DEBUG_PRINT(F(" / "));
+  DEBUG_PRINT_DEC(sdTotalMB, 1);
+  DEBUG_PRINTLN(F(" MB"));
+}
+
+// ----------------------------------------------------------------------------
+// Counts the number of files in the root directory of the microSD card.
+// ----------------------------------------------------------------------------
+void getSdFileCount() {
+
+  // Open the root directory
+  FsFile root = sd.open("/");
+  if (!root) {
+    DEBUG_PRINTLN(F("[microSD] Error: Failed to open root directory."));
+    return;
+  }
+
+  sdFileCount = 0;
+
+  FsFile file;
+
+  // Iterate through files in the root directory
+  while ((file = root.openNextFile())) {
+    if (!file.isDirectory()) {
+      sdFileCount++;
+    }
+    file.close();
+  }
+  root.close();
+
+  // Print debug message
+  //DEBUG_PRINT(F("[microSD] Info: File count = "));
+  DEBUG_PRINTLN(sdFileCount);
 }
 
 // ----------------------------------------------------------------------------

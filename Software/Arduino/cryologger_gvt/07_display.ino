@@ -274,6 +274,43 @@ void displayErrorMicrosd2() {
 }
 
 // ----------------------------------------------------------------------------
+// Display microSD storage usage on OLED.
+// ----------------------------------------------------------------------------
+void displaySdStorageInfo() {
+  if (!online.oled || !online.microSd) return;
+
+  enablePullups();
+  oled.erase();
+  oled.setCursor(0, 0);
+  oled.print("SD Storage:");
+  oled.setCursor(0, 10);
+  oled.print(sdFreeMB, 1);
+  oled.print(" / ");
+  oled.print(sdTotalMB, 1);
+  oled.print(" MB free");
+  oled.display();
+  disablePullups();
+  myDelay(3000);
+}
+
+// ----------------------------------------------------------------------------
+// Display microSD file count on OLED.
+// ----------------------------------------------------------------------------
+void displaySdFileCount() {
+  if (!online.oled || !online.microSd) return;
+
+  enablePullups();
+  oled.erase();
+  oled.setCursor(0, 0);
+  oled.print("SD Files:");
+  oled.setCursor(0, 10);
+  oled.print(sdFileCount);
+  oled.display();
+  disablePullups();
+  myDelay(3000);
+}
+
+// ----------------------------------------------------------------------------
 // Display log file details.
 // Shows the current log file name, file size, and buffer usage.
 // ----------------------------------------------------------------------------
