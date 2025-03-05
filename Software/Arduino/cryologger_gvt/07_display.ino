@@ -61,7 +61,7 @@ void displayWelcome() {
   enablePullups();
   oled.erase();
   oled.setCursor(0, 0);
-  oled.print("Cryologger GVT ");
+  oled.print("Cryologger ");
   oled.print(uid);
   oled.setCursor(0, 10);
   oled.print(dateTimeBuffer);
@@ -157,8 +157,8 @@ void displayLoggingMode() {
   char displayBuffer2[32];
 
   if (operationMode == 1) {
-    sprintf(displayBuffer1, "Start time: %d:%d", alarmStartHour, alarmStartMinute);
-    sprintf(displayBuffer2, "End time: %d:%d", alarmStopHour, alarmStopMinute);
+    sprintf(displayBuffer1, "Start time: %02d:%02d", alarmStartHour, alarmStartMinute);
+    sprintf(displayBuffer2, "End time: %02d:%02d", alarmStopHour, alarmStopMinute);
     oled.print("Daily");
   } else if (operationMode == 2) {
     sprintf(displayBuffer1, "Log: %02d hrs %02d min", alarmAwakeHours, alarmAwakeMinutes);
@@ -274,9 +274,9 @@ void displayErrorMicrosd2() {
 }
 
 // ----------------------------------------------------------------------------
-// Display microSD storage usage on OLED.
+// Display microSD storage usage and file count on OLED.
 // ----------------------------------------------------------------------------
-void displaySdStorageInfo() {
+void displaySdInfo() {
   if (!online.oled || !online.microSd) return;
 
   enablePullups();
@@ -284,27 +284,15 @@ void displaySdStorageInfo() {
   oled.setCursor(0, 0);
   oled.print("SD Storage:");
   oled.setCursor(0, 10);
-  oled.print(sdFreeMB, 1);
+  oled.print(sdUsedMB, 1);
   oled.print(" / ");
   oled.print(sdTotalMB, 1);
-  oled.print(" MB free");
-  oled.display();
-  disablePullups();
-  myDelay(3000);
-}
+  oled.print(" MB");
 
-// ----------------------------------------------------------------------------
-// Display microSD file count on OLED.
-// ----------------------------------------------------------------------------
-void displaySdFileCount() {
-  if (!online.oled || !online.microSd) return;
-
-  enablePullups();
-  oled.erase();
-  oled.setCursor(0, 0);
-  oled.print("SD Files:");
-  oled.setCursor(0, 10);
+  oled.setCursor(0, 20);
+  oled.print("Files: ");
   oled.print(sdFileCount);
+
   oled.display();
   disablePullups();
   myDelay(3000);
@@ -321,8 +309,8 @@ void displayScreen1() {
   char displayBuffer1[32];
   char displayBuffer2[32];
 
-  sprintf(displayBuffer1, "File size: %d KB", bytesWritten / 1024);
-  sprintf(displayBuffer2, "Max buffer: %d", maxBufferBytes);
+  sprintf(displayBuffer1, "File size: %lu KB", bytesWritten / 1024);
+  sprintf(displayBuffer2, "Max buffer: %lu", maxBufferBytes);
 
   oled.erase();
   oled.text(0, 0, logFileName);
@@ -358,6 +346,35 @@ void displayScreen2() {
 }
 
 // ----------------------------------------------------------------------------
+// Display GNSS Module Info on OLED
+// ----------------------------------------------------------------------------
+void displayGnssModuleInfo() {
+  if (!online.oled) return;
+
+  enablePullups();
+  oled.erase();
+  oled.setCursor(0, 0);
+  oled.print("FW: ");
+  oled.print(gnssFirmwareVersionHigh);
+  oled.print(".");
+  oled.print(gnssFirmwareVersionLow);
+  oled.setCursor(54, 0);
+  oled.print("Mod: ");
+  oled.print(gnssFirmwareType);
+  oled.setCursor(0, 10);
+  oled.print("Prot: ");
+  oled.print(gnssProtocolVersionHigh);
+  oled.print(".");
+  oled.print(gnssProtocolVersionLow);
+  oled.setCursor(0, 20);
+  oled.print("Mod: ");
+  oled.print(gnssModuleName);
+  oled.display();
+  disablePullups();
+  myDelay(4000);
+}
+
+// ----------------------------------------------------------------------------
 // Display deep sleep message.
 // ----------------------------------------------------------------------------
 void displayDeepSleep() {
@@ -365,10 +382,10 @@ void displayDeepSleep() {
 
   enablePullups();
   oled.erase();
-  oled.text(0, 0, "Entering deep sleep...");
+  oled.text(0, 0, "Entering deep sleep.");
   oled.display();
   disablePullups();
-  myDelay(4000);
+  myDelay(3000);
 }
 
 // ----------------------------------------------------------------------------
@@ -400,11 +417,11 @@ void lineTest() {
     oled.line(0, 0, i, height - 1);
     oled.display();
   }
-  myDelay(2000);
+  myDelay(500);
   oled.erase();
   for (int i = width - 1; i >= 0; i -= 6) {
     oled.line(width - 1, 0, i, height - 1);
     oled.display();
   }
-  myDelay(1000);
+  myDelay(500);
 }
