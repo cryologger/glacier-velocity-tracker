@@ -55,8 +55,6 @@ void goToSleep() {
     alarmFlag = false;  // Ensure the alarm flag is cleared.
   }
 
-  DEBUG_PRINTLN("[POWER] Info: System is entering deep sleep mode. Powering down...");
-
   // Display deep sleep message on OLED.
   displayDeepSleep();
 

@@ -108,47 +108,48 @@ void logDebug() {
           rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 
-  // Define an array of values to log.
-  const int NUM_FIELDS = 20;
-  unsigned long values[NUM_FIELDS] = {
-    (unsigned long)readBattery(),   // Ensure return type is correct
-    (unsigned long)online.microSd,  // Convert boolean to unsigned long
-    (unsigned long)online.gnss,
-    (unsigned long)online.logGnss,
-    (unsigned long)online.logDebug,
-    timer.voltage,  // These should already be unsigned long
-    timer.microSd,
-    timer.gnss,
-    timer.syncRtc,
-    timer.logGnss,
-    timer.logDebug,
-    (unsigned long)rtcSyncFlag,
-    (long)rtcDrift,
-    bytesWritten,
-    maxBufferBytes,
-    wdtCounterMax,
-    writeFailCounter,
-    syncFailCounter,
-    closeFailCounter,
-    debugCounter
-  };
-
-  // Write timestamp first.
+  // Log debugging information
   debugFile.print(dateTime);
-  DEBUG_PRINT(dateTime);
-
-  // Print all values using a loop.
-  for (int i = 0; i < NUM_FIELDS; i++) {
-    debugFile.print(",");
-    debugFile.print(values[i]);
-
-    DEBUG_PRINT(",");
-    DEBUG_PRINT(values[i]);
-  }
-
-  // Finish with a newline.
-  debugFile.println();
-  DEBUG_PRINTLN();
+  debugFile.print(",");
+  debugFile.print(readBattery());
+  debugFile.print(",");
+  debugFile.print(online.microSd);
+  debugFile.print(",");
+  debugFile.print(online.gnss);
+  debugFile.print(",");
+  debugFile.print(online.logGnss);
+  debugFile.print(",");
+  debugFile.print(online.logDebug);
+  debugFile.print(",");
+  debugFile.print(timer.voltage);
+  debugFile.print(",");
+  debugFile.print(timer.microSd);
+  debugFile.print(",");
+  debugFile.print(timer.gnss);
+  debugFile.print(",");
+  debugFile.print(timer.syncRtc);
+  debugFile.print(",");
+  debugFile.print(timer.logGnss);
+  debugFile.print(",");
+  debugFile.print(timer.logDebug);
+  debugFile.print(",");
+  debugFile.print(rtcSyncFlag);
+  debugFile.print(",");
+  debugFile.print(rtcDrift);
+  debugFile.print(",");
+  debugFile.print(bytesWritten);
+  debugFile.print(",");
+  debugFile.print(maxBufferBytes);
+  debugFile.print(",");
+  debugFile.print(wdtCounterMax);
+  debugFile.print(",");
+  debugFile.print(writeFailCounter);
+  debugFile.print(",");
+  debugFile.print(syncFailCounter);
+  debugFile.print(",");
+  debugFile.print(closeFailCounter);
+  debugFile.print(",");
+  debugFile.println(debugCounter);
 
   // Sync the debug file to disk.
   if (!debugFile.sync()) {
@@ -168,6 +169,50 @@ void logDebug() {
   } else {
     DEBUG_PRINTLN("[Logging] Info: Closed debug file.");
   }
+
+  // Print debugging information
+  DEBUG_PRINTLN("[Logging] Info: ");
+  DEBUG_PRINT(dateTime);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(readBattery());
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(online.microSd);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(online.gnss);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(online.logGnss);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(online.logDebug);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(timer.voltage);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(timer.microSd);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(timer.gnss);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(timer.syncRtc);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(timer.logGnss);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(timer.logDebug);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(rtcSyncFlag);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(rtcDrift);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(bytesWritten);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(maxBufferBytes);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(wdtCounterMax);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(writeFailCounter);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(syncFailCounter);
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(closeFailCounter);
+  DEBUG_PRINT(",");
+  DEBUG_PRINTLN(debugCounter);
 
   // Stop loop timer and store execution time.
   timer.logDebug = millis() - loopStartTime;
