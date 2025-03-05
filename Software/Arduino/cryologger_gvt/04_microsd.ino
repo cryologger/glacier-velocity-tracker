@@ -29,18 +29,10 @@ void configureSd() {
       online.microSd = true;  // Set flag.
       DEBUG_PRINTLN(F("[microSD] Info: Initialized successfully."));
       displaySuccess();  // Display OLED success message.
-      
+
       // Get storage information
       getSdSpaceInfo();
       getSdFileCount();
-
-      // Attempt to load config from "config.json"
-      bool loaded = loadConfigFromSd();
-      if (loaded) {
-        DEBUG_PRINTLN(F("[microSD] Info: Configuration loaded successfully."));
-      } else {
-        DEBUG_PRINTLN(F("[microSD] Info: Using fallback defaults."));
-      }
       break;  // Exit retry loop on success.
     }
 
@@ -79,7 +71,9 @@ bool loadConfigFromSd() {
     return false;
   }
 
-  StaticJsonDocument<512> doc;
+  // Allocate the JSON document
+  JsonDocument doc;
+
   DeserializationError err = deserializeJson(doc, configFile);
   configFile.close();
 
@@ -351,7 +345,7 @@ void getSdSpaceInfo() {
   // Compute free space in bytes
   uint64_t freeBytes = (uint64_t)freeClusterCount * spc * 512ULL;
   // Compute used space in bytes
-  uint64_t usedBytes = totalBytes - freeBytes;
+  //uint64_t usedBytes = totalBytes - freeBytes;
 
   // Convert to MB (1 MB = 1,000,000 bytes)
   sdTotalMB = (double)totalBytes / 1000000.0;
@@ -359,10 +353,10 @@ void getSdSpaceInfo() {
   sdUsedMB = sdTotalMB - sdFreeMB;
 
   // Print single-line debug message: "Used / Total MB"
-  DEBUG_PRINT_DEC(sdUsedMB, 1);
-  DEBUG_PRINT(F(" / "));
-  DEBUG_PRINT_DEC(sdTotalMB, 1);
-  DEBUG_PRINTLN(F(" MB"));
+  //DEBUG_PRINT_DEC(sdUsedMB, 1);
+  //DEBUG_PRINT(F(" / "));
+  //DEBUG_PRINT_DEC(sdTotalMB, 1);
+  //DEBUG_PRINTLN(F(" MB"));
 }
 
 // ----------------------------------------------------------------------------
@@ -392,7 +386,7 @@ void getSdFileCount() {
 
   // Print debug message
   //DEBUG_PRINT(F("[microSD] Info: File count = "));
-  DEBUG_PRINTLN(sdFileCount);
+  //DEBUG_PRINTLN(sdFileCount);
 }
 
 // ----------------------------------------------------------------------------
