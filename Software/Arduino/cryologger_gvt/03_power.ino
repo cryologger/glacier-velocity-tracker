@@ -40,7 +40,7 @@ void disablePullups() {
 
 // ----------------------------------------------------------------------------
 // Enter deep sleep mode to conserve power.
-// Disables peripherals (I2C, SPI, ADC, etc.), turns off unused GPIO pads, 
+// Disables peripherals (I2C, SPI, ADC, etc.), turns off unused GPIO pads,
 // powers down external devices, and configures the system to wake up on an RTC
 // or WDT interrupt.
 // ----------------------------------------------------------------------------
@@ -49,17 +49,20 @@ void goToSleep() {
 
   // Skip deep sleep if operating in continuous logging mode.
   if (operationMode == CONTINUOUS) {
-    DEBUG_PRINTLN(F("[POWER] Info: System is in continuous mode. Skipping sleep..."));
+    DEBUG_PRINTLN("[POWER] Info: System is in continuous mode. Skipping sleep...");
     return;
   } else {
     alarmFlag = false;  // Ensure the alarm flag is cleared.
   }
 
+  DEBUG_PRINTLN("[POWER] Info: System is entering deep sleep mode. Powering down...");
+
   // Display deep sleep message on OLED.
   displayDeepSleep();
 
 #if DEBUG
-  Serial.end();  // Close Serial port to save power.
+  Serial.flush();  // Flush the serial port.
+  Serial.end();    // Close Serial port to save power.
 #endif
 
   // Disable peripherals and reduce leakage.
@@ -194,7 +197,7 @@ void blinkLed(byte ledFlashes, unsigned int ledDelay) {
 
 // ----------------------------------------------------------------------------
 // Non-blocking delay function that continues to service the Watchdog Timer.
-// This function delays for a specified duration (in milliseconds) while 
+// This function delays for a specified duration (in milliseconds) while
 // calling petDog() to prevent unintended WDT resets.
 // ----------------------------------------------------------------------------
 void myDelay(unsigned long ms) {

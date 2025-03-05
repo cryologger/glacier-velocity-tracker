@@ -31,7 +31,7 @@ void configureRtc() {
   //rtc.setTime(23, 52, 30, 0, 1, 5, 25);
 
   // Scenario 2: Power-on day before seasonal logging period prior to daily logging period
-  rtc.setTime(23, 54, 30, 0, 31, 5, 25);
+  //rtc.setTime(23, 57, 30, 0, 28, 2, 25);
 
   // Scenario 3: Power-on day before seasonal logging period after daily logging period
   //rtc.setTime(23, 57, 30, 0, 31, 5, 25);
@@ -158,7 +158,7 @@ void readRtc() {
 // ----------------------------------------------------------------------------
 void getDateTime() {
   rtc.getTime();
-  sprintf(dateTimeBuffer, "20%02d-%02d-%02d %02d:%02d:%02d",
+  sprintf(dateTimeBuffer, "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
           rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 }
@@ -168,9 +168,9 @@ void getDateTime() {
 // ---------------------------------------------------------------------------
 void printDateTime() {
   rtc.getTime();
-  sprintf(dateTimeBuffer, "20%02d-%02d-%02d %02d:%02d:%02d.%02d",
+  sprintf(dateTimeBuffer, "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
           rtc.year, rtc.month, rtc.dayOfMonth,
-          rtc.hour, rtc.minute, rtc.seconds, rtc.hundredths);
+          rtc.hour, rtc.minute, rtc.seconds);
   DEBUG_PRINTLN(dateTimeBuffer);
 }
 
@@ -180,7 +180,7 @@ void printDateTime() {
 void printAlarm() {
   rtc.getAlarm();
   char alarmBuffer[30];
-  sprintf(alarmBuffer, "20%02d-%02d-%02d %02d:%02d:%02d",
+  sprintf(alarmBuffer, "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
           rtc.year, rtc.alarmMonth, rtc.alarmDayOfMonth,
           rtc.alarmHour, rtc.alarmMinute, rtc.alarmSeconds);
   DEBUG_PRINTLN(alarmBuffer);

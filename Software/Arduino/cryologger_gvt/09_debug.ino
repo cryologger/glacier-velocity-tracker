@@ -101,23 +101,23 @@ void printGnssSettings() {
   printLine();
 
   if (gnss.getModuleInfo()) {
-    DEBUG_PRINT(F("FWVER: "));
+    DEBUG_PRINT("FWVER: ");
     DEBUG_PRINT(gnss.getFirmwareVersionHigh());  // Returns uint8_t
-    DEBUG_PRINT(F("."));
+    DEBUG_PRINT(".");
     DEBUG_PRINTLN(gnss.getFirmwareVersionLow());  // Returns uint8_t
 
-    DEBUG_PRINT(F("Firmware: "));
+    DEBUG_PRINT("Firmware: ");
     DEBUG_PRINTLN(gnss.getFirmwareType());  // Returns HPG, SPG etc. as (const char *)
 
-    DEBUG_PRINT(F("PROTVER: "));
+    DEBUG_PRINT("PROTVER: ");
     DEBUG_PRINT(gnss.getProtocolVersionHigh());  // Returns uint8_t
-    DEBUG_PRINT(F("."));
+    DEBUG_PRINT(".");
     DEBUG_PRINTLN(gnss.getProtocolVersionLow());  // Returns uint8_t
 
-    DEBUG_PRINT(F("MOD: "));
+    DEBUG_PRINT("MOD: ");
     DEBUG_PRINTLN(gnss.getModuleName());  // Returns ZED-F9P, MAX-M10S etc. as (const char *)
   } else
-    DEBUG_PRINTLN(F("[GNSS] Error: Could not read module info!"));
+    DEBUG_PRINTLN("[GNSS] Error: Could not read module info!");
 
   printLine();
   DEBUG_PRINTLN("Receiver Configuration Settings");

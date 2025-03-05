@@ -16,11 +16,11 @@
 // each log session is uniquely named and avoids overwriting previous logs.
 // ----------------------------------------------------------------------------
 void getLogFileName() {
-  sprintf(logFileName, "%s_20%02d%02d%02d_%02d%02d%02d.ubx",
+  sprintf(logFileName, "%s_20%02lu%02lu%02lu_%02lu%02lu%02lu.ubx",
           uid, rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 
-  DEBUG_PRINT(F("[Logging] Info: logFileName = "));
+  DEBUG_PRINT("[Logging] Info: logFileName = ");
   DEBUG_PRINTLN(logFileName);
 }
 
@@ -41,7 +41,7 @@ void createDebugFile() {
     DEBUG_PRINTLN(F("[Logging] Warning: Failed to create debug file."));
     return;
   }
-  DEBUG_PRINT(F("[Logging] Info: Created or opened debug file: "));
+  DEBUG_PRINT("[Logging] Info: Created or opened debug file: ");
   DEBUG_PRINTLN(debugFileName);
 
   // Write CSV header if necessary.
@@ -53,9 +53,9 @@ void createDebugFile() {
 
   // Sync the debug file to ensure integrity.
   if (!debugFile.sync()) {
-    DEBUG_PRINTLN(F("[Logging] Warning: Failed to sync debug file."));
+    DEBUG_PRINTLN("[Logging] Warning: Failed to sync debug file.");
   } else {
-    DEBUG_PRINTLN(F("[Logging] Info: Synced debug file."));
+    DEBUG_PRINTLN("[Logging] Info: Synced debug file.");
   }
 
   // Update the file creation timestamp.
@@ -92,38 +92,38 @@ void logDebug() {
 
   // Open debug log file.
   if (!debugFile.open(debugFileName, O_APPEND | O_WRITE)) {
-    DEBUG_PRINT(F("[Logging] Warning: Failed to open debug file: "));
+    DEBUG_PRINT("[Logging] Warning: Failed to open debug file: ");
     DEBUG_PRINTLN(debugFileName);
     online.logDebug = false;  // Set flag
     return;
   } else {
-    DEBUG_PRINT(F("[Logging] Info: Opened debug file: "));
+    DEBUG_PRINT("[Logging] Info: Opened debug file: ");
     DEBUG_PRINTLN(debugFileName);
     online.logDebug = true;  // Set flag
   }
 
   // Create timestamp string.
   char dateTime[30];
-  sprintf(dateTime, "20%02d-%02d-%02d %02d:%02d:%02d",
+  sprintf(dateTime, "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
           rtc.year, rtc.month, rtc.dayOfMonth,
           rtc.hour, rtc.minute, rtc.seconds);
 
   // Define an array of values to log.
   const int NUM_FIELDS = 20;
-  long values[NUM_FIELDS] = {
-    readBattery(),
-    online.microSd,
-    online.gnss,
-    online.logGnss,
-    online.logDebug,
-    timer.voltage,
+  unsigned long values[NUM_FIELDS] = {
+    (unsigned long)readBattery(),   // Ensure return type is correct
+    (unsigned long)online.microSd,  // Convert boolean to unsigned long
+    (unsigned long)online.gnss,
+    (unsigned long)online.logGnss,
+    (unsigned long)online.logDebug,
+    timer.voltage,  // These should already be unsigned long
     timer.microSd,
     timer.gnss,
     timer.syncRtc,
     timer.logGnss,
     timer.logDebug,
-    rtcSyncFlag,
-    rtcDrift,
+    (unsigned long)rtcSyncFlag,
+    (long)rtcDrift,
     bytesWritten,
     maxBufferBytes,
     wdtCounterMax,
@@ -152,10 +152,10 @@ void logDebug() {
 
   // Sync the debug file to disk.
   if (!debugFile.sync()) {
-    DEBUG_PRINTLN(F("[Logging] Warning: Failed to sync debug file."));
+    DEBUG_PRINTLN("[Logging] Warning: Failed to sync debug file.");
     syncFailCounter++;  // Track failed sync attempts
   } else {
-    DEBUG_PRINTLN(F("[Logging] Info: Synced debug file."));
+    DEBUG_PRINTLN("[Logging] Info: Synced debug file.");
   }
 
   // Update file access timestamps.
@@ -163,10 +163,10 @@ void logDebug() {
 
   // Close the debug file.
   if (!debugFile.close()) {
-    DEBUG_PRINTLN(F("[Logging] Warning: Failed to close debug file."));
+    DEBUG_PRINTLN("[Logging] Warning: Failed to close debug file.");
     closeFailCounter++;  // Track failed close attempts
   } else {
-    DEBUG_PRINTLN(F("[Logging] Info: Closed debug file."));
+    DEBUG_PRINTLN("[Logging] Info: Closed debug file.");
   }
 
   // Stop loop timer and store execution time.
