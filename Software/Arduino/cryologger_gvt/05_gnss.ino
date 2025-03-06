@@ -2,126 +2,153 @@
   GNSS Module
 
   This module handles the initialization and configuration of the GNSS receiver,
-  synchronizes RTC time with GNSS, and logs raw GNSS data to microSD.
+  synchronizing RTC time with GNSS, and logging raw GNSS data (RAWX, SFRBX) to 
+  microSD.
 */
 
 // ----------------------------------------------------------------------------
-// Configure u-blox GNSS
+// Configure and initialize the GNSS receiver.
+//
+// This function attempts to initialize the u-blox GNSS module and sets the
+// appropriate 'online.gnss' flag. If initialization fails, it retries once
+// before shutting down power to conserve energy.
 // ----------------------------------------------------------------------------
 void configureGnss() {
-  // Start loop timer
-  unsigned long loopStartTime = millis();
+  unsigned long loopStartTime = millis();  // Start loop timer.
 
-  // Check if u-blox has been initialized
-  if (!online.gnss) {
-    // Disable internal I2C pull-ups
-    disablePullups();
+  // Check if GNSS is already initialized
+  if (online.gnss) {
+    DEBUG_PRINTLN(F("[GNSS] Info: GNSS already initialized."));
+    return;
+  }
 
-    // Uncomment  line to enable GNSS debug messages on Serial
-    //gnss.enableDebugging();
+  // Disable internal I2C pull-ups before initialization
+  disablePullups();
+  
+  // Uncomment to enable GNSS debug messages on Serial.
+  //gnss.enableDebugging();
 
-    // Allocate sufficient RAM to store RAWX messages (>2 KB)
-    gnss.setFileBufferSize(fileBufferSize);  // Must be called before gnss.begin()
+  // Display OLED initialization message
+  displayInitialize("GNSS");
 
-    // Display OLED messages(s)
-    displayInitialize("GNSS");
+  // Allocate sufficient RAM to store RAWX messages (>2 KB)
+  gnss.setFileBufferSize(fileBufferSize);  // Must be called before gnss.begin()
 
-    // Initialize u-blox GNSS
-    if (!gnss.begin()) {
-      
+  // Attempt GNSS initialization with a maximum of 2 retries
+  for (int attempt = 1; attempt <= 2; attempt++) {
+
+    // Try to begin GNSS
+    if (gnss.begin()) {
+      online.gnss = true;
+      DEBUG_PRINTLN(F("[GNSS] Info: u-blox initialized."));
+      displaySuccess();       // Display OLED success message
+      fetchGnssModuleInfo();  // Get receiver firmware
+      break;                  // Exit retry loop on success
+    }
+
+    // On failed attempt
+    if (attempt < 2) {
+      // First failure
+      DEBUG_PRINTLN(F("[GNSS] Warning: u-blox failed to initialize. Reattempting..."));
+      displayFailure();
+      myDelay(2000);  // Delay before retry
+    } else {
+      // Second failure
+      DEBUG_PRINTLN(F("[GNSS] Error: u-blox failed to initialize! Please check wiring."));
       displayFailure();
 
-      DEBUG_PRINTLN("[GNSS] Warning: u-blox failed to initialize. Reattempting...");
+      online.gnss = false;
+      logDebug();  // Log system debug information
 
-      // Delay between initialization attempts
-      myDelay(2000);
-
-      if (!gnss.begin()) {
-        DEBUG_PRINTLN("[GNSS] Warning: u-blox failed to initialize! Please check wiring.");
-        online.gnss = false;
-        logDebug();  // Log system debug information
-
-        // Display OLED messages(s)
-        displayFailure();
-
-        // Disable power to Qwiic connector
-        qwiicPowerOff();
-
-        // Disable power to peripherals
-        peripheralPowerOff();
-      } else {
-        online.gnss = true;
-        DEBUG_PRINTLN("[GNSS] Info: u-blox initialized.");
-
-        // Display OLED messages(s)
-        displaySuccess();
-      }
-    } else {
-      online.gnss = true;
-      DEBUG_PRINTLN("[GNSS] Info: u-blox initialized.");
-
-      // Display OLED messages(s)
-      displaySuccess();
+      // Disable power to Qwiic connector
+      qwiicPowerOff();
+      // Disable power to peripherals
+      peripheralPowerOff();
     }
+  }
 
-    // Configure communication interfaces and satellite signals only if program is running for the first time
-    if (gnssConfigFlag) {
-      bool response = true;
+  // If GNSS was successfully initialized, configure communication/satellite if first run
+  if (online.gnss && gnssConfigFlag) {
+    configureGnssInterfaces();  // Communitcation interfaces
+    configureGnssSignals();     // Satellite signals
+    gnssConfigFlag = false;
+  }
 
-      // Configure communciation interfaces
-      response &= gnss.newCfgValset();                             // Defaults to configuring the setting in RAM and BBR
-      response &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);    // Enable I2C
-      response &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);    // Disable SPI
-      response &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 0);  // Disable UART1
-      response &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);  // Enable UART2
-      response &= gnss.addCfgValset8(UBLOX_CFG_USB_ENABLED, 0);    // Disable USB
-      response &= gnss.sendCfgValset();                            // Send the packet using sendCfgValset
-
-      if (response) {
-        DEBUG_PRINTLN("[GNSS] Info: u-blox communication interfaces configured.");
-      } else {
-        DEBUG_PRINTLN("[GNSS] Warning: u-blox communication interfaces not configured!");
-      }
-
-      // Configure satellite signals
-      response &= gnss.newCfgValset();                                             // Defaults to configuring the setting in RAM and BBR
-      response &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, gnssGpsEnabled);    // Configure GPS
-      response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GLO_ENA, gnssGloEnabled);    // Configure GLONASS
-      response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, gnssGalEnabled);    // Configure Galileo
-      response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, gnssBdsEnabled);    // Configure Beidou
-      response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_SBAS_ENA, gnssSbasEnabled);  // Configure SBAS
-      response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, gnssQzssEnabled);  // Configure QZSS
-      response &= gnss.sendCfgValset();                                            // Send the packet using sendCfgValset
-      myDelay(2000);
-
-      if (response) {
-        DEBUG_PRINTLN("[GNSS] Info: u-blox satellite signals configured.");
-      } else {
-        DEBUG_PRINTLN("[GNSS] Warning: u-blox satellite signals not configured!");
-      }
-
-      // Clear flag
-      gnssConfigFlag = false;
-
-    }
-
-    // Configure u-blox GNSS
+  // Configure u-blox GNSS
+  if (online.gnss) {
     gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
     gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
-    gnss.setNavigationFrequency(1);                   // Produce 1 navigation solution(s) per second
+    gnss.setNavigationFrequency(1);                   // Set navigation frequency (1 nav solution per second)
     gnss.setAutoPVT(true);                            // Enable automatic NAV-PVT messages
     gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM-SFRBX messages
     gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM-RAWX messages
     gnss.logRXMSFRBX();                               // Enable RXM-SFRBX data logging
     gnss.logRXMRAWX();                                // Enable RXM-RAWX data logging
-  } else {
-    DEBUG_PRINTLN("[GNSS] Info: GNSS already initialized.");
   }
 
   // Stop the loop timer
   timer.gnss = millis() - loopStartTime;
+}
 
-  //DEBUG_PRINT("Debug - configureGnss(): "); DEBUG_PRINTLN(timer.gnss);
+// ----------------------------------------------------------------------------
+// Configure GNSS Communication Interfaces (RAM and BBR).
+// ----------------------------------------------------------------------------
+void configureGnssInterfaces() {
+  bool response = true;
+
+  response &= gnss.newCfgValset();                             // Defaults to configuring in RAM and BBR
+  response &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);    // Enable I2C
+  response &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);    // Disable SPI
+  response &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 0);  // Disable UART1
+  response &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);  // Enable UART2
+  response &= gnss.addCfgValset8(UBLOX_CFG_USB_ENABLED, 0);    // Disable USB
+  response &= gnss.sendCfgValset();                            // Send packet
+
+  if (response) {
+    DEBUG_PRINTLN(F("[GNSS] Info: Communication interfaces configured."));
+  } else {
+    DEBUG_PRINTLN(F("[GNSS] Warning: Failed to configure GNSS communication interfaces!"));
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Configure GNSS Satellite Signals (RAM and BBR).
+// ----------------------------------------------------------------------------
+void configureGnssSignals() {
+  bool response = true;
+
+  response &= gnss.newCfgValset();  // Configure in RAM and BBR
+  response &= gnss.newCfgValset8(UBLOX_CFG_SIGNAL_GPS_ENA, gnssGpsEnabled);
+  response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GLO_ENA, gnssGloEnabled);
+  response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_GAL_ENA, gnssGalEnabled);
+  response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_BDS_ENA, gnssBdsEnabled);
+  response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_SBAS_ENA, gnssSbasEnabled);
+  response &= gnss.addCfgValset8(UBLOX_CFG_SIGNAL_QZSS_ENA, gnssQzssEnabled);
+  response &= gnss.sendCfgValset();  // Send packet
+  myDelay(2000);
+
+  if (response) {
+    DEBUG_PRINTLN(F("[GNSS] Info: Satellite signals configured."));
+  } else {
+    DEBUG_PRINTLN(F("[GNSS] Warning: Failed to configure GNSS satellite signals!"));
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Retrieve GNSS Module Information and store in global variables.
+// ----------------------------------------------------------------------------
+void fetchGnssModuleInfo() {
+  if (gnss.getModuleInfo()) {
+    gnssFirmwareVersionHigh = gnss.getFirmwareVersionHigh();
+    gnssFirmwareVersionLow = gnss.getFirmwareVersionLow();
+    gnssFirmwareType = gnss.getFirmwareType();
+    gnssProtocolVersionHigh = gnss.getProtocolVersionHigh();
+    gnssProtocolVersionLow = gnss.getProtocolVersionLow();
+    gnssModuleName = gnss.getModuleName();
+    gnssInfoAvailable = true;
+  } else {
+    gnssInfoAvailable = false;  // Indicate failure to retrieve info
+  }
 }
 
 // ----------------------------------------------------------------------------

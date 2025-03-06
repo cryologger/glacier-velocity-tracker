@@ -171,7 +171,7 @@ void logDebug() {
   }
 
   // Print debugging information
-  DEBUG_PRINTLN("[Logging] Info: ");
+  DEBUG_PRINT("[Logging] Info: ");
   DEBUG_PRINT(dateTime);
   DEBUG_PRINT(",");
   DEBUG_PRINT(readBattery());

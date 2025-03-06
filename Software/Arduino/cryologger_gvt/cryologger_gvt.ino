@@ -1,7 +1,7 @@
 /*
   Cryologger - Glacier Velocity Tracker (GVT)
   Version: 3.0.0
-  Date: February 27, 2025
+  Date: March 6, 2025
   Author: Adam Garbo
   License: GPLv3. See license file for more information.
 
@@ -13,8 +13,8 @@
   - Pololu 5V 600mA Step-Down Voltage Regulator D36V6F5
 
   Description:
-  This sketch integrates the RTC, microSD, GNSS, OLED display, and WDT modules to
-  implement a glacier velocity measurement and logging system.
+  This sketch integrates the RTC, microSD, GNSS, OLED display, and WDT modules 
+  to implement a glacier velocity measurement and logging system.
 */
 
 // ----------------------------------------------------------------------------
@@ -28,25 +28,25 @@ char uid[20] = "GVT_25_XXX";  // Default unique identifier (UID)
 #define OPERATION_MODE DAILY  // Options: DAILY, ROLLING, CONTINUOUS
 
 // Daily mode parameters (only used if OPERATION_MODE == DAILY)
-#define DAILY_START_HOUR 14   // Logging start hour (UTC)
+#define DAILY_START_HOUR 17   // Logging start hour (UTC)
 #define DAILY_START_MINUTE 0  // Logging start minute (UTC)
-#define DAILY_STOP_HOUR 15    // Logging stop hour (UTC)
+#define DAILY_STOP_HOUR 20    // Logging stop hour (UTC)
 #define DAILY_STOP_MINUTE 0   // Logging stop minute (UTC)
 
 // Rolling mode parameters (only used if OPERATION_MODE == ROLLING)
-#define ROLLING_AWAKE_HOURS 0    // Awake period (hours)
-#define ROLLING_AWAKE_MINUTES 5  // Awake period (minutes)
-#define ROLLING_SLEEP_HOURS 0    // Sleep period (hours)
-#define ROLLING_SLEEP_MINUTES 1  // Sleep period (minutes)
+#define ROLLING_AWAKE_HOURS 1    // Awake period (hours)
+#define ROLLING_AWAKE_MINUTES 0  // Awake period (minutes)
+#define ROLLING_SLEEP_HOURS 1    // Sleep period (hours)
+#define ROLLING_SLEEP_MINUTES 0  // Sleep period (minutes)
 
 // Seasonal logging override
 // If ENABLED and the current date is within the seasonal window,
 // we switch to CONTINUOUS mode automatically.
-#define SEASONAL_LOGGING_MODE DISABLED  // ENABLED or DISABLED
-#define SEASONAL_START_DAY 1            // Seasonal logging start day
-#define SEASONAL_START_MONTH 6          // Seasonal logging start month
-#define SEASONAL_END_DAY 31             // Seasonal logging stop day
-#define SEASONAL_END_MONTH 8            // Seasonal logging stop month
+#define SEASONAL_LOGGING_MODE ENABLED  // ENABLED or DISABLED
+#define SEASONAL_START_DAY 1           // Seasonal logging start day
+#define SEASONAL_START_MONTH 6         // Seasonal logging start month
+#define SEASONAL_END_DAY 31            // Seasonal logging stop day
+#define SEASONAL_END_MONTH 8           // Seasonal logging stop month
 
 // GNSS Satellite Signal configuration (0=DISABLE, 1=ENABLE)
 #define GNSS_GPS_ENABLED 1
@@ -63,7 +63,7 @@ char uid[20] = "GVT_25_XXX";  // Default unique identifier (UID)
 // ----------------------------------------------------------------------------
 // Libraries                          Version     Comments
 // ----------------------------------------------------------------------------
-#include <ArduinoJson.h>              // 7.3.0
+#include <ArduinoJson.h>              // 7.3.1
 #include <RTC.h>                      // 1.2      Apollo3 Core v1.2.3
 #include <SdFat.h>                    // 2.3.0
 #include <SparkFun_Qwiic_OLED.h>      // 1.0.13
@@ -109,13 +109,12 @@ char uid[20] = "GVT_25_XXX";  // Default unique identifier (UID)
 // ----------------------------------------------------------------------------
 // Peripheral Object Instantiations
 // ----------------------------------------------------------------------------
-APM3_RTC rtc;       // Real-Time Clock
-APM3_WDT wdt;       // Watchdog Timer
-SdFs sd;            // SD card filesystem
-FsFile configFile;  // Configuration file on SD
-FsFile logFile;     // Log file on SD
-FsFile debugFile;   // Debug log file on SD
-
+APM3_RTC rtc;          // Real-Time Clock
+APM3_WDT wdt;          // Watchdog Timer
+SdFs sd;               // SD card filesystem
+FsFile configFile;     // Configuration file on SD
+FsFile logFile;        // Log file on SD
+FsFile debugFile;      // Debug log file on SD
 QwiicNarrowOLED oled;  // OLED display (I2C address: 0x3C)
 SFE_UBLOX_GNSS gnss;   // GNSS receiver (I2C address: 0x42)
 
@@ -197,8 +196,8 @@ byte dateCurrent = 0;
 byte dateNew = 0;
 
 // Buffers
-char logFileName[30] = "";
-char debugFileName[20] = "";
+char logFileName[100] = "";
+char debugFileName[30] = "";
 char dateTimeBuffer[30] = "";
 
 // SD card write configuration
@@ -209,12 +208,21 @@ float sdFreeMB = 0.0;
 float sdUsedMB = 0.0;
 int sdFileCount = 0;
 
+// Global variables to store GNSS firmware info
+uint8_t gnssFirmwareVersionHigh = 0;
+uint8_t gnssFirmwareVersionLow = 0;
+const char* gnssFirmwareType = "";
+uint8_t gnssProtocolVersionHigh = 0;
+uint8_t gnssProtocolVersionLow = 0;
+const char* gnssModuleName = "";
+bool gnssInfoAvailable = false;  // Flag to track if retrieval was successful
+
 // Counters and timers
-unsigned int debugCounter = 0;    // Count of debug messages logged
-unsigned int gnssTimeout = 180;   // GNSS acquisition timeout (default = 300 seconds)
-unsigned int maxBufferBytes = 0;  // Maximum buffer size used
-unsigned int reading = 0;         // Battery voltage reading (analog)
-unsigned int fixCounter = 0;      // Count of GNSS fixes
+unsigned long debugCounter = 0;    // Count of debug messages logged
+unsigned int gnssTimeout = 180;    // GNSS acquisition timeout (default = 180 seconds)
+unsigned long maxBufferBytes = 0;  // Maximum buffer size used
+unsigned int reading = 0;          // Battery voltage reading (analog)
+unsigned int fixCounter = 0;       // Count of GNSS fixes
 
 unsigned long previousMillis = 0;    // For millis()-based timing
 unsigned long bytesWritten = 0;      // Total bytes written to microSD
@@ -277,56 +285,59 @@ void setup() {
 
   DEBUG_PRINTLN();
   printLine();
-  DEBUG_PRINTLN(F("Cryologger - Glacier Velocity Tracker"));
+  DEBUG_PRINTLN("Cryologger - Glacier Velocity Tracker");
   printLine();
-  DEBUG_PRINTLN(F("[Main] Info: Initializing peripherals..."));
+  DEBUG_PRINTLN("[Setup] Info: Initializing peripherals...");
 
   // Initialize peripherals.
   configureRtc();   // Set up the Real-Time Clock.
   configureOled();  // Set up the OLED display.
   configureWdt();   // Set up Watchdog Timer.
   configureSd();    // Set up microSD card.
+  displaySdInfo();  //
 
   // Load configuration from microSD card.
   if (loadConfigFromSd()) {
-    DEBUG_PRINTLN(F("[Config] Info: Configuration loaded successfully."));
+    DEBUG_PRINTLN("[Setup] Info: Configuration loaded successfully.");
   } else {
-    DEBUG_PRINTLN(F("[Config] Info: Using fallback defaults."));
+    DEBUG_PRINTLN("[Setup] Info: Using fallback defaults.");
   }
   configureGnss();  // Set up GNSS receiver.
+  displayGnssModuleInfo();
 
-  // Output startup information.
   printLine();
-  DEBUG_PRINTLN(F("System Information"));
+  DEBUG_PRINTLN("System Information");
   printLine();
-  DEBUG_PRINT(F("Serial:"));
+  DEBUG_PRINT("Serial:");
   printTab(3);
   DEBUG_PRINTLN(uid);
-  DEBUG_PRINT(F("Software Version:"));
+  DEBUG_PRINT("Software Version:");
   printTab(1);
   DEBUG_PRINTLN(SOFTWARE_VERSION);
-  DEBUG_PRINT(F("Hardware Version:"));
+  DEBUG_PRINT("Hardware Version:");
   printTab(1);
   DEBUG_PRINTLN(HARDWARE_VERSION);
-  DEBUG_PRINT(F("Datetime:"));
+  DEBUG_PRINT("Datetime:");
   printTab(2);
   printDateTime();
-  DEBUG_PRINT(F("Battery Voltage:"));
+  DEBUG_PRINT("Battery Voltage:");
   printTab(1);
   DEBUG_PRINTLN(readBattery());
-  DEBUG_PRINT(F("Storage:"));
+  DEBUG_PRINT("Storage:");
   printTab(2);
-  getSdSpaceInfo();
-  DEBUG_PRINT(F("File Count:"));
+  DEBUG_PRINT_DEC(sdUsedMB, 1);
+  DEBUG_PRINT(" / ");
+  DEBUG_PRINT_DEC(sdTotalMB, 1);
+  DEBUG_PRINTLN(" MB");
+  DEBUG_PRINT("File Count:");
   printTab(2);
-  getSdFileCount();
+  DEBUG_PRINTLN(sdFileCount);
 
   // Display welcome messages and logging configuration on OLED.
+  //printSystemSettings();
   displayWelcome();
   printLoggingSettings();
   displayLoggingMode();
-  displaySdStorageInfo();
-  displaySdFileCount();
   printGnssSettings();  // Print current GNSS settings
 
   // Configure additional devices and logging parameters.
@@ -335,7 +346,7 @@ void setup() {
   createDebugFile();  // Create a debug log file on SD.
   setSleepAlarm();    // Set the RTC alarm based on operation mode.
 
-  DEBUG_PRINT(F("[Main] Info: Datetime "));
+  DEBUG_PRINT("[Setup] Info: Datetime ");
   printDateTime();
 
   // Indicate setup is complete.
@@ -348,7 +359,7 @@ void setup() {
 void loop() {
   // Process RTC alarm events.
   if (alarmFlag) {
-    DEBUG_PRINT(F("[Main] Info: Alarm trigger "));
+    DEBUG_PRINT("[Main] Info: Alarm trigger ");
     printDateTime();
 
     // Update RTC and logging configuration.
@@ -369,7 +380,7 @@ void loop() {
 
     // If the date has changed (daily logging), re-sync the RTC.
     if (checkDate()) {
-      DEBUG_PRINTLN(F("[Main] Info: Daily RTC sync required..."));
+      DEBUG_PRINTLN("[Main] Info: Daily RTC sync required...");
       syncRtc();
     };
 
