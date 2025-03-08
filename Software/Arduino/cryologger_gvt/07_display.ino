@@ -250,6 +250,7 @@ void displayRtcOffset(long drift) {
 // Display microSD initialization error (first attempt).
 // ----------------------------------------------------------------------------
 void displayErrorMicrosd1() {
+  if (!online.oled || !firstTimeFlag) return;
   enablePullups();
   oled.erase();
   oled.text(0, 0, "Error: microSD");
@@ -264,6 +265,7 @@ void displayErrorMicrosd1() {
 // Display microSD initialization error (second attempt).
 // ----------------------------------------------------------------------------
 void displayErrorMicrosd2() {
+  if (!online.oled || !firstTimeFlag) return;
   enablePullups();
   oled.erase();
   oled.text(0, 0, "Error: microSD");
