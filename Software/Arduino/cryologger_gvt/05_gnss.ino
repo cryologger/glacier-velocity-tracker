@@ -78,7 +78,7 @@ void configureGnss() {
   if (online.gnss) {
     gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
     gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
-    gnss.setNavigationFrequency(1);                   // Set navigation frequency (1 nav solution per second)
+    gnss.setMeasurementRate(gnssMeasurementRate);     // Set measurement ratequency (1 nav solution per second)
     gnss.setAutoPVT(true);                            // Enable automatic NAV-PVT messages
     gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM-SFRBX messages
     gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM-RAWX messages

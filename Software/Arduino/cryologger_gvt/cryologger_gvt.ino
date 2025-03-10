@@ -1,7 +1,7 @@
 /*
   Cryologger - Glacier Velocity Tracker (GVT)
   Version: 3.0.0
-  Date: March 6, 2025
+  Date: March 10, 2025
   Author: Adam Garbo
   License: GPLv3. See license file for more information.
 
@@ -49,6 +49,7 @@ char uid[20] = "GVT_25_XXX";  // Default unique identifier (UID)
 #define SEASONAL_END_MONTH 8           // Seasonal logging stop month
 
 // GNSS Satellite Signal configuration (0=DISABLE, 1=ENABLE)
+#define GNSS_MEASUREMENT_RATE 1000
 #define GNSS_GPS_ENABLED 1
 #define GNSS_GLO_ENABLED 1
 #define GNSS_GAL_ENABLED 1
@@ -164,8 +165,9 @@ byte alarmSeasonalEndDay = SEASONAL_END_DAY;
 byte alarmSeasonalEndMonth = SEASONAL_END_MONTH;
 
 // ----------------------------------------------------------------------------
-// GNSS Satellite Signal Enables
+// GNSS Measurement Rate & Satellite Signal Enables
 // ----------------------------------------------------------------------------
+unsigned int gnssMeasurementRate = GNSS_MEASUREMENT_RATE;
 byte gnssGpsEnabled = GNSS_GPS_ENABLED;
 byte gnssGloEnabled = GNSS_GLO_ENABLED;
 byte gnssGalEnabled = GNSS_GAL_ENABLED;
