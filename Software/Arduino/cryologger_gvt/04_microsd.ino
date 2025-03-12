@@ -85,240 +85,317 @@ bool loadConfigFromSd() {
   DEBUG_PRINTLN(F("[microSD] Info: Validating config.json..."));
 
   // --------------------------
-  // Validate UID (Device Identifier)
+  // Declare local temp variables
   // --------------------------
-  if (doc["uid"].is<const char*>()) {
-    strncpy(uid, doc["uid"].as<const char*>(), sizeof(uid) - 1);
-    uid[sizeof(uid) - 1] = '\0';  // Ensure null termination
-  } else {
-    DEBUG_PRINTLN(F("[Config] Error: 'uid' is missing or invalid. Using default UID."));
-    return false;
-  }
+  char tmpUid[32];
+
+  OperationMode tmpOpMode;
+  int tmpStartHour, tmpStartMin;
+  int tmpStopHour, tmpStopMin;
+
+  int tmpAwakeHours, tmpAwakeMinutes;
+  int tmpSleepHours, tmpSleepMinutes;
+
+  SeasonalMode tmpSeasonalMode;
+  int tmpSeasonalStartDay, tmpSeasonalStartMonth;
+  int tmpSeasonalEndDay, tmpSeasonalEndMonth;
+
+  int tmpGnssRate;
+  byte tmpGpsEnabled;
+  byte tmpGloEnabled;
+  byte tmpGalEnabled;
+  byte tmpBdsEnabled;
+  byte tmpSbasEnabled;
+  byte tmpQzssEnabled;
 
   // --------------------------
-  // Validate Operation Mode
+  // Validate each field
   // --------------------------
-  const char* modeStr = doc["operationMode"].as<const char*>();
-  if (modeStr) {
-    if (strcmp(modeStr, "DAILY") == 0) operationMode = DAILY;
-    else if (strcmp(modeStr, "ROLLING") == 0) operationMode = ROLLING;
-    else if (strcmp(modeStr, "CONTINUOUS") == 0) operationMode = CONTINUOUS;
+
+  // UID
+  if (!doc.containsKey("uid") || !doc["uid"].is<const char*>()) {
+    DEBUG_PRINTLN("[Config] Error: 'uid' missing or invalid.");
+    return false;
+  }
+  strncpy(tmpUid, doc["uid"].as<const char*>(), sizeof(tmpUid) - 1);
+  tmpUid[sizeof(tmpUid) - 1] = '\0';
+
+  // operationMode
+  if (!doc.containsKey("operationMode") || !doc["operationMode"].is<const char*>()) {
+    DEBUG_PRINTLN("[Config] Error: 'operationMode' missing or invalid.");
+    return false;
+  }
+  {
+    const char* modeStr = doc["operationMode"].as<const char*>();
+    if (strcmp(modeStr, "DAILY") == 0) tmpOpMode = DAILY;
+    else if (strcmp(modeStr, "ROLLING") == 0) tmpOpMode = ROLLING;
+    else if (strcmp(modeStr, "CONTINUOUS") == 0) tmpOpMode = CONTINUOUS;
     else {
-      DEBUG_PRINTLN(F("[Config] Error: Invalid 'operationMode'. Using defaults."));
+      DEBUG_PRINTLN("[Config] Error: 'operationMode' not recognized.");
       return false;
     }
-    normalOperationMode = operationMode;  // Store original mode for seasonal switching
-  } else {
-    DEBUG_PRINTLN(F("[Config] Error: 'operationMode' missing or invalid."));
+  }
+
+  // dailyStartHour
+  if (!doc.containsKey("dailyStartHour") || !doc["dailyStartHour"].is<int>()) {
+    DEBUG_PRINTLN("[Config] Error: 'dailyStartHour' missing or invalid.");
+    return false;
+  }
+  tmpStartHour = doc["dailyStartHour"].as<int>();
+  if (tmpStartHour < 0 || tmpStartHour > 23) {
+    DEBUG_PRINTLN("[Config] Error: 'dailyStartHour' out of range (0–23).");
     return false;
   }
 
-  // --------------------------
-  // Validate Daily Logging Times (0-23 for hours, 0-59 for minutes)
-  // --------------------------
-  if (doc["dailyStartHour"].is<int>()) {
-    alarmStartHour = doc["dailyStartHour"].as<int>();
-    if (alarmStartHour < 0 || alarmStartHour > 23) {
-      DEBUG_PRINTLN(F("[Config] Error: 'dailyStartHour' out of range (0-23)."));
-      return false;
-    }
-  } else {
-    DEBUG_PRINTLN(F("[Config] Error: 'dailyStartHour' missing or invalid."));
+  // dailyStartMinute
+  if (!doc.containsKey("dailyStartMinute") || !doc["dailyStartMinute"].is<int>()) {
+    DEBUG_PRINTLN("[Config] Error: 'dailyStartMinute' missing or invalid.");
+    return false;
+  }
+  tmpStartMin = doc["dailyStartMinute"].as<int>();
+  if (tmpStartMin < 0 || tmpStartMin > 59) {
+    DEBUG_PRINTLN("[Config] Error: 'dailyStartMinute' out of range (0–59).");
     return false;
   }
 
-  if (doc["dailyStartMinute"].is<int>()) {
-    alarmStartMinute = doc["dailyStartMinute"].as<int>();
-    if (alarmStartMinute < 0 || alarmStartMinute > 59) {
-      DEBUG_PRINTLN(F("[Config] Error: 'dailyStartMinute' out of range (0-59)."));
-      return false;
-    }
-  } else {
-    DEBUG_PRINTLN(F("[Config] Error: 'dailyStartMinute' missing or invalid."));
+  // dailyStopHour
+  if (!doc.containsKey("dailyStopHour") || !doc["dailyStopHour"].is<int>()) {
+    DEBUG_PRINTLN("[Config] Error: 'dailyStopHour' missing or invalid.");
+    return false;
+  }
+  tmpStopHour = doc["dailyStopHour"].as<int>();
+  if (tmpStopHour < 0 || tmpStopHour > 23) {
+    DEBUG_PRINTLN("[Config] Error: 'dailyStopHour' out of range (0–23).");
     return false;
   }
 
-  if (doc["dailyStopHour"].is<int>()) {
-    alarmStopHour = doc["dailyStopHour"].as<int>();
-    if (alarmStopHour < 0 || alarmStopHour > 23) {
-      DEBUG_PRINTLN(F("[Config] Error: 'dailyStopHour' out of range (0-23)."));
-      return false;
-    }
-  } else {
-    DEBUG_PRINTLN(F("[Config] Error: 'dailyStopHour' missing or invalid."));
+  // dailyStopMinute
+  if (!doc.containsKey("dailyStopMinute") || !doc["dailyStopMinute"].is<int>()) {
+    DEBUG_PRINTLN("[Config] Error: 'dailyStopMinute' missing or invalid.");
+    return false;
+  }
+  tmpStopMin = doc["dailyStopMinute"].as<int>();
+  if (tmpStopMin < 0 || tmpStopMin > 59) {
+    DEBUG_PRINTLN("[Config] Error: 'dailyStopMinute' out of range (0–59).");
     return false;
   }
 
-  if (doc["dailyStopMinute"].is<int>()) {
-    alarmStopMinute = doc["dailyStopMinute"].as<int>();
-    if (alarmStopMinute < 0 || alarmStopMinute > 59) {
-      DEBUG_PRINTLN(F("[Config] Error: 'dailyStopMinute' out of range (0-59)."));
-      return false;
-    }
-  } else {
-    DEBUG_PRINTLN(F("[Config] Error: 'dailyStopMinute' missing or invalid."));
+  // rollingAwakeHours
+  if (!doc.containsKey("rollingAwakeHours") || !doc["rollingAwakeHours"].is<int>()) {
+    DEBUG_PRINTLN("[Config] Error: 'rollingAwakeHours' missing or invalid.");
     return false;
   }
+  tmpAwakeHours = doc["rollingAwakeHours"].as<int>();
 
-  // --------------------------
-  // Validate Rolling Mode Times (0-23 for hours, 0-59 for minutes)
-  // --------------------------
-  if (doc["rollingAwakeHours"].is<int>()) {
-    alarmAwakeHours = doc["rollingAwakeHours"].as<int>();
-  } else {
-    DEBUG_PRINTLN(F("[Config] Error: 'rollingAwakeHours' missing or invalid."));
+  // rollingAwakeMinutes
+  if (!doc.containsKey("rollingAwakeMinutes") || !doc["rollingAwakeMinutes"].is<int>()) {
+    DEBUG_PRINTLN("[Config] Error: 'rollingAwakeMinutes' missing or invalid.");
     return false;
   }
+  tmpAwakeMinutes = doc["rollingAwakeMinutes"].as<int>();
 
-  if (doc["rollingAwakeMinutes"].is<int>()) {
-    alarmAwakeMinutes = doc["rollingAwakeMinutes"].as<int>();
-  } else {
-    DEBUG_PRINTLN(F("[Config] Error: 'rollingAwakeMinutes' missing or invalid."));
+  // rollingSleepHours
+  if (!doc.containsKey("rollingSleepHours") || !doc["rollingSleepHours"].is<int>()) {
+    DEBUG_PRINTLN("[Config] Error: 'rollingSleepHours' missing or invalid.");
     return false;
   }
+  tmpSleepHours = doc["rollingSleepHours"].as<int>();
 
-  if (doc["rollingSleepHours"].is<int>()) {
-    alarmSleepHours = doc["rollingSleepHours"].as<int>();
-  } else {
-    DEBUG_PRINTLN(F("[Config] Error: 'rollingSleepHours' missing or invalid."));
+  // rollingSleepMinutes
+  if (!doc.containsKey("rollingSleepMinutes") || !doc["rollingSleepMinutes"].is<int>()) {
+    DEBUG_PRINTLN("[Config] Error: 'rollingSleepMinutes' missing or invalid.");
     return false;
   }
+  tmpSleepMinutes = doc["rollingSleepMinutes"].as<int>();
 
-  if (doc["rollingSleepMinutes"].is<int>()) {
-    alarmSleepMinutes = doc["rollingSleepMinutes"].as<int>();
-  } else {
-    DEBUG_PRINTLN(F("[Config] Error: 'rollingSleepMinutes' missing or invalid."));
+  // seasonalLoggingMode
+  if (!doc.containsKey("seasonalLoggingMode") || !doc["seasonalLoggingMode"].is<const char*>()) {
+    DEBUG_PRINTLN("[Config] Error: 'seasonalLoggingMode' missing or invalid.");
     return false;
   }
-
-  // --------------------------
-  // Validate Seasonal Mode
-  // --------------------------
-  const char* seasonalStr = doc["seasonalLoggingMode"].as<const char*>();
-  if (seasonalStr) {
-    if (strcmp(seasonalStr, "ENABLED") == 0) seasonalLoggingMode = ENABLED;
-    else if (strcmp(seasonalStr, "DISABLED") == 0) seasonalLoggingMode = DISABLED;
+  {
+    const char* sMode = doc["seasonalLoggingMode"].as<const char*>();
+    if (strcmp(sMode, "ENABLED") == 0) tmpSeasonalMode = ENABLED;
+    else if (strcmp(sMode, "DISABLED") == 0) tmpSeasonalMode = DISABLED;
     else {
-      DEBUG_PRINTLN(F("[Config] Error: Invalid 'seasonalLoggingMode'. Using default."));
+      DEBUG_PRINTLN("[Config] Error: 'seasonalLoggingMode' not recognized.");
       return false;
     }
-  } else {
-    DEBUG_PRINTLN(F("[Config] Error: 'seasonalLoggingMode' missing or invalid."));
+  }
+
+  // seasonalStartDay
+  if (!doc.containsKey("seasonalStartDay") || !doc["seasonalStartDay"].is<int>()) {
+    DEBUG_PRINTLN("[Config] Error: 'seasonalStartDay' missing or invalid.");
+    return false;
+  }
+  tmpSeasonalStartDay = doc["seasonalStartDay"].as<int>();
+  if (tmpSeasonalStartDay < 1 || tmpSeasonalStartDay > 31) {
+    DEBUG_PRINTLN("[Config] Error: 'seasonalStartDay' out of range (1–31).");
     return false;
   }
 
-  // --------------------------
-  // Validate Seasonal Window (Day: 1-31, Month: 1-12)
-  // --------------------------
-  if (doc["seasonalStartDay"].is<int>()) {
-    alarmSeasonalStartDay = doc["seasonalStartDay"].as<int>();
-    if (alarmSeasonalStartDay < 1 || alarmSeasonalStartDay > 31) {
-      DEBUG_PRINTLN(F("[Config] Error: 'seasonalStartDay' out of range (1-31)."));
-      return false;
-    }
-  } else {
-    DEBUG_PRINTLN(F("[Config] Error: 'seasonalStartDay' missing or invalid."));
+  // seasonalStartMonth
+  if (!doc.containsKey("seasonalStartMonth") || !doc["seasonalStartMonth"].is<int>()) {
+    DEBUG_PRINTLN("[Config] Error: 'seasonalStartMonth' missing or invalid.");
+    return false;
+  }
+  tmpSeasonalStartMonth = doc["seasonalStartMonth"].as<int>();
+  if (tmpSeasonalStartMonth < 1 || tmpSeasonalStartMonth > 12) {
+    DEBUG_PRINTLN("[Config] Error: 'seasonalStartMonth' out of range (1–12).");
     return false;
   }
 
-  if (doc["seasonalStartMonth"].is<int>()) {
-    alarmSeasonalStartMonth = doc["seasonalStartMonth"].as<int>();
-    if (alarmSeasonalStartMonth < 1 || alarmSeasonalStartMonth > 12) {
-      DEBUG_PRINTLN(F("[Config] Error: 'seasonalStartMonth' out of range (1-12)."));
-      return false;
-    }
-  } else {
-    DEBUG_PRINTLN(F("[Config] Error: 'seasonalStartMonth' missing or invalid."));
+  // seasonalEndDay
+  if (!doc.containsKey("seasonalEndDay") || !doc["seasonalEndDay"].is<int>()) {
+    DEBUG_PRINTLN("[Config] Error: 'seasonalEndDay' missing or invalid.");
+    return false;
+  }
+  tmpSeasonalEndDay = doc["seasonalEndDay"].as<int>();
+  if (tmpSeasonalEndDay < 1 || tmpSeasonalEndDay > 31) {
+    DEBUG_PRINTLN("[Config] Error: 'seasonalEndDay' out of range (1–31).");
     return false;
   }
 
-  if (doc["seasonalEndDay"].is<int>()) {
-    alarmSeasonalEndDay = doc["seasonalEndDay"].as<int>();
-    if (alarmSeasonalEndDay < 1 || alarmSeasonalEndDay > 31) {
-      DEBUG_PRINTLN(F("[Config] Error: 'seasonalEndDay' out of range (1-31)."));
-      return false;
-    }
-  } else {
-    DEBUG_PRINTLN(F("[Config] Error: 'seasonalEndDay' missing or invalid."));
+  // seasonalEndMonth
+  if (!doc.containsKey("seasonalEndMonth") || !doc["seasonalEndMonth"].is<int>()) {
+    DEBUG_PRINTLN("[Config] Error: 'seasonalEndMonth' missing or invalid.");
+    return false;
+  }
+  tmpSeasonalEndMonth = doc["seasonalEndMonth"].as<int>();
+  if (tmpSeasonalEndMonth < 1 || tmpSeasonalEndMonth > 12) {
+    DEBUG_PRINTLN("[Config] Error: 'seasonalEndMonth' out of range (1–12).");
     return false;
   }
 
-  if (doc["seasonalEndMonth"].is<int>()) {
-    alarmSeasonalEndMonth = doc["seasonalEndMonth"].as<int>();
-    if (alarmSeasonalEndMonth < 1 || alarmSeasonalEndMonth > 12) {
-      DEBUG_PRINTLN(F("[Config] Error: 'seasonalEndMonth' out of range (1-12)."));
-      return false;
-    }
-  } else {
-    DEBUG_PRINTLN(F("[Config] Error: 'seasonalEndMonth' missing or invalid."));
+  // gnssMeasurementRate
+  if (!doc.containsKey("gnssMeasurementRate") || !doc["gnssMeasurementRate"].is<int>()) {
+    DEBUG_PRINTLN("[Config] Error: 'gnssMeasurementRate' missing or invalid.");
+    return false;
+  }
+  tmpGnssRate = doc["gnssMeasurementRate"].as<int>();
+  if (tmpGnssRate < 250 || tmpGnssRate > 30000) {
+    DEBUG_PRINTLN("[Config] Error: 'gnssMeasurementRate' out of range (250–30000).");
     return false;
   }
 
-  // ----------------------------------------------------------------------------
-  // GNSS Satellite Signal Enables (0=DISABLE, 1=ENABLE)
-  // If the user provides them, override. Otherwise keep fallback.
-  // ----------------------------------------------------------------------------
-
-  // GPS
-  if (doc["gnssGpsEnabled"].is<int>()) {
+  // gnssGpsEnabled (optional, if present must be 0 or 1)
+  if (doc.containsKey("gnssGpsEnabled")) {
+    if (!doc["gnssGpsEnabled"].is<int>()) {
+      DEBUG_PRINTLN("[Config] Error: 'gnssGpsEnabled' must be 0 or 1.");
+      return false;
+    }
     int val = doc["gnssGpsEnabled"].as<int>();
-    if (val == 0 || val == 1) {
-      gnssGpsEnabled = (byte)val;
-    } else {
-      DEBUG_PRINTLN(F("[Config] Warning: 'gnssGpsEnabled' must be 0 or 1. Using fallback."));
+    if (val != 0 && val != 1) {
+      DEBUG_PRINTLN("[Config] Error: 'gnssGpsEnabled' must be 0 or 1.");
+      return false;
     }
+    tmpGpsEnabled = (byte)val;
   }
 
-  // GLONASS
-  if (doc["gnssGloEnabled"].is<int>()) {
+  // gnssGloEnabled
+  if (doc.containsKey("gnssGloEnabled")) {
+    if (!doc["gnssGloEnabled"].is<int>()) {
+      DEBUG_PRINTLN("[Config] Error: 'gnssGloEnabled' must be 0 or 1.");
+      return false;
+    }
     int val = doc["gnssGloEnabled"].as<int>();
-    if (val == 0 || val == 1) {
-      gnssGloEnabled = (byte)val;
-    } else {
-      DEBUG_PRINTLN(F("[Config] Warning: 'gnssGloEnabled' must be 0 or 1. Using fallback."));
+    if (val != 0 && val != 1) {
+      DEBUG_PRINTLN("[Config] Error: 'gnssGloEnabled' must be 0 or 1.");
+      return false;
     }
+    tmpGloEnabled = (byte)val;
   }
 
-  // Galileo
-  if (doc["gnssGalEnabled"].is<int>()) {
+  // gnssGalEnabled
+  if (doc.containsKey("gnssGalEnabled")) {
+    if (!doc["gnssGalEnabled"].is<int>()) {
+      DEBUG_PRINTLN("[Config] Error: 'gnssGalEnabled' must be 0 or 1.");
+      return false;
+    }
     int val = doc["gnssGalEnabled"].as<int>();
-    if (val == 0 || val == 1) {
-      gnssGalEnabled = (byte)val;
-    } else {
-      DEBUG_PRINTLN(F("[Config] Warning: 'gnssGalEnabled' must be 0 or 1. Using fallback."));
+    if (val != 0 && val != 1) {
+      DEBUG_PRINTLN("[Config] Error: 'gnssGalEnabled' must be 0 or 1.");
+      return false;
     }
+    tmpGalEnabled = (byte)val;
   }
 
-  // BeiDou
-  if (doc["gnssBdsEnabled"].is<int>()) {
+  // gnssBdsEnabled
+  if (doc.containsKey("gnssBdsEnabled")) {
+    if (!doc["gnssBdsEnabled"].is<int>()) {
+      DEBUG_PRINTLN("[Config] Error: 'gnssBdsEnabled' must be 0 or 1.");
+      return false;
+    }
     int val = doc["gnssBdsEnabled"].as<int>();
-    if (val == 0 || val == 1) {
-      gnssBdsEnabled = (byte)val;
-    } else {
-      DEBUG_PRINTLN(F("[Config] Warning: 'gnssBdsEnabled' must be 0 or 1. Using fallback."));
+    if (val != 0 && val != 1) {
+      DEBUG_PRINTLN("[Config] Error: 'gnssBdsEnabled' must be 0 or 1.");
+      return false;
     }
+    tmpBdsEnabled = (byte)val;
   }
 
-  // SBAS
-  if (doc["gnssSbasEnabled"].is<int>()) {
+  // gnssSbasEnabled
+  if (doc.containsKey("gnssSbasEnabled")) {
+    if (!doc["gnssSbasEnabled"].is<int>()) {
+      DEBUG_PRINTLN("[Config] Error: 'gnssSbasEnabled' must be 0 or 1.");
+      return false;
+    }
     int val = doc["gnssSbasEnabled"].as<int>();
-    if (val == 0 || val == 1) {
-      gnssSbasEnabled = (byte)val;
-    } else {
-      DEBUG_PRINTLN(F("[Config] Warning: 'gnssSbasEnabled' must be 0 or 1. Using fallback."));
+    if (val != 0 && val != 1) {
+      DEBUG_PRINTLN("[Config] Error: 'gnssSbasEnabled' must be 0 or 1.");
+      return false;
     }
+    tmpSbasEnabled = (byte)val;
   }
 
-  // QZSS
-  if (doc["gnssQzssEnabled"].is<int>()) {
+  // gnssQzssEnabled
+  if (doc.containsKey("gnssQzssEnabled")) {
+    if (!doc["gnssQzssEnabled"].is<int>()) {
+      DEBUG_PRINTLN("[Config] Error: 'gnssQzssEnabled' must be 0 or 1.");
+      return false;
+    }
     int val = doc["gnssQzssEnabled"].as<int>();
-    if (val == 0 || val == 1) {
-      gnssQzssEnabled = (byte)val;
-    } else {
-      DEBUG_PRINTLN(F("[Config] Warning: 'gnssQzssEnabled' must be 0 or 1. Using fallback."));
+    if (val != 0 && val != 1) {
+      DEBUG_PRINTLN("[Config] Error: 'gnssQzssEnabled' must be 0 or 1.");
+      return false;
     }
+    tmpQzssEnabled = (byte)val;
   }
 
+  // --------------------------
+  // If we reach here, it's all valid. Commit to globals:
+  // --------------------------
+  strncpy(uid, tmpUid, sizeof(uid) - 1);
+  uid[sizeof(uid) - 1] = '\0';
+
+  operationMode = tmpOpMode;
+  normalOperationMode = tmpOpMode;
+
+  alarmStartHour = tmpStartHour;
+  alarmStartMinute = tmpStartMin;
+  alarmStopHour = tmpStopHour;
+  alarmStopMinute = tmpStopMin;
+
+  alarmAwakeHours = tmpAwakeHours;
+  alarmAwakeMinutes = tmpAwakeMinutes;
+  alarmSleepHours = tmpSleepHours;
+  alarmSleepMinutes = tmpSleepMinutes;
+
+  seasonalLoggingMode = tmpSeasonalMode;
+  alarmSeasonalStartDay = tmpSeasonalStartDay;
+  alarmSeasonalStartMonth = tmpSeasonalStartMonth;
+  alarmSeasonalEndDay = tmpSeasonalEndDay;
+  alarmSeasonalEndMonth = tmpSeasonalEndMonth;
+
+  gnssMeasurementRate = tmpGnssRate;
+  gnssGpsEnabled = tmpGpsEnabled;
+  gnssGloEnabled = tmpGloEnabled;
+  gnssGalEnabled = tmpGalEnabled;
+  gnssBdsEnabled = tmpBdsEnabled;
+  gnssSbasEnabled = tmpSbasEnabled;
+  gnssQzssEnabled = tmpQzssEnabled;
+
+  DEBUG_PRINTLN("[microSD] Info: Configuration loaded and validated!");
   return true;
 }
 
