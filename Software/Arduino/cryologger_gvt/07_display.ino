@@ -182,6 +182,30 @@ void displayLoggingMode() {
 }
 
 // ----------------------------------------------------------------------------
+// Display seasonal logging mode status.
+// Shows whether seasonal logging mode is enabled or disabled.
+// ----------------------------------------------------------------------------
+void displaySeasonalMode() {
+  if (!online.oled) return;
+
+  enablePullups();
+  oled.erase();
+  oled.setCursor(0, 0);
+  oled.print("Seasonal Mode:");
+
+  oled.setCursor(0, 10);
+  if (seasonalLoggingMode == ENABLED) {
+    oled.print("Enabled");
+  } else {
+    oled.print("Disabled");
+  }
+
+  oled.display();
+  disablePullups();
+  myDelay(3000);
+}
+
+// ----------------------------------------------------------------------------
 // Display RTC sync status.
 // ----------------------------------------------------------------------------
 void displayRtcSyncStatus() {

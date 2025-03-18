@@ -340,7 +340,8 @@ void setup() {
   displayWelcome();
   printLoggingSettings();
   displayLoggingMode();
-  printGnssSettings();  // Print current GNSS settings
+  displaySeasonalMode();
+  printGnssSettings();
 
   // Configure additional devices and logging parameters.
   syncRtc();          // Synchronize RTC with GNSS.
