@@ -280,6 +280,28 @@ void displayErrorMicrosd2() {
 }
 
 // ----------------------------------------------------------------------------
+// Display JSON Configuration Status.
+// Shows whether the JSON config file was successfully loaded or if defaults were used.
+// ----------------------------------------------------------------------------
+void displayConfigStatus(bool jsonLoaded) {
+  if (!online.oled) return;
+
+  enablePullups();
+  oled.erase();
+  oled.setCursor(0, 0);
+
+  if (jsonLoaded) {
+    oled.print("Config: JSON loaded");
+  } else {
+    oled.print("Config: Defaults used");
+  }
+
+  oled.display();
+  disablePullups();
+  myDelay(3000);
+}
+
+// ----------------------------------------------------------------------------
 // Display microSD storage usage and file count on OLED.
 // ----------------------------------------------------------------------------
 void displaySdInfo() {
