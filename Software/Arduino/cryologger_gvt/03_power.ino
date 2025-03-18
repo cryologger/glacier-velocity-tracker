@@ -20,8 +20,8 @@ float readBattery() {
   float voltage = reading / 452.89;  // Apply ADC linear gain.
   voltage += -0.13;                  // Apply ADC linear offset.
 
-  //DEBUG_PRINT(F("[POWER] Info: ADC = ")); DEBUG_PRINTLN(reading);
-  //DEBUG_PRINT(F("[POWER] Info: Voltage = ")); DEBUG_PRINTLN(voltage);
+  //DEBUG_PRINT("[POWER] Info: ADC = "); DEBUG_PRINTLN(reading);
+  //DEBUG_PRINT("[POWER] Info: Voltage = "); DEBUG_PRINTLN(voltage);
 
   timer.voltage = micros() - startTime;  // Record execution time.
   return voltage;
@@ -143,7 +143,7 @@ void wakeUp() {
 // Reinitializes power for I2C devices, GNSS, OLED, and the microSD card.
 // ----------------------------------------------------------------------------
 void restorePeripherals() {
-  DEBUG_PRINTLN(F("[Power] Info: Restoring power to peripherals."));
+  DEBUG_PRINTLN("[Power] Info: Restoring power to peripherals.");
   qwiicPowerOn();       // Re-enable power to I2C devices.
   peripheralPowerOn();  // Re-enable power to peripherals.
   resetOled();          // Reset/reconfigure the OLED display.

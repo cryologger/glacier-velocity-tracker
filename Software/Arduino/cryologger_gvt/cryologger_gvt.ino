@@ -44,7 +44,7 @@ char uid[20] = "GVT_25_XXX";  // Default unique identifier (UID)
 // we switch to CONTINUOUS mode automatically.
 #define SEASONAL_LOGGING_MODE ENABLED  // ENABLED or DISABLED
 #define SEASONAL_START_DAY 1           // Seasonal logging start day
-#define SEASONAL_START_MONTH 7         // Seasonal logging start month
+#define SEASONAL_START_MONTH 6         // Seasonal logging start month
 #define SEASONAL_END_DAY 30            // Seasonal logging stop day
 #define SEASONAL_END_MONTH 9           // Seasonal logging stop month
 

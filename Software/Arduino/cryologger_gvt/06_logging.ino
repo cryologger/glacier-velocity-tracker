@@ -16,9 +16,10 @@
 // each log session is uniquely named and avoids overwriting previous logs.
 // ----------------------------------------------------------------------------
 void getLogFileName() {
-  sprintf(logFileName, "%s_20%02lu%02lu%02lu_%02lu%02lu%02lu.ubx",
-          uid, rtc.year, rtc.month, rtc.dayOfMonth,
-          rtc.hour, rtc.minute, rtc.seconds);
+  snprintf(logFileName, sizeof(logFileName),
+           "%s_20%02lu%02lu%02lu_%02lu%02lu%02lu.ubx",
+           uid, rtc.year, rtc.month, rtc.dayOfMonth,
+           rtc.hour, rtc.minute, rtc.seconds);
 
   DEBUG_PRINT("[Logging] Info: logFileName = ");
   DEBUG_PRINTLN(logFileName);
@@ -38,19 +39,25 @@ void createDebugFile() {
   // O_APPEND - Seeks to the end of the file prior to each write.
   // O_WRITE - Open the file for writing.
   if (!debugFile.open(debugFileName, O_CREAT | O_APPEND | O_WRITE)) {
-    DEBUG_PRINTLN(F("[Logging] Warning: Failed to create debug file."));
+    DEBUG_PRINTLN("[Logging] Warning: Failed to create debug file.");
     return;
   }
   DEBUG_PRINT("[Logging] Info: Created or opened debug file: ");
   DEBUG_PRINTLN(debugFileName);
 
   // Write CSV header if necessary.
-  debugFile.println(
-    "datetime,battery,online_microsd,online_gnss,online_log_gnss,online_log_debug,"
-    "timer_battery,timer_microsd,timer_gnss,timer_sync_rtc,timer_log_gnss,timer_log_debug,"
-    "rtc_sync_flag,rtc_drift,bytes_written,max_buffer_bytes,wdt_counter_max,"
-    "write_fail_counter,sync_fail_counter,close_fail_counter,debug_counter");
-
+  if (debugFile.size() == 0) {
+    debugFile.println(
+      "datetime,battery,online_microsd,online_gnss,online_log_gnss,online_log_debug,"
+      "timer_battery,timer_microsd,timer_gnss,timer_sync_rtc,timer_log_gnss,timer_log_debug,"
+      "rtc_sync_flag,rtc_drift,bytes_written,max_buffer_bytes,wdt_counter_max,"
+      "write_fail_counter,sync_fail_counter,close_fail_counter,debug_counter");
+    DEBUG_PRINT("[Logging] Info: Header written to ");
+    DEBUG_PRINTLN(debugFileName);
+  } else {
+    DEBUG_PRINT("[Logging] Info: Header already exists in ");
+    DEBUG_PRINTLN(debugFileName);
+  }
   // Sync the debug file to ensure integrity.
   if (!debugFile.sync()) {
     DEBUG_PRINTLN("[Logging] Warning: Failed to sync debug file.");
@@ -63,9 +70,9 @@ void createDebugFile() {
 
   // Close the debug file.
   if (!debugFile.close()) {
-    DEBUG_PRINTLN(F("[Logging] Warning: Failed to close debug file."));
+    DEBUG_PRINTLN("[Logging] Warning: Failed to close debug file.");
   } else {
-    DEBUG_PRINTLN(F("[Logging] Info: Closed debug file."));
+    DEBUG_PRINTLN("[Logging] Info: Closed debug file.");
   }
 }
 
@@ -85,9 +92,9 @@ void logDebug() {
   // Check if debug file is open.
   if (debugFile.isOpen()) {
     debugFile.close();
-    DEBUG_PRINTLN(F("[Logging] Info: Debug file closed before reopening."));
+    DEBUG_PRINTLN("[Logging] Info: Debug file closed before reopening.");
   } else {
-    DEBUG_PRINTLN(F("[Logging] Debug: Debug file is already closed."));
+    DEBUG_PRINTLN("[Logging] Debug: Debug file is already closed.");
   }
 
   // Open debug log file.

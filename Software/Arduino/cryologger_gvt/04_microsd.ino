@@ -17,7 +17,7 @@ void configureSd() {
 
   // Check if microSD is already initialized.
   if (online.microSd) {
-    DEBUG_PRINTLN(F("[microSD] Info: Already initialized."));
+    DEBUG_PRINTLN("[microSD] Info: Already initialized.");
     return;
   }
 
@@ -27,7 +27,7 @@ void configureSd() {
   for (int attempt = 1; attempt <= 2; attempt++) {
     if (sd.begin(PIN_SD_CS, SD_SCK_MHZ(24))) {
       online.microSd = true;  // Set flag.
-      DEBUG_PRINTLN(F("[microSD] Info: Initialized successfully."));
+      DEBUG_PRINTLN("[microSD] Info: Initialized successfully.");
       displaySuccess();  // Display OLED success message.
 
       // Get storage information
@@ -36,13 +36,13 @@ void configureSd() {
       break;  // Exit retry loop on success.
     }
 
-    DEBUG_PRINTLN(F("[microSD] Warning: Initialization failed. Retrying..."));
+    DEBUG_PRINTLN("[microSD] Warning: Initialization failed. Retrying...");
     displayErrorMicrosd1();  // Display OLED error message.
     myDelay(2000);           // Non-blocking delay before retry.
 
     // On second failure, log error and disable peripherals.
     if (attempt == 2) {
-      DEBUG_PRINTLN(F("[microSD] Error: Failed to initialize."));
+      DEBUG_PRINTLN("[microSD] Error: Failed to initialize.");
       online.microSd = false;  // Set flag.
 
       displayErrorMicrosd2();  // Display OLED failure message.
@@ -61,13 +61,13 @@ void configureSd() {
 // ---------------------------------------------------------------------------
 bool loadConfigFromSd() {
   if (!online.microSd) {
-    DEBUG_PRINTLN(F("[microSD] Warning: microSD not available."));
+    DEBUG_PRINTLN("[microSD] Warning: microSD not available.");
     return false;
   }
 
   FsFile configFile = sd.open("config.json", FILE_READ);
   if (!configFile) {
-    DEBUG_PRINTLN(F("[microSD] Warning: 'config.json' not found on SD. Using defaults."));
+    DEBUG_PRINTLN("[microSD] Warning: 'config.json' not found on SD. Using defaults.");
     return false;
   }
 
@@ -78,11 +78,11 @@ bool loadConfigFromSd() {
   configFile.close();
 
   if (err) {
-    DEBUG_PRINTLN(F("[microSD] Error: JSON parse failed. Using defaults."));
+    DEBUG_PRINTLN("[microSD] Error: JSON parse failed. Using defaults.");
     return false;
   }
 
-  DEBUG_PRINTLN(F("[microSD] Info: Validating config.json..."));
+  DEBUG_PRINTLN("[microSD] Info: Validating config.json...");
 
   // --------------------------
   // Declare local temp variables
@@ -410,7 +410,7 @@ void getSdSpaceInfo() {
   int32_t freeClusterCount = sd.freeClusterCount();
 
   if (freeClusterCount < 0) {
-    DEBUG_PRINTLN(F("[microSD] Error: freeClusterCount() failed!"));
+    DEBUG_PRINTLN("[microSD] Error: freeClusterCount() failed!");
     return;
   }
 
@@ -431,9 +431,9 @@ void getSdSpaceInfo() {
 
   // Print single-line debug message: "Used / Total MB"
   //DEBUG_PRINT_DEC(sdUsedMB, 1);
-  //DEBUG_PRINT(F(" / "));
+  //DEBUG_PRINT(" / ");
   //DEBUG_PRINT_DEC(sdTotalMB, 1);
-  //DEBUG_PRINTLN(F(" MB"));
+  //DEBUG_PRINTLN(" MB");
 }
 
 // ----------------------------------------------------------------------------
@@ -444,7 +444,7 @@ void getSdFileCount() {
   // Open the root directory
   FsFile root = sd.open("/");
   if (!root) {
-    DEBUG_PRINTLN(F("[microSD] Error: Failed to open root directory."));
+    DEBUG_PRINTLN("[microSD] Error: Failed to open root directory.");
     return;
   }
 
@@ -462,7 +462,7 @@ void getSdFileCount() {
   root.close();
 
   // Print debug message
-  //DEBUG_PRINT(F("[microSD] Info: File count = "));
+  //DEBUG_PRINT("[microSD] Info: File count = ");
   //DEBUG_PRINTLN(sdFileCount);
 }
 
@@ -474,7 +474,7 @@ void updateFileCreate(FsFile* dataFile) {
 
   if (!dataFile->timestamp(T_CREATE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth,
                            rtc.hour, rtc.minute, rtc.seconds)) {
-    DEBUG_PRINTLN(F("[microSD] Warning: Could not update file create timestamp."));
+    DEBUG_PRINTLN("[microSD] Warning: Could not update file create timestamp.");
   }
 }
 
@@ -486,11 +486,11 @@ void updateFileAccess(FsFile* dataFile) {
 
   if (!dataFile->timestamp(T_ACCESS, (rtc.year + 2000), rtc.month, rtc.dayOfMonth,
                            rtc.hour, rtc.minute, rtc.seconds)) {
-    DEBUG_PRINTLN(F("[microSD] Warning: Could not update file access timestamp."));
+    DEBUG_PRINTLN("[microSD] Warning: Could not update file access timestamp.");
   }
 
   if (!dataFile->timestamp(T_WRITE, (rtc.year + 2000), rtc.month, rtc.dayOfMonth,
                            rtc.hour, rtc.minute, rtc.seconds)) {
-    DEBUG_PRINTLN(F("[microSD] Warning: Could not update file write timestamp."));
+    DEBUG_PRINTLN("[microSD] Warning: Could not update file write timestamp.");
   }
 }

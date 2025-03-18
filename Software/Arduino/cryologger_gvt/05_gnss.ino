@@ -18,7 +18,7 @@ void configureGnss() {
 
   // Check if GNSS is already initialized
   if (online.gnss) {
-    DEBUG_PRINTLN(F("[GNSS] Info: GNSS already initialized."));
+    DEBUG_PRINTLN("[GNSS] Info: GNSS already initialized.");
     return;
   }
 
@@ -40,7 +40,7 @@ void configureGnss() {
     // Try to begin GNSS
     if (gnss.begin()) {
       online.gnss = true;
-      DEBUG_PRINTLN(F("[GNSS] Info: u-blox initialized."));
+      DEBUG_PRINTLN("[GNSS] Info: u-blox initialized.");
       displaySuccess();       // Display OLED success message
       fetchGnssModuleInfo();  // Get receiver firmware
       break;                  // Exit retry loop on success
@@ -49,12 +49,12 @@ void configureGnss() {
     // On failed attempt
     if (attempt < 2) {
       // First failure
-      DEBUG_PRINTLN(F("[GNSS] Warning: u-blox failed to initialize. Reattempting..."));
+      DEBUG_PRINTLN("[GNSS] Warning: u-blox failed to initialize. Reattempting...");
       displayFailure();
       myDelay(2000);  // Delay before retry
     } else {
       // Second failure
-      DEBUG_PRINTLN(F("[GNSS] Error: u-blox failed to initialize! Please check wiring."));
+      DEBUG_PRINTLN("[GNSS] Error: u-blox failed to initialize! Please check wiring.");
       displayFailure();
 
       online.gnss = false;
@@ -105,9 +105,9 @@ void configureGnssInterfaces() {
   response &= gnss.sendCfgValset();                            // Send packet
 
   if (response) {
-    DEBUG_PRINTLN(F("[GNSS] Info: Communication interfaces configured."));
+    DEBUG_PRINTLN("[GNSS] Info: Communication interfaces configured.");
   } else {
-    DEBUG_PRINTLN(F("[GNSS] Warning: Failed to configure GNSS communication interfaces!"));
+    DEBUG_PRINTLN("[GNSS] Warning: Failed to configure GNSS communication interfaces!");
   }
 }
 
@@ -128,9 +128,9 @@ void configureGnssSignals() {
   myDelay(2000);
 
   if (response) {
-    DEBUG_PRINTLN(F("[GNSS] Info: Satellite signals configured."));
+    DEBUG_PRINTLN("[GNSS] Info: Satellite signals configured.");
   } else {
-    DEBUG_PRINTLN(F("[GNSS] Warning: Failed to configure GNSS satellite signals!"));
+    DEBUG_PRINTLN("[GNSS] Warning: Failed to configure GNSS satellite signals!");
   }
 }
 
@@ -427,7 +427,7 @@ void logGnss() {
     }
   } else {
     online.logGnss = false;
-    DEBUG_PRINTLN("[GNSS] Warning: u-blox ofline!");
+    DEBUG_PRINTLN("[GNSS] Warning: u-blox offline!");
   }
 
   // Stop the loop timer.

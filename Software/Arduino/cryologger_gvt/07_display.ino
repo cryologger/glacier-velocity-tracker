@@ -17,18 +17,18 @@ void configureOled() {
   // Initialize OLED display
   if (!oled.begin()) {
     online.oled = false;
-    DEBUG_PRINTLN(F("[Display] Warning: OLED failed to initialize. Reattempting..."));
+    DEBUG_PRINTLN("[Display] Warning: OLED failed to initialize. Reattempting...");
 
     // Delay before retrying
     myDelay(2000);
 
     if (!oled.begin()) {
       online.oled = false;
-      DEBUG_PRINTLN(F("[Display] Warning: OLED initialization failed."));
+      DEBUG_PRINTLN("[Display] Warning: OLED initialization failed.");
     } else {
       lineTest();
       online.oled = true;
-      DEBUG_PRINTLN(F("[Display] Info: Initialized successfully."));
+      DEBUG_PRINTLN("[Display] Info: Initialized successfully.");
     }
   } else {
     lineTest();
