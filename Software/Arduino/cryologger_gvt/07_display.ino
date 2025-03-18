@@ -78,7 +78,7 @@ void displayWelcome() {
 // Display initialization message.
 // Shows which device is currently being initialized.
 // ----------------------------------------------------------------------------
-void displayInitialize(char *device) {
+void displayInitialize(const char *device) {
   if (!online.oled) return;
 
   enablePullups();
