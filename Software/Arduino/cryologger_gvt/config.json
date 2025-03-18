@@ -24,8 +24,7 @@
     "gnssSbasEnabled": "Enable or disable SBAS satellite augmentation (0-1).",
     "gnssQzssEnabled": "Enable or disable QZSS satellite constellation (0-1)."
   },
-
-  "uid": "GVT_25_TST", 
+  "uid": "GVT_25_TST",
   "operationMode": "DAILY",
   "seasonalLoggingMode": "ENABLED",
   "dailyStartHour": 19,

@@ -29,8 +29,8 @@ void configureWdt() {
   wdt.start();
 }
 // ----------------------------------------------------------------------------
-// Reset ("pet") the Watchdog Timer to prevent an unintended system reset. 
-// This function also resets the WDT flag and counter, while recording the 
+// Reset ("pet") the Watchdog Timer to prevent an unintended system reset.
+// This function also resets the WDT flag and counter, while recording the
 // service time for profiling purposes.
 // ----------------------------------------------------------------------------
 void petDog() {

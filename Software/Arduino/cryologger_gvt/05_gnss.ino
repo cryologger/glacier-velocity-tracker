@@ -24,7 +24,7 @@ void configureGnss() {
 
   // Disable internal I2C pull-ups before initialization
   disablePullups();
-  
+
   // Uncomment to enable GNSS debug messages on Serial.
   //gnss.enableDebugging();
 
@@ -185,12 +185,13 @@ void syncRtc() {
 
 #if DEBUG_GNSS
         char gnssBuffer[100];
-        sprintf(gnssBuffer, "%04u-%02d-%02d %02d:%02d:%02d.%03d,%ld,%ld,%d,%d,%d,%d,%d",
-                gnss.getYear(), gnss.getMonth(), gnss.getDay(),
-                gnss.getHour(), gnss.getMinute(), gnss.getSecond(), gnss.getMillisecond(),
-                gnss.getLatitude(), gnss.getLongitude(), gnss.getSIV(),
-                gnss.getPDOP(), gnss.getFixType(),
-                dateValidFlag, timeValidFlag);
+        snprintf(gnssBuffer, sizeof(gnssBuffer),
+                 "%04u-%02d-%02d %02d:%02d:%02d.%03d,%ld,%ld,%d,%d,%d,%d,%d",
+                 gnss.getYear(), gnss.getMonth(), gnss.getDay(),
+                 gnss.getHour(), gnss.getMinute(), gnss.getSecond(), gnss.getMillisecond(),
+                 gnss.getLatitude(), gnss.getLongitude(), gnss.getSIV(),
+                 gnss.getPDOP(), gnss.getFixType(),
+                 dateValidFlag, timeValidFlag);
         DEBUG_PRINT("[GNSS] Info: ");
         DEBUG_PRINTLN(gnssBuffer);
 

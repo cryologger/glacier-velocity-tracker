@@ -83,7 +83,8 @@ void displayInitialize(char *device) {
 
   enablePullups();
   char displayBuffer[24];
-  sprintf(displayBuffer, "Initialize %s...", device);
+  snprintf(displayBuffer, sizeof(displayBuffer),
+           "Initialize %s...", device);
   oled.erase();
   oled.text(0, 0, displayBuffer);
   oled.display();
@@ -157,19 +158,22 @@ void displayLoggingMode() {
   char displayBuffer2[32];
 
   if (operationMode == 1) {
-    sprintf(displayBuffer1, "Start time: %02d:%02d", alarmStartHour, alarmStartMinute);
-    sprintf(displayBuffer2, "End time: %02d:%02d", alarmStopHour, alarmStopMinute);
+    snprintf(displayBuffer1, sizeof(displayBuffer1),
+             "Start time: %02d:%02d", alarmStartHour, alarmStartMinute);
+    snprintf(displayBuffer2, sizeof(displayBuffer2),
+             "End time: %02d:%02d", alarmStopHour, alarmStopMinute);
     oled.print("Daily");
   } else if (operationMode == 2) {
-    sprintf(displayBuffer1, "Log: %02d hrs %02d min", alarmAwakeHours, alarmAwakeMinutes);
-    sprintf(displayBuffer2, "Sleep: %02d hrs %02d min", alarmSleepHours, alarmSleepMinutes);
+    snprintf(displayBuffer1, sizeof(displayBuffer1),
+             "Log: %02d hrs %02d min", alarmAwakeHours, alarmAwakeMinutes);
+    snprintf(displayBuffer2, sizeof(displayBuffer2),
+             "Sleep: %02d hrs %02d min", alarmSleepHours, alarmSleepMinutes);
     oled.print("Rolling");
   } else if (operationMode == 3) {
     oled.print("Continuous");
   } else {
     oled.print("Not specified!");
   }
-
   oled.text(0, 10, displayBuffer1);
   oled.text(0, 20, displayBuffer2);
   oled.display();
@@ -311,8 +315,10 @@ void displayScreen1() {
   char displayBuffer1[32];
   char displayBuffer2[32];
 
-  sprintf(displayBuffer1, "File size: %lu KB", bytesWritten / 1024);
-  sprintf(displayBuffer2, "Max buffer: %lu", maxBufferBytes);
+  snprintf(displayBuffer1, sizeof(displayBuffer1),
+           "File size: %lu KB", bytesWritten / 1024);
+  snprintf(displayBuffer2, sizeof(displayBuffer2),
+           "Max buffer: %lu", maxBufferBytes);
 
   oled.erase();
   oled.text(0, 0, logFileName);

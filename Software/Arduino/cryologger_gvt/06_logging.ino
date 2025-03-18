@@ -32,7 +32,7 @@ void getLogFileName() {
 // ----------------------------------------------------------------------------
 void createDebugFile() {
   // Generate debug log filename.
-  sprintf(debugFileName, "%s_debug.csv", uid);
+  snprintf(debugFileName, sizeof(debugFileName), "%s_debug.csv", uid);
 
   // Open or create the debug log file.
   // O_CREAT - Creates the file if it does not exist.
@@ -111,9 +111,10 @@ void logDebug() {
 
   // Create timestamp string.
   char dateTime[30];
-  sprintf(dateTime, "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
-          rtc.year, rtc.month, rtc.dayOfMonth,
-          rtc.hour, rtc.minute, rtc.seconds);
+  snprintf(dateTime, sizeof(dateTime),
+           "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
+           rtc.year, rtc.month, rtc.dayOfMonth,
+           rtc.hour, rtc.minute, rtc.seconds);
 
   // Log debugging information
   debugFile.print(dateTime);

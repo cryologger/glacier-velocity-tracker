@@ -158,9 +158,10 @@ void readRtc() {
 // ----------------------------------------------------------------------------
 void getDateTime() {
   rtc.getTime();
-  sprintf(dateTimeBuffer, "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
-          rtc.year, rtc.month, rtc.dayOfMonth,
-          rtc.hour, rtc.minute, rtc.seconds);
+  snprintf(dateTimeBuffer, sizeof(dateTimeBuffer),
+           "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
+           rtc.year, rtc.month, rtc.dayOfMonth,
+           rtc.hour, rtc.minute, rtc.seconds);
 }
 
 // ---------------------------------------------------------------------------
@@ -168,9 +169,10 @@ void getDateTime() {
 // ---------------------------------------------------------------------------
 void printDateTime() {
   rtc.getTime();
-  sprintf(dateTimeBuffer, "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
-          rtc.year, rtc.month, rtc.dayOfMonth,
-          rtc.hour, rtc.minute, rtc.seconds);
+  snprintf(dateTimeBuffer, sizeof(dateTimeBuffer),
+           "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
+           rtc.year, rtc.month, rtc.dayOfMonth,
+           rtc.hour, rtc.minute, rtc.seconds);
   DEBUG_PRINTLN(dateTimeBuffer);
 }
 
@@ -180,9 +182,10 @@ void printDateTime() {
 void printAlarm() {
   rtc.getAlarm();
   char alarmBuffer[30];
-  sprintf(alarmBuffer, "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
-          rtc.year, rtc.alarmMonth, rtc.alarmDayOfMonth,
-          rtc.alarmHour, rtc.alarmMinute, rtc.alarmSeconds);
+  snprintf(alarmBuffer, sizeof(alarmBuffer),
+           "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
+           rtc.year, rtc.alarmMonth, rtc.alarmDayOfMonth,
+           rtc.alarmHour, rtc.alarmMinute, rtc.alarmSeconds);
   DEBUG_PRINTLN(alarmBuffer);
 }
 
