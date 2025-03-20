@@ -1,34 +1,51 @@
-// Configure the Watchdog Timer (WDT)
-void configureWdt()
-{
-  /*
-    Watchdog Timer (WDT) Clock Divider Selections
-    See: Apollo3 Blue Datasheet Section 15/Table 1002 for more information
-    WDT_OFF     = Low Power Mode. This setting disables the watchdog timer
-    WDT_128HZ   = 28 Hz LFRC clock
-    WDT_16HZ    = 16 Hz LFRC clock
-    WDT_1HZ     = 1 Hz LFRC clock
-    WDT_1_16HZ  = 1/16th Hz LFRC clock
-  */
-  // Set the WDT interrupt and reset periods
-  //wdt.configure(WDT_16HZ, 128, 240); // 16 Hz clock, 10-second interrupt period, 15-second reset period
-  wdt.configure(WDT_1HZ, 64, 128); // 1 Hz clock, 64-second interrupt period, 128-second reset period
+/*
+  Watchdog Timer (WDT) Module
 
-  // Start the WDT
+  This module configures the Watchdog Timer to ensure system reliability by 
+  resetting the microcontroller if the main loop becomes unresponsive. 
+  It sets the WDT's clock divider, interrupt, and reset periods.
+
+  ----------------------------------------------------------------------------
+  Watchdog Clock Divider Selections:
+  ----------------------------------------------------------------------------
+  WDT_OFF     : Disables the watchdog timer (Low Power Mode)
+  WDT_128HZ   : 128 Hz LFRC clock
+  WDT_16HZ    : 16 Hz LFRC clock
+  WDT_1HZ     : 1 Hz LFRC clock
+  WDT_1_16HZ  : 1/16 Hz LFRC clock
+*/
+
+// ----------------------------------------------------------------------------
+// Configure and enable the Watchdog Timer.
+// ----------------------------------------------------------------------------
+void configureWdt() {
+  // Configure the Watchdog Timer (WDT)
+  // Using a 1 Hz clock, 64-second interrupt period, and 128-second reset period.
+  // (Alternative configuration is commented out below)
+  // wdt.configure(WDT_16HZ, 128, 240); // 16 Hz clock: 10-sec interrupt, 15-sec reset period
+  wdt.configure(WDT_1HZ, 64, 128);
+
+  // Start the Watchdog Timer.
   wdt.start();
 }
-
-// Reset the WDT
-void petDog()
-{
-  // Start the loop timer
+// ----------------------------------------------------------------------------
+// Reset ("pet") the Watchdog Timer to prevent an unintended system reset.
+// This function also resets the WDT flag and counter, while recording the
+// service time for profiling purposes.
+// ----------------------------------------------------------------------------
+void petDog() {
+  // Record the start time for profiling the WDT service routine.
   unsigned long loopStartTime = micros();
 
-  wdt.restart(); // Restart the WDT
-  //DEBUG_PRINT("Watchdog interrupt: "); DEBUG_PRINTLN(wdtCounter);
-  wdtFlag = false; // Clear WDT flag
-  wdtCounter = 0; // Reset WDT interrupt counter
+  // Restart the WDT timer.
+  wdt.restart();
 
-  // Stop the loop timer
+  // DEBUG_PRINT("[WDT] Info: Watchdog interrupt = "); DEBUG_PRINTLN(wdtCounter);
+
+  // Clear the WDT flag and reset the interrupt counter.
+  wdtFlag = false;
+  wdtCounter = 0;
+
+  // Record the time taken to service the WDT.
   timer.wdt = micros() - loopStartTime;
 }

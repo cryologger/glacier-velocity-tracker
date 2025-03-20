@@ -1,66 +1,78 @@
-float readVoltage()
-{
-  // Start loop timer
-  unsigned long loopStartTime = micros();
+/*
+  Power Management Module
 
-  // Measure voltage across 150/100 kOhm op-amp scaling circuit and 10/1 MOhm resistor divider
+  This module handles battery voltage measurement, I2C pull-up configuration,
+  and deep sleep management. It includes routines to shut down peripherals,
+  disable leakage sources, and reinitialize the system upon wake-up.
+*/
+
+// ----------------------------------------------------------------------------
+// Reads the ADC voltage from a battery voltage divider and applies
+// a gain/offset correction. Returns the voltage in volts.
+// ----------------------------------------------------------------------------
+float readBattery() {
+  unsigned long startTime = micros();  // Record function start time.
+
+  // Measure the ADC reading from the battery voltage divider on A0.
   reading = analogRead(A0);
-  float voltage = reading / 452.89; // Apply ADC linear gain
-  voltage += -0.13; // Apply ADC linear offset
-  //DEBUG_PRINT("ADC: "); DEBUG_PRINTLN(reading);
-  //DEBUG_PRINT("Voltage: "); DEBUG_PRINTLN(voltage);
-  return voltage;
 
-  // Stop loop timer
-  timer.voltage = micros() - loopStartTime;
+  // Convert ADC reading to voltage using the scaling factor and offset.
+  float voltage = reading / 452.89;  // Apply ADC linear gain.
+  voltage += -0.13;                  // Apply ADC linear offset.
+
+  //DEBUG_PRINT("[POWER] Info: ADC = "); DEBUG_PRINTLN(reading);
+  //DEBUG_PRINT("[POWER] Info: Voltage = "); DEBUG_PRINTLN(voltage);
+
+  timer.voltage = micros() - startTime;  // Record execution time.
+  return voltage;
 }
 
-// Enable internal I2C pull-ups to help communicate with I2C devices
-void enablePullups()
-{
+// Enable internal I2C pull-ups to maintain stable communication
+// with connected I2C devices.
+void enablePullups() {
   Wire.setPullups(1);
 }
 
-// Disable internal I2C pull-ups to help reduce bus errors
-void disablePullups()
-{
+// Disable internal I2C pull-ups to reduce leakage and potential bus errors.
+void disablePullups() {
   Wire.setPullups(0);
 }
 
-// Enter deep sleep
-void goToSleep()
-{
-  // Clear flag
-  firstTimeFlag = false;
+// ----------------------------------------------------------------------------
+// Enter deep sleep mode to conserve power.
+// Disables peripherals (I2C, SPI, ADC, etc.), turns off unused GPIO pads,
+// powers down external devices, and configures the system to wake up on an RTC
+// or WDT interrupt.
+// ----------------------------------------------------------------------------
+void goToSleep() {
+  firstTimeFlag = false;  // Clear the first-time flag.
 
-  // Skip deep sleep if logging 24 hours/day
-  if (operationMode == 3)
-  {
-    //alarmFlag = true; // Set flag
-    DEBUG_PRINTLN("Info - Continuous mode. Skipping sleep...");
+  // Skip deep sleep if operating in continuous logging mode.
+  if (operationMode == CONTINUOUS) {
+    DEBUG_PRINTLN("[POWER] Info: System is in continuous mode. Skipping sleep...");
     return;
-  }
-  else
-  {
-    alarmFlag = false; // Clear flag
-    //DEBUG_PRINTLN("Info - Entering deep sleep...");
-    //DEBUG_PRINT("Info - Sleeping until "); printAlarm();
+  } else {
+    alarmFlag = false;  // Ensure the alarm flag is cleared.
   }
 
-  // Display OLED messages(s)
+  // Display deep sleep message on OLED.
   displayDeepSleep();
 
 #if DEBUG
-  Serial.end();         // Close Serial port
+  Serial.flush();  // Flush the serial port.
+  Serial.end();    // Close Serial port to save power.
 #endif
-  disablePullups();     // Disable internal pull-ups to reduce leakage
-  Wire.end();           // Disable I2C
-  SPI.end();            // Disable SPI
-  power_adc_disable();  // Disable ADC
 
-  digitalWrite(LED_BUILTIN, LOW); // Turn off LED
+  // Disable peripherals and reduce leakage.
+  disablePullups();
+  Wire.end();
+  SPI.end();
+  power_adc_disable();
 
-  // Force peripherals off
+  // Turn off the built-in LED.
+  digitalWrite(LED_BUILTIN, LOW);
+
+  // Disable hardware peripherals.
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_IOM0);
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_IOM1);
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_IOM2);
@@ -71,121 +83,124 @@ void goToSleep()
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART0);
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART1);
 
-  // Disable all pads except G1 (33), G2 (34), A0 (??) and LED_BUILTIN (19)
-  for (int x = 0; x < 50; x++)
-  {
-    if ((x != 33) && (x != 34) && (x != A0) && (x != 19))
-    {
-      am_hal_gpio_pinconfig(x, g_AM_HAL_GPIO_DISABLE);
+  // Disable all GPIO pads except: G1 (33), G2 (34), A0, LED_BUILTIN (19).
+  for (int pin = 0; pin < 50; pin++) {
+    if ((pin != 33) && (pin != 34) && (pin != A0) && (pin != 19)) {
+      am_hal_gpio_pinconfig(pin, g_AM_HAL_GPIO_DISABLE);
     }
   }
 
-  // Disable power to Qwiic connector
+  // Power off external devices.
   qwiicPowerOff();
-
-  // Disable power to peripherals
   peripheralPowerOff();
 
-  // Clear online/offline flags
+  // Clear all online status flags.
   online.gnss = false;
   online.microSd = false;
   online.oled = false;
   online.logGnss = false;
   online.logDebug = false;
 
-  // Power down flash, SRAM, cache
-  am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_ALL); // Power down all memory during deepsleep
-  am_hal_pwrctrl_memory_deepsleep_retain(AM_HAL_PWRCTRL_MEM_SRAM_384K); // Retain all SRAM
+  // Configure memory power settings for deep sleep.
+  am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_ALL);
+  am_hal_pwrctrl_memory_deepsleep_retain(AM_HAL_PWRCTRL_MEM_SRAM_384K);
 
-  // Keep the 32kHz clock running for RTC
+  // Configure system timer for RTC.
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
   am_hal_stimer_config(AM_HAL_STIMER_XTAL_32KHZ);
 
-  // Enter deep sleep
+  // Enter deep sleep.
   am_hal_sysctrl_sleep(AM_HAL_SYSCTRL_SLEEP_DEEP);
 
   /*
-     Processor sleeps and awaits RTC or WDT ISR
+     Processor now sleeps and awaits an RTC or WDT interrupt.
   */
 
-  // Wake up
-  wakeUp();
+  wakeUp();  // Reinitialize system upon waking.
 }
 
-// Wake from deep sleep
-void wakeUp()
-{
-  // Return to using the main clock
+// ----------------------------------------------------------------------------
+// Wake up from deep sleep and reinitialize system components.
+// ----------------------------------------------------------------------------
+void wakeUp() {
+  // Reconfigure system timer to use the high-frequency clock.
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
   am_hal_stimer_config(AM_HAL_STIMER_HFRC_3MHZ);
 
-  ap3_adc_setup();        // Enable ADC
-  Wire.begin();           // Enable I2C
-  Wire.setClock(400000);  // Set I2C clock speed to 400 kHz
-  SPI.begin();            // Enable SPI
+  // Re-enable ADC, I2C, and SPI.
+  ap3_adc_setup();
+  Wire.begin();
+  Wire.setClock(400000);
+  SPI.begin();
 
 #if DEBUG
-  Serial.begin(115200);   // Open Serial port
+  Serial.begin(115200);  // Reopen Serial for debugging.
 #endif
-
 }
 
-// Enable power to Qwiic connector
-void qwiicPowerOn()
-{
+// ----------------------------------------------------------------------------
+// Restore power to all necessary peripherals.
+// Reinitializes power for I2C devices, GNSS, OLED, and the microSD card.
+// ----------------------------------------------------------------------------
+void restorePeripherals() {
+  DEBUG_PRINTLN("[Power] Info: Restoring power to peripherals.");
+  qwiicPowerOn();       // Re-enable power to I2C devices.
+  peripheralPowerOn();  // Re-enable power to peripherals.
+  resetOled();          // Reset/reconfigure the OLED display.
+  configureSd();        // Reinitialize the microSD card.
+  configureGnss();      // Reinitialize the GNSS receiver.
+}
+
+// ----------------------------------------------------------------------------
+// Power control for the Qwiic connector.
+// ----------------------------------------------------------------------------
+void qwiicPowerOn() {
   digitalWrite(PIN_QWIIC_POWER, HIGH);
-  myDelay(2500); // Non-blocking delay to allow Qwiic devices time to power up
+  myDelay(2500);  // Non-blocking delay to allow Qwiic devices time to power up.
 }
 
-// Disable power to Qwiic connector
-void qwiicPowerOff()
-{
+void qwiicPowerOff() {
   digitalWrite(PIN_QWIIC_POWER, LOW);
 }
 
-// Enable power to microSD and peripherals
-void peripheralPowerOn()
-{
+// ----------------------------------------------------------------------------
+// Power control for microSD and other peripherals.
+// ----------------------------------------------------------------------------
+void peripheralPowerOn() {
   digitalWrite(PIN_MICROSD_POWER, HIGH);
-  myDelay(250); // Non-blocking delay to allow Qwiic devices time to power up
+  myDelay(250);  // Non-blocking delay to allow peripherals time to power up.
 }
 
-// Disable power to microSD and peripherals
-void peripheralPowerOff()
-{
-  myDelay(250); // Non-blocking delay
+void peripheralPowerOff() {
+  myDelay(250);
   digitalWrite(PIN_MICROSD_POWER, LOW);
 }
 
-// Non-blocking blink LED (https://forum.arduino.cc/index.php?topic=503368.0)
-void blinkLed(byte ledFlashes, unsigned int ledDelay)
-{
+// ----------------------------------------------------------------------------
+// Non-blocking LED blink routine.
+// Flashes the built-in LED a specified number of times with the given delay.
+// ----------------------------------------------------------------------------
+void blinkLed(byte ledFlashes, unsigned int ledDelay) {
   byte i = 0;
-  while (i < ledFlashes * 2)
-  {
+  while (i < ledFlashes * 2) {
     unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis >= ledDelay)
-    {
+    if (currentMillis - previousMillis >= ledDelay) {
       digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
       previousMillis = currentMillis;
       i++;
     }
   }
-  // Turn off LED
-  digitalWrite(LED_BUILTIN, LOW);
+  digitalWrite(LED_BUILTIN, LOW);  // Ensure LED is off after blinking.
 }
 
-// Non-blocking delay (ms: duration)
-// https://arduino.stackexchange.com/questions/12587/how-can-i-handle-the-millis-rollover
-void myDelay(unsigned long ms)
-{
-  unsigned long start = millis();         // Start: timestamp
-  for (;;)
-  {
-    petDog();                             // Reset WDT
-    unsigned long now = millis();         // Now: timestamp
-    unsigned long elapsed = now - start;  // Elapsed: duration
-    if (elapsed >= ms)                    // Comparing durations: OK
-      return;
+// ----------------------------------------------------------------------------
+// Non-blocking delay function that continues to service the Watchdog Timer.
+// This function delays for a specified duration (in milliseconds) while
+// calling petDog() to prevent unintended WDT resets.
+// ----------------------------------------------------------------------------
+void myDelay(unsigned long ms) {
+  unsigned long start = millis();
+  while (millis() - start < ms) {
+    petDog();  // Service the WDT during the delay.
   }
 }
