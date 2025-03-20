@@ -170,7 +170,7 @@ void syncRtc() {
 
     DEBUG_PRINTLN("[GNSS] Info: Attempting to sync RTC with GNSS...");
 
-    // Attempt to acquire a valid GNSS position fix for up to 5 minutes
+    // Attempt to acquire a valid GNSS position fix for the duration specified in gnssTimeout
     while (!rtcSyncFlag && millis() - loopStartTime < gnssTimeout * 1000UL) {
       petDog();  // Reset WDT
 

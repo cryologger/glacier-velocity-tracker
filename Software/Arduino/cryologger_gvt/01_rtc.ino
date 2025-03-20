@@ -218,7 +218,7 @@ bool checkDate() {
 
 // ----------------------------------------------------------------------------
 // Determines if the given RTC year offset from 2000 is a leap year.
-// Example: If rtc.year == 25, then it's 2025, which is a leap year.
+// Example: If rtc.year == 24, then it's 2024, which is a leap year.
 // ----------------------------------------------------------------------------
 bool isLeapYear(int rtcYear) {
   int fullYear = 2000 + rtcYear;
