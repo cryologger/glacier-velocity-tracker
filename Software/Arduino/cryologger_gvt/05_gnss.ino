@@ -207,7 +207,7 @@ void syncRtc() {
           fixCounter++;
 
           // Collect a minimum number of valid positions before synchronizing RTC with GNSS
-          if (fixCounter >= 5) {
+          if (fixCounter >= 10) {
             unsigned long rtcEpoch = rtc.getEpoch();        // Get RTC epoch time
             unsigned long gnssEpoch = gnss.getUnixEpoch();  // Get GNSS epoch time
             rtc.setEpoch(gnssEpoch);                        // Set RTC date and time
