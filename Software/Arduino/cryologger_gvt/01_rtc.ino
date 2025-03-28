@@ -131,7 +131,7 @@ void setSleepAlarm() {
 
     case CONTINUOUS:
       // In continuous mode, we don't go to sleep at all.
-      DEBUG_PRINT("[RTC] Info: Continuous mode. No sleep alarm.");
+      DEBUG_PRINTLN("[RTC] Info: Continuous mode. No sleep alarm.");
       alarmFlag = true;  // signals immediate handling
       return;
   }

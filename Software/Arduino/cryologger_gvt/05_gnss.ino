@@ -163,6 +163,9 @@ void syncRtc() {
     // Disable internal I2C pull-ups
     disablePullups();
 
+    // Temporarily set GNSS measurement rate to 1 Hz (1000 ms)
+    gnss.setMeasurementRate(1000);
+
     // Clear flag
     rtcSyncFlag = false;
     rtcDrift = 0;
@@ -239,6 +242,9 @@ void syncRtc() {
     DEBUG_PRINTLN("[GNSS] Warning: GNSS offline!");
     rtcSyncFlag = false;  // Clear flag
   }
+
+  // Restore original GNSS measurement rate from configuration
+  gnss.setMeasurementRate(gnssMeasurementRate);
 
   // Stop the loop timer
   timer.syncRtc = millis() - loopStartTime;
