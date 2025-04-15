@@ -14,27 +14,27 @@
 // before shutting down power to conserve energy.
 // ----------------------------------------------------------------------------
 void configureGnss() {
-  unsigned long loopStartTime = millis();  // Start loop timer.
+  unsigned long loopStartTime = millis();  // Start loop timer
 
-  // Check if GNSS is already initialized
+  // Check if GNSS is already initialized.
   if (online.gnss) {
     DEBUG_PRINTLN("[GNSS] Info: GNSS already initialized.");
     return;
   }
 
-  // Disable internal I2C pull-ups before initialization
+  // Disable internal I2C pull-ups before initialization.
   disablePullups();
 
   // Uncomment to enable GNSS debug messages on Serial.
   //gnss.enableDebugging();
 
-  // Display OLED initialization message
+  // Display OLED initialization message.
   displayInitialize("GNSS");
 
-  // Allocate sufficient RAM to store RAWX messages (>2 KB)
+  // Allocate sufficient RAM to store RAWX messages (>2 KB).
   gnss.setFileBufferSize(fileBufferSize);  // Must be called before gnss.begin()
 
-  // Attempt GNSS initialization with a maximum of 2 retries
+  // Attempt GNSS initialization with a maximum of 2 retries.
   for (int attempt = 1; attempt <= 2; attempt++) {
 
     // Try to begin GNSS
@@ -152,7 +152,7 @@ void fetchGnssModuleInfo() {
 }
 
 // ----------------------------------------------------------------------------
-// Acquire valid GNSS fix and sync RTC
+// Acquire valid GNSS fix and sync RTC.
 // ----------------------------------------------------------------------------
 void syncRtc() {
   // Start loop timer
@@ -251,7 +251,7 @@ void syncRtc() {
 }
 
 // ----------------------------------------------------------------------------
-// Log UBX-RXM-RAWX/SFRBX data
+// Log UBX-RXM-RAWX/SFRBX data.
 // ----------------------------------------------------------------------------
 void logGnss() {
   // Start loop timer
@@ -261,10 +261,10 @@ void logGnss() {
   byte displayCounter = 0;
   bool displayToggle = false;
 
-  // Record logging start time
+  // Record logging start time.
   logStartTime = rtc.getEpoch();
 
-  // Check if microSD and u-blox GNSS initialized successfully
+  // Check if microSD and u-blox GNSS initialized successfully.
   if (online.microSd && online.gnss) {
     // Disable internal I2C pull-ups
     disablePullups();
@@ -283,10 +283,10 @@ void logGnss() {
       DEBUG_PRINTLN(logFileName);
     }
 
-    // Update file create timestamp
+    // Update file create timestamp.
     updateFileCreate(&logFile);
 
-    // Reset counters
+    // Reset counters.
     bytesWritten = 0;
     writeFailCounter = 0;
     syncFailCounter = 0;
@@ -297,10 +297,9 @@ void logGnss() {
 
     DEBUG_PRINTLN("[GNSS] Info: Starting logging...");
 
-    // Log data until logging alarm triggers
+    // Log data until logging alarm triggers.
     while (!alarmFlag) {
-      // Reset watchdog
-      petDog();
+      petDog();  // Reset watchdog
 
       // Check for the arrival of new data and process it
       gnss.checkUblox();

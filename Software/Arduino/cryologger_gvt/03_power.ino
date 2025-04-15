@@ -194,13 +194,13 @@ void blinkLed(byte ledFlashes, unsigned int ledDelay) {
 }
 
 // ----------------------------------------------------------------------------
-// Non-blocking delay function that continues to service the Watchdog Timer.
+// Non-blocking delay function that continues to reset the Watchdog Timer.
 // This function delays for a specified duration (in milliseconds) while
 // calling petDog() to prevent unintended WDT resets.
 // ----------------------------------------------------------------------------
 void myDelay(unsigned long ms) {
   unsigned long start = millis();
   while (millis() - start < ms) {
-    petDog();  // Service the WDT during the delay.
+    petDog();  // Reset the WDT during the delay.
   }
 }

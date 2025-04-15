@@ -7,7 +7,7 @@
 */
 
 // ----------------------------------------------------------------------------
-// Print a horizontal separator line.
+// Print a horizontal separator line (80 dashes).
 // ----------------------------------------------------------------------------
 void printLine() {
   for (byte i = 0; i < 80; i++) {
@@ -17,7 +17,7 @@ void printLine() {
 }
 
 // ----------------------------------------------------------------------------
-// Print tab spacing.
+// Print tab spacing. Each tab is displayed `_times` times.
 // ----------------------------------------------------------------------------
 void printTab(byte _times) {
   for (byte i = 0; i < _times; i++) {

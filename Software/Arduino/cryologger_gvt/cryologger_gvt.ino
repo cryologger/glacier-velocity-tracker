@@ -83,9 +83,9 @@ char uid[20] = "GVT_25_XXX";  // Default unique identifier (UID)
 // ----------------------------------------------------------------------------
 // Debugging Macros
 // ----------------------------------------------------------------------------
-#define DEBUG true       // Enable Serial Monitor debug messages
-#define DEBUG_GNSS true  // Enable Serial Monitor GNSS positional output
-#define OLED true        // Enable OLED display messages
+#define DEBUG true       // Enable Serial Monitor debug messages.
+#define DEBUG_GNSS true  // Enable Serial Monitor GNSS positional output.
+#define OLED true        // Enable OLED display messages.
 
 #if DEBUG
 #define DEBUG_PRINT(x) Serial.print(x)
@@ -141,7 +141,7 @@ enum SeasonalMode : bool {
 // The user-chosen “normal” operation mode (DAILY/ROLLING/CONTINUOUS)
 OperationMode operationMode = (OperationMode)OPERATION_MODE;
 
-// We store a copy of that mode so we can revert after seasonal
+// Store a copy of that mode so we can revert after seasonal
 OperationMode normalOperationMode = operationMode;
 
 // The seasonal override (ENABLED or DISABLED)
@@ -259,14 +259,14 @@ struct Timer {
 } timer;
 
 // ----------------------------------------------------------------------------
-// Setup Function
+// Setup
 // ----------------------------------------------------------------------------
 void setup() {
 
 #if DEBUG
-  Serial.begin(115200);  // Initialize Serial for debugging.
-  // while (!Serial);     // Optionally wait for Serial Monitor connection.
-  blinkLed(2, 1000);  // Blink LED to signal startup.
+  Serial.begin(115200);  // Initialize Serial for debugging
+  // while (!Serial);     // Optionally wait for Serial Monitor connection
+  blinkLed(2, 1000);  // Blink LED to signal startup
 #endif
 
   // Initialize pin modes for peripheral power control and LED indicator.
@@ -279,13 +279,12 @@ void setup() {
   peripheralPowerOn();
 
   // Initialize communication protocols.
-  Wire.begin();              // Start I2C communications.
-  Wire.setClock(400000);     // Set I2C clock to 400 kHz.
-  SPI.begin();               // Start SPI communications.
-  analogReadResolution(14);  // Set ADC resolution to 14 bits.
+  Wire.begin();              // Start I2C communications
+  Wire.setClock(400000);     // Set I2C clock to 400 kHz
+  SPI.begin();               // Start SPI communications
+  analogReadResolution(14);  // Set ADC resolution to 14 bits
 
   // Output startup information.
-
   DEBUG_PRINTLN();
   printLine();
   DEBUG_PRINTLN("Cryologger - Glacier Velocity Tracker");
@@ -297,7 +296,7 @@ void setup() {
   configureOled();  // Set up the OLED display.
   configureWdt();   // Set up Watchdog Timer.
   configureSd();    // Set up microSD card.
-  displaySdInfo();  //
+  displaySdInfo();
 
   // Load configuration from microSD card.
   if (loadConfigFromSd()) {
