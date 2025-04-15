@@ -1,6 +1,8 @@
 # u-blox ZED-F9P - Firmware Upgrade
 This guide provides step-by-step instructions on how to check and upgrade the firmware of the u-blox ZED-F9P GNSS receiver used in the Cryologger glacier velocity tracker (GVT).
 
+Update (2025-04-15): This documentation is currently outdated. Starting from version 3.x, the current firmware version is automatically displayed in the Serial Monitor output. Therefore, Steps 1 and 2 are no longer necessary and can be skipped.
+
 ## Step 1: Determine firmware version
 The current version of firmware on the u-blox module can be determined by uploading a new program to the Cryologger. The steps are as follows:
 * Ensure the Arduino IDE v1.8.19 and SparkFun GNSS v3 library are installed (see Steps 1-4 in [INSTALLATION.md](/Documentation/INSTALLATION.md)
@@ -36,8 +38,8 @@ Unit has now been factory reset. Freezing...
 Upgrading of the u-blox firmware will be accomplished using the SparkFun RTK u-blox Firmware Update Tool.
 * Download the SparkFun RTK u-blox Firmware Update Tool:
   * https://github.com/sparkfun/SparkFun_RTK_Firmware_Binaries/raw/main/u-blox_Update_GUI/Windows_exe/RTK_u-blox_Update_GUI.exe
-* Download the most recent u-blox ZED-F9P firmware (v1.32):
-  * https://content.u-blox.com/sites/default/files/2022-05/UBX_F9_100_HPG132.df73486d99374142f3aabf79b7178f48.bin
+* Download the most recent u-blox ZED-F9P firmware (v1.51):
+  * https://content.u-blox.com/sites/default/files/2024-11/UBX_F9_100_HPG151_ZED_F9P.6c43b30ccfed539322eccedfb96ad933.bin
 * Run the SparkFun RTK u-blox Firmware Update Tool
 * Connect directly to u-blox ZED-F9P USB-C port 
 * Confirm the COM port in use (i.e., using Device Manager)
