@@ -50,7 +50,7 @@ char uid[20] = "GVT_25_XXX";  // Default unique identifier (UID)
 #define SEASONAL_END_MONTH 9           // Seasonal logging stop month
 
 // GNSS Satellite Signal configuration (0=DISABLE, 1=ENABLE)
-#define GNSS_MEASUREMENT_RATE 15000
+#define GNSS_MEASUREMENT_RATE 1000
 #define GNSS_GPS_ENABLED 1
 #define GNSS_GLO_ENABLED 1
 #define GNSS_GAL_ENABLED 1
