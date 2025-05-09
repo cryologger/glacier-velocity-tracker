@@ -41,7 +41,6 @@ The glacier velocity measurement system requires three external libraries. These
 Code for the Cryologger GVT is made available on the following GitHub repository:
 * https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Tracker
 * Click on "Releases" and download the v3.0.1 .zip file:
-![image](/Images/github-release.png)
 
 ## Step 6: Connect Hardware & Configure Port Settings
 * Connect the MicroMod Artemis Data Logging Carrier board via a USB-C cable. 
