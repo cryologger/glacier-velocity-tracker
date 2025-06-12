@@ -1,8 +1,7 @@
 /*
   Cryologger - Glacier Velocity Tracker (GVT)
-  Version: 3.0.1
-  Date: March 21, 2025
-  Date: March 28, 2025
+  Version: 3.0.3
+  Date: June 12, 2025
   Author: Adam Garbo
   License: GPLv3. See license file for more information.
 
@@ -23,7 +22,7 @@
 // ----------------------------------------------------------------------------
 
 // Device Identifier
-char uid[20] = "GVT_25_XXX";  // Default unique identifier (UID)
+char uid[20] = "GVT_25_TST";  // Default unique identifier (UID)
 
 // Select the default operation mode (for normal periods when NOT in seasonal)
 #define OPERATION_MODE DAILY  // Options: DAILY, ROLLING, CONTINUOUS
@@ -234,6 +233,10 @@ unsigned long writeFailCounter = 0;  // Count of SD write failures
 unsigned long closeFailCounter = 0;  // Count of SD file close failures
 unsigned long logStartTime = 0;      // Logging session start time (millis)
 long rtcDrift = 0;                   // RTC drift measurement
+
+// Display
+uint8_t displayScreenIndex = 0;  // OLED logging screen display counter
+const uint8_t numScreens = 4;
 
 // ----------------------------------------------------------------------------
 // Structures for System Status and Timers

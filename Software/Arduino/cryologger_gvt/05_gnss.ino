@@ -359,16 +359,32 @@ void logGnss() {
 
         // Display logging information to OLED display
         if (online.oled && displayDebug) {
+
           // After a specified number of cycles put OLED to sleep (1.2 uA)
-          if (displayCounter <= 100)  // Use >= 0 for testing and <= 100 for deployment
+          if (displayCounter <= 10)  // Use >= 0 for testing and <= 100 for deployment
           {
             displayCounter++;
-            if (!displayToggle) {
-              displayScreen1();  // Display information panel 1
-              displayToggle = !displayToggle;
-            } else {
-              displayScreen2();  // Display information panel 2
-              displayToggle = !displayToggle;
+
+            // Display the current screen based on displayScreenIndex
+            switch (displayScreenIndex) {
+              case 0:
+                displayScreen1();
+                break;
+              case 1:
+                displayScreen2();
+                break;
+              case 2:
+                displayScreen3();
+                break;
+              default:
+                displayScreen1();
+                break;
+            }
+
+            // Increment and wrap around displayScreenIndex
+            displayScreenIndex++;
+            if (displayScreenIndex >= numScreens) {
+              displayScreenIndex = 0;
             }
           } else {
             oled.displayPower(0);  // Put OLED display into sleep mode

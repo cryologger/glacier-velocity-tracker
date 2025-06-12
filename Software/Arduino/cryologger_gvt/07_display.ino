@@ -400,6 +400,38 @@ void displayScreen2() {
 }
 
 // ----------------------------------------------------------------------------
+// Display GNSS satellite info.
+// ----------------------------------------------------------------------------
+void displayScreen3() {
+  if (!online.oled) return;
+
+  enablePullups();
+  oled.erase();
+  oled.setCursor(0, 0);
+  oled.print("Sat:");
+  oled.setCursor(25, 0);
+  oled.print(gnss.getSIV());
+  oled.setCursor(40, 0);
+  oled.print("Fix:");
+  oled.setCursor(65, 0);
+  oled.print(gnss.getFixType());
+  oled.setCursor(75, 0);
+  oled.print("PDOP:");
+  oled.setCursor(105, 0);
+  oled.print(gnss.getPDOP());
+  oled.setCursor(0, 10);
+  oled.print("Lat:");
+  oled.setCursor(25, 10);
+  oled.print(gnss.getLatitude() / 10000000.0, 6);
+  oled.setCursor(0, 20);
+  oled.print("Lon:");
+  oled.setCursor(25, 20);
+  oled.print(gnss.getLongitude() / 10000000.0, 6);
+  oled.display();
+  disablePullups();
+}
+
+// ----------------------------------------------------------------------------
 // Display GNSS Module Info on OLED
 // ----------------------------------------------------------------------------
 void displayGnssModuleInfo() {
