@@ -64,11 +64,11 @@ char uid[20] = "GVT_25_TST";  // Default unique identifier (UID)
 // ----------------------------------------------------------------------------
 // Libraries                          Version     Comments
 // ----------------------------------------------------------------------------
-#include <ArduinoJson.h>              // 7.3.1
+#include <ArduinoJson.h>              // 7.4.1
 #include <RTC.h>                      // 1.2      Apollo3 Core v1.2.3
 #include <SdFat.h>                    // 2.3.0
 #include <SparkFun_Qwiic_OLED.h>      // 1.0.13
-#include <SparkFun_u-blox_GNSS_v3.h>  // 3.1.8
+#include <SparkFun_u-blox_GNSS_v3.h>  // 3.1.9
 #include <SPI.h>                      //          Apollo3 Core v1.2.3
 #include <WDT.h>                      // 0.1      Apollo3 Core v1.2.3
 #include <Wire.h>                     //          Apollo3 Core v1.2.3
