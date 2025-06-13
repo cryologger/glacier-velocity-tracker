@@ -1,8 +1,7 @@
 /*
   Cryologger - Glacier Velocity Tracker (GVT)
-  Version: 3.0.1
-  Date: March 21, 2025
-  Date: March 28, 2025
+  Version: 3.0.2
+  Date: June 13, 2025
   Author: Adam Garbo
   License: GPLv3. See license file for more information.
 
@@ -23,7 +22,7 @@
 // ----------------------------------------------------------------------------
 
 // Device Identifier
-char uid[20] = "GVT_25_XXX";  // Default unique identifier (UID)
+char uid[20] = "GVT_25_TST";  // Default unique identifier (UID)
 
 // Select the default operation mode (for normal periods when NOT in seasonal)
 #define OPERATION_MODE DAILY  // Options: DAILY, ROLLING, CONTINUOUS
@@ -65,11 +64,11 @@ char uid[20] = "GVT_25_XXX";  // Default unique identifier (UID)
 // ----------------------------------------------------------------------------
 // Libraries                          Version     Comments
 // ----------------------------------------------------------------------------
-#include <ArduinoJson.h>              // 7.3.1
+#include <ArduinoJson.h>              // 7.4.1
 #include <RTC.h>                      // 1.2      Apollo3 Core v1.2.3
 #include <SdFat.h>                    // 2.3.0
 #include <SparkFun_Qwiic_OLED.h>      // 1.0.13
-#include <SparkFun_u-blox_GNSS_v3.h>  // 3.1.8
+#include <SparkFun_u-blox_GNSS_v3.h>  // 3.1.9
 #include <SPI.h>                      //          Apollo3 Core v1.2.3
 #include <WDT.h>                      // 0.1      Apollo3 Core v1.2.3
 #include <Wire.h>                     //          Apollo3 Core v1.2.3
@@ -77,7 +76,7 @@ char uid[20] = "GVT_25_XXX";  // Default unique identifier (UID)
 // ----------------------------------------------------------------------------
 // Software & Hardware Versions
 // ----------------------------------------------------------------------------
-#define SOFTWARE_VERSION "3.0.1"
+#define SOFTWARE_VERSION "3.0.2"
 #define HARDWARE_VERSION "2.21"
 
 // ----------------------------------------------------------------------------
@@ -235,6 +234,10 @@ unsigned long closeFailCounter = 0;  // Count of SD file close failures
 unsigned long logStartTime = 0;      // Logging session start time (millis)
 long rtcDrift = 0;                   // RTC drift measurement
 
+// Display
+uint8_t displayScreenIndex = 0;  // OLED logging screen display counter
+const uint8_t numScreens = 4;
+
 // ----------------------------------------------------------------------------
 // Structures for System Status and Timers
 // ----------------------------------------------------------------------------
@@ -294,6 +297,7 @@ void setup() {
   // Initialize peripherals.
   configureRtc();   // Set up the Real-Time Clock.
   configureOled();  // Set up the OLED display.
+  displayBoot();
   configureWdt();   // Set up Watchdog Timer.
   configureSd();    // Set up microSD card.
   displaySdInfo();
