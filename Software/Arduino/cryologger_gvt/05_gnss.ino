@@ -361,7 +361,7 @@ void logGnss() {
         if (online.oled && displayDebug) {
 
           // After a specified number of cycles put OLED to sleep (1.2 uA)
-          if (displayCounter <= 10)  // Use >= 0 for testing and <= 100 for deployment
+          if (displayCounter <= 100)  // Use >= 0 for testing and <= 100 for deployment
           {
             displayCounter++;
 

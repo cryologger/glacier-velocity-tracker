@@ -297,6 +297,7 @@ void setup() {
   // Initialize peripherals.
   configureRtc();   // Set up the Real-Time Clock.
   configureOled();  // Set up the OLED display.
+  displayBoot();
   configureWdt();   // Set up Watchdog Timer.
   configureSd();    // Set up microSD card.
   displaySdInfo();

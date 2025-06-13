@@ -53,6 +53,30 @@ void resetOled() {
 }
 
 // ----------------------------------------------------------------------------
+// Display the boot message.
+// ----------------------------------------------------------------------------
+void displayBoot() {
+  if (!online.oled) return;
+
+  enablePullups();
+  oled.erase();
+  oled.setCursor(0, 0);
+  oled.print("Cryologger ");
+  oled.print(uid);
+  oled.setCursor(0, 10);
+  oled.print("SWVER:");
+  oled.setCursor(42, 10);
+  oled.print(SOFTWARE_VERSION);
+  oled.setCursor(0, 20);
+  oled.print("HWVER:");
+  oled.setCursor(42, 20);
+  oled.print(HARDWARE_VERSION);
+  oled.display();
+  disablePullups();
+  myDelay(10000);
+}
+
+// ----------------------------------------------------------------------------
 // Display the welcome message.
 // ----------------------------------------------------------------------------
 void displayWelcome() {
@@ -409,23 +433,23 @@ void displayScreen3() {
   oled.erase();
   oled.setCursor(0, 0);
   oled.print("Sat:");
-  oled.setCursor(25, 0);
+  oled.setCursor(24, 0);
   oled.print(gnss.getSIV());
-  oled.setCursor(40, 0);
+  oled.setCursor(42, 0);
   oled.print("Fix:");
-  oled.setCursor(65, 0);
+  oled.setCursor(66, 0);
   oled.print(gnss.getFixType());
-  oled.setCursor(75, 0);
+  oled.setCursor(78, 0);
   oled.print("PDOP:");
-  oled.setCursor(105, 0);
+  oled.setCursor(108, 0);
   oled.print(gnss.getPDOP());
   oled.setCursor(0, 10);
   oled.print("Lat:");
-  oled.setCursor(25, 10);
+  oled.setCursor(24, 10);
   oled.print(gnss.getLatitude() / 10000000.0, 6);
   oled.setCursor(0, 20);
   oled.print("Lon:");
-  oled.setCursor(25, 20);
+  oled.setCursor(24, 20);
   oled.print(gnss.getLongitude() / 10000000.0, 6);
   oled.display();
   disablePullups();
