@@ -12,9 +12,6 @@ authors:
     family-names: Garbo
     email: adam@cryologger.org
     orcid: 'https://orcid.org/0000-0002-7312-7390'
-identifiers:
-  - type: doi
-    value: 10.5281/zenodo.10522852
 repository-code: 'https://github.com/cryologger/glacier-velocity-tracker'
 url: 'https://cryologger.org'
 abstract: >-
@@ -29,4 +26,4 @@ keywords:
   - open-source
 license: GPL-3.0+
 version: 3.0.2
-date-released: '2025-06-14'
+date-released: '2025-06-15'
