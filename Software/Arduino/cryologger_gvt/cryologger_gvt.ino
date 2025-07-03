@@ -1,7 +1,7 @@
 /*
   Cryologger - Glacier Velocity Tracker (GVT)
-  Version: 3.0.2
-  Date: June 13, 2025
+  Version: 3.0.3
+  Date: July 1, 2025
   Author: Adam Garbo
   License: GPLv3. See license file for more information.
 
@@ -64,11 +64,11 @@ char uid[20] = "GVT_25_TST";  // Default unique identifier (UID)
 // ----------------------------------------------------------------------------
 // Libraries                          Version     Comments
 // ----------------------------------------------------------------------------
-#include <ArduinoJson.h>              // 7.4.1
+#include <ArduinoJson.h>              // 7.4.2
 #include <RTC.h>                      // 1.2      Apollo3 Core v1.2.3
 #include <SdFat.h>                    // 2.3.0
 #include <SparkFun_Qwiic_OLED.h>      // 1.0.13
-#include <SparkFun_u-blox_GNSS_v3.h>  // 3.1.9
+#include <SparkFun_u-blox_GNSS_v3.h>  // 3.1.10
 #include <SPI.h>                      //          Apollo3 Core v1.2.3
 #include <WDT.h>                      // 0.1      Apollo3 Core v1.2.3
 #include <Wire.h>                     //          Apollo3 Core v1.2.3
@@ -348,10 +348,10 @@ void setup() {
   printGnssSettings();
 
   // Configure additional devices and logging parameters.
-  syncRtc();          // Synchronize RTC with GNSS.
-  checkDate();        // Update the current date.
-  createDebugFile();  // Create a debug log file on SD.
-  setSleepAlarm();    // Set the RTC alarm based on operation mode.
+  syncRtc();          // Synchronize RTC with GNSS
+  checkDate();        // Update the current date
+  createDebugFile();  // Create a debug log file on SD
+  setSleepAlarm();    // Set the RTC alarm based on operation mode
 
   DEBUG_PRINT("[Setup] Info: Datetime ");
   printDateTime();
