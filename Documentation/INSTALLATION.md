@@ -30,17 +30,17 @@ The glacier velocity measurement system requires three external libraries. These
 **Table 1.** Libraries required by Cryologger GVT. Last updated 2025-04-24.
 | Library                              | Version | GitHub Repository                                               |
 |--------------------------------------|:-------:|-----------------------------------------------------------------|
-| SparkFun u-blox GNSS v3              |  3.0.16 | https://github.com/sparkfun/SparkFun_u-blox_GNSS_v3             |
-| SdFat                                |  2.2.2  | https://github.com/greiman/SdFat                                |
-| SparkFun Qwiic OLED Arduino Library  |  1.0.5  | https://github.com/sparkfun/SparkFun_Qwiic_OLED_Arduino_Library |
-| ArduinoJ SON                         |  7.4.1  | https://github.com/sparkfun/SparkFun_Qwiic_OLED_Arduino_Library |
+| SparkFun u-blox GNSS v3              |  3.1.10 | https://github.com/sparkfun/SparkFun_u-blox_GNSS_v3             |
+| SdFat                                |  2.3.0  | https://github.com/greiman/SdFat                                |
+| SparkFun Qwiic OLED Arduino Library  |  1.0.13 | https://github.com/sparkfun/SparkFun_Qwiic_OLED_Arduino_Library |
+| ArduinoJ SON                         |  7.4.2  | https://github.com/sparkfun/SparkFun_Qwiic_OLED_Arduino_Library |
 
 ![image](/Images/arduino-ide-library.png)
 
 ## Step 5: Download Software
 Code for the Cryologger GVT is made available on the following GitHub repository:
 * https://github.com/adamgarbo/Cryologger_Glacier_Velocity_Tracker
-* Click on "Releases" and download the v3.0.1 .zip file:
+* Click on "Releases" and download the v3.0.3 .zip file:
 
 ## Step 6: Connect Hardware & Configure Port Settings
 * Connect the MicroMod Artemis Data Logging Carrier board via a USB-C cable. 
