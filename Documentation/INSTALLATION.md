@@ -43,7 +43,8 @@ Code for the Cryologger GVT is made available on the following GitHub repository
 * Click on "Releases" and download the v3.0.3 .zip file:
 
 ## Step 6: Connect Hardware & Configure Port Settings
-* Connect the MicroMod Artemis Data Logging Carrier board via a USB-C cable. 
+* Connect the MicroMod Artemis Data Logging Carrier board via a USB-C cable.
+* Install the [CH340 drivers](https://learn.sparkfun.com/tutorials/how-to-install-ch340-drivers/all#drivers-if-you-need-them), if necessary.
 * In the Arduino IDE click on Tools > Board: >   
 ![image](/Images/arduino-ide-board-1.png)
 ![image](/Images/arduino-ide-board-2.png)
