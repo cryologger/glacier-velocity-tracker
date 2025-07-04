@@ -62,10 +62,6 @@ The Cryologger GVT is a low-cost, open-source GNSS logging system designed for l
 - [ ] Loosen the cable gland at the bottom of the enclosure and remove the solar panel cable.
 - [ ] The battery can stay inside the enclosure during transport if preferred.
 
-![ICE_0279 copy](https://github.com/user-attachments/assets/9cf21099-9081-4116-9427-23c8396da7e8)
-**Figure 3.** Cryologger GVT deployed on Mittie Glacier (September 25, 2023), annotated to show power disconnection points.
-
-
 ## 3. Tripod Disassembly
 
 - [ ] Disconnect the GNSS cable, then remove the GNSS antenna from the top of the mast.
@@ -77,9 +73,6 @@ The Cryologger GVT is a low-cost, open-source GNSS logging system designed for l
 - [ ] Use a 7/16" socket or wrench to loosen the U-bolts on the tripod legs.
 - [ ] Use a 1/2" socket or wrench to loosen the U-bolts on the centre mast and slide the mast out.
 - [ ] Collapse the tripod and organize all components for helicopter transport.
-
-![tripod](https://github.com/user-attachments/assets/eb2504b3-acfc-43e8-ab55-f5631f74f096)
-**Figure 4.** Cryologger GVT deployed on Mittie Glacier (September 25, 2023), annotated to highlight components involved in disassembly.
 
 ## 4. Return to the Ship
 
@@ -123,8 +116,6 @@ Field recovery operations involve several potential hazards. Always prioritise p
 
 **Deployment Note:**  
 - The system was deployed on September 25, 2023. The position may have moved a few tens of metres downglacier since.
-
-
 
 ### Satellite Maps
 The following Sentinel-2 imagery provides an overview of the glacier and system location. Use these to visually confirm your approach by helicopter.  
