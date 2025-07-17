@@ -1,7 +1,7 @@
 # Cryologger Glacier Velocity Tracker – Recovery Guide  
 
 **Version 1.0**  
-**Date: 2025-06-25**  
+**Date: 2025-07-17**  
 
 ## Introduction
 
