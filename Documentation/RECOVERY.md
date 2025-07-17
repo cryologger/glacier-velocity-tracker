@@ -62,6 +62,9 @@ The Cryologger GVT is a low-cost, open-source GNSS logging system designed for l
 - [ ] Loosen the cable gland at the bottom of the enclosure and remove the solar panel cable.
 - [ ] The battery can stay inside the enclosure during transport if preferred.
 
+![recovery-2](https://github.com/user-attachments/assets/f19d0024-a634-4db4-b1d4-aec8e9314d41)
+**Figure 3.** Annotated view of the interior of the Cryologger Glacier Velocity Tracker (GVT) enclosure, showing key components and cable connections to be disconnected during system recovery. 
+
 ## 3. Tripod Disassembly
 
 - [ ] Disconnect the GNSS cable, then remove the GNSS antenna from the top of the mast.
@@ -73,6 +76,9 @@ The Cryologger GVT is a low-cost, open-source GNSS logging system designed for l
 - [ ] Use a 7/16" socket or wrench to loosen the U-bolts on the tripod legs.
 - [ ] Use a 1/2" socket or wrench to loosen the U-bolts on the centre mast and slide the mast out.
 - [ ] Collapse the tripod and organize all components for helicopter transport.
+
+![recovery-1](https://github.com/user-attachments/assets/74bf337a-06b0-4f53-a39a-73a4bf6ee19a)
+**Figure 4.** Overview of the Cryologger GVT field installation, including the full tripod assembly, enclosure, and mounted sensors. Annotations indicate disassembly points and structural elements to be detached during recovery.
 
 ## 4. Return to the Ship
 
