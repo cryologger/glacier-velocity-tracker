@@ -1,7 +1,7 @@
 # u-blox ZED-F9P - Firmware Upgrade
 This guide provides step-by-step instructions on how to check and upgrade the firmware of the u-blox ZED-F9P GNSS receiver used in the Cryologger glacier velocity tracker (GVT).
 
-Update (2025-04-15): This documentation is currently outdated. Starting from version 3.x, the current firmware version is automatically displayed in the Serial Monitor output. Therefore, Steps 1 and 2 are no longer necessary and can be skipped.
+Update (2025-04-15): This documentation is currently outdated. Starting from version 3.x, the current firmware version is automatically displayed in the Serial Monitor output. Therefore, Step 1 is no longer necessary and can be skipped. However, Step 2 is still required to reset the u-blox module.
 
 ## Step 1: Determine firmware version
 The current version of firmware on the u-blox module can be determined by uploading a new program to the Cryologger. The steps are as follows:
