@@ -43,7 +43,7 @@ Upgrading of the u-blox firmware will be accomplished using the SparkFun RTK u-b
 * Run the SparkFun RTK u-blox Firmware Update Tool
 * Connect directly to u-blox ZED-F9P USB-C port 
 * Confirm the COM port in use (i.e., using Device Manager)
-* Click the Firmware File "Browse" button and select the binary file for the v1.32 firmware update
+* Click the Firmware File "Browse" button and select the downloaded binary file for the firmware update
 * Select the appropriate COM port from the dropdown (click Refresh if necessary)
 * Click "Update Firmware"
   * Once complete, the u-blox module will restart
