@@ -1,10 +1,16 @@
 /*
   Display Module
 
-  This module manages the OLED display, handling initialization, error messages, 
-  and status updates. It provides real-time feedback on system status, logging 
+  This module manages the OLED display, handling initialization, error messages,
+  and status updates. It provides real-time feedback on system status, logging
   mode, and RTC synchronization.
 */
+
+// ----------------------------------------------------------------------------
+// OLED I2C addresses
+// ----------------------------------------------------------------------------
+static const uint8_t OLED_ADDR_1 = 0x3C;
+static const uint8_t OLED_ADDR_2 = 0x3D;
 
 // ----------------------------------------------------------------------------
 // Configure the OLED display.
@@ -12,44 +18,87 @@
 // attempt fails, it retries once before disabling the display.
 // ----------------------------------------------------------------------------
 void configureOled() {
-  enablePullups();  // Enable internal I2C pull-ups
 
-  // Initialize OLED display
+#if OLED
+  enablePullups();
+
+  bool present = false;
+
+  // Wait up to 250 ms for OLED to ACK (power-up / cold start / slow rail)
+  for (uint16_t i = 0; i < 25; i++) { // 25 * 10 ms = 250 ms
+    if (i2cDevicePresent(OLED_ADDR_1) || i2cDevicePresent(OLED_ADDR_2)) {
+      present = true;
+      break;
+    }
+    myDelay(10);
+  }
+
+  if (!present) {
+    online.oled = false;
+    DEBUG_PRINTLN("[Display] Warning: OLED not detected.");
+    disablePullups();
+    return;
+  }
+
   if (!oled.begin()) {
     online.oled = false;
-    DEBUG_PRINTLN("[Display] Warning: OLED failed to initialize. Reattempting...");
-
-    // Delay before retrying
-    myDelay(2000);
+    DEBUG_PRINTLN("[Display] Warning: OLED initialization failed. Reattempting...");
+    myDelay(200);
 
     if (!oled.begin()) {
       online.oled = false;
       DEBUG_PRINTLN("[Display] Warning: OLED initialization failed.");
-    } else {
-      lineTest();
-      online.oled = true;
-      DEBUG_PRINTLN("[Display] Info: Initialized successfully.");
+      disablePullups();
+      return;
     }
-  } else {
-    lineTest();
-    online.oled = true;
   }
 
-  disablePullups();  // Disable internal I2C pull-ups
+  online.oled = true;
+  welcomeScreen();
+  DEBUG_PRINTLN("[Display] Info: Initialized successfully.");
+
+  disablePullups();
+#endif
+
 }
 
 // ----------------------------------------------------------------------------
 // Reset the OLED display after sleep/power cycle.
 // This function resets the OLED screen after deep sleep or a power cycle
 // to ensure proper initialization.
+// Ensures the OLED is present and responsive before issuing a reset.
 // ----------------------------------------------------------------------------
 void resetOled() {
+
 #if OLED
-  myDelay(4000);
-  online.oled = true;
+
   enablePullups();
+  myDelay(2);  // Allow pull-ups and rail to stabilize
+
+  bool present = false;
+
+  // Wait up to 2000 ms for the OLED to respond
+  for (uint16_t i = 0; i < 200; i++) {
+    if (i2cDevicePresent(OLED_ADDR_1) || i2cDevicePresent(OLED_ADDR_2)) {
+      present = true;
+      break;
+    }
+    myDelay(10);
+  }
+
+  if (!present) {
+    online.oled = false;
+    disablePullups();
+    return;
+  }
+
   oled.reset(1);
+  online.oled = true;
+
+  disablePullups();
+
 #endif
+
 }
 
 // ----------------------------------------------------------------------------
@@ -502,36 +551,63 @@ void displayDeepSleep() {
 // Power off the display.
 // ----------------------------------------------------------------------------
 void displayOff() {
-  if (online.oled) {
-    oled.displayPower(1);
-  }
+  if (!online.oled) return;
+  enablePullups();
+  oled.displayPower(1);
+  disablePullups();
 }
 
 // ----------------------------------------------------------------------------
 // Power on the display.
 // ----------------------------------------------------------------------------
 void displayOn() {
-  if (online.oled) {
-    oled.displayPower(0);
-  }
+  if (!online.oled) return;
+  enablePullups();
+  oled.displayPower(0);
+  disablePullups();
 }
 
 // ----------------------------------------------------------------------------
-// Run OLED line test.
+// Run OLED welcome screen.
+// Draws animated lines with readable pacing.
 // ----------------------------------------------------------------------------
-void lineTest() {
-  int width = oled.getWidth();
-  int height = oled.getHeight();
+void welcomeScreen() {
+  if (!online.oled) return;
 
+  enablePullups();
+  myDelay(2);  // Allow pull-ups and rail to stabilize
+
+  const int width = oled.getWidth();
+  const int height = oled.getHeight();
+
+  oled.erase();
+
+  // Draw forward
   for (int i = 0; i < width; i += 6) {
     oled.line(0, 0, i, height - 1);
-    oled.display();
+
+    // Refresh every few lines to reduce I2C traffic
+    if ((i % 24) == 0) {
+      oled.display();
+      myDelay(60);
+    }
   }
-  myDelay(500);
+  oled.display();
+  myDelay(400);
+
   oled.erase();
+
+  // Draw backward
   for (int i = width - 1; i >= 0; i -= 6) {
     oled.line(width - 1, 0, i, height - 1);
-    oled.display();
+
+    if (((width - 1 - i) % 24) == 0) {
+      oled.display();
+      myDelay(60);
+    }
   }
-  myDelay(500);
+  oled.display();
+  myDelay(400);
+
+  disablePullups();
 }

@@ -2,7 +2,7 @@
   GNSS Module
 
   This module handles the initialization and configuration of the GNSS receiver,
-  synchronizing RTC time with GNSS, and logging raw GNSS data (RAWX, SFRBX) to 
+  synchronizing RTC time with GNSS, and logging raw GNSS data (RAWX, SFRBX) to
   microSD.
 */
 
@@ -387,7 +387,7 @@ void logGnss() {
               displayScreenIndex = 0;
             }
           } else {
-            oled.displayPower(0);  // Put OLED display into sleep mode
+            displayOff();  // Put OLED display into sleep mode
             displayDebug = false;  // Clear flag
           }
         }

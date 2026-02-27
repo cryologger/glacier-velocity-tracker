@@ -199,7 +199,7 @@ void printGnssSettings() {
       }
     }
   } else {
-    DEBUG_PRINTLN("Warning - VALGET failed!");
+    DEBUG_PRINTLN("[GNSS] Warning: VALGET failed!");
   }
 
   printLine();
@@ -244,4 +244,31 @@ void printTimers() {
   }
 
   printLine();
+}
+
+// ----------------------------------------------------------------------------
+// Private helper: check if an I2C device ACKs at the given address.
+// ----------------------------------------------------------------------------
+static bool i2cDevicePresent(uint8_t addr)
+{
+  Wire.beginTransmission(addr);
+  return (Wire.endTransmission() == 0);
+}
+
+// ----------------------------------------------------------------------------
+// Scan I2C bus for connected devices.
+// Iterates through all valid 7-bit addresses and prints any responding
+// devices to the debug console. Used for diagnostics and troubleshooting.
+// ----------------------------------------------------------------------------
+static void i2cScan()
+{
+  DEBUG_PRINTLN("[I2C] Scan start");
+  for (uint8_t addr = 1; addr < 127; addr++) {
+    Wire.beginTransmission(addr);
+    if (Wire.endTransmission() == 0) {
+      DEBUG_PRINT("[I2C] Found 0x");
+      DEBUG_PRINTLN_HEX(addr);
+    }
+  }
+  DEBUG_PRINTLN("[I2C] Scan end");
 }

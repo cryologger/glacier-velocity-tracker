@@ -1,7 +1,7 @@
 /*
   Cryologger - Glacier Velocity Tracker (GVT)
-  Version: 3.0.3
-  Date: July 1, 2025
+  Version: 3.0.4
+  Date: February 27, 2026
   Author: Adam Garbo
   License: GPLv3. See license file for more information.
 
@@ -22,7 +22,7 @@
 // ----------------------------------------------------------------------------
 
 // Device Identifier
-char uid[20] = "GVT_25_TST";  // Default unique identifier (UID)
+char uid[20] = "GVT_26_TST";  // Default unique identifier (UID)
 
 // Select the default operation mode (for normal periods when NOT in seasonal)
 #define OPERATION_MODE DAILY  // Options: DAILY, ROLLING, CONTINUOUS
@@ -76,7 +76,7 @@ char uid[20] = "GVT_25_TST";  // Default unique identifier (UID)
 // ----------------------------------------------------------------------------
 // Software & Hardware Versions
 // ----------------------------------------------------------------------------
-#define SOFTWARE_VERSION "3.0.3"
+#define SOFTWARE_VERSION "3.0.4"
 #define HARDWARE_VERSION "2.21"
 
 // ----------------------------------------------------------------------------
@@ -92,12 +92,16 @@ char uid[20] = "GVT_25_TST";  // Default unique identifier (UID)
 #define DEBUG_PRINT_DEC(x, y) Serial.print(x, y)
 #define DEBUG_PRINTLN_DEC(x, y) Serial.println(x, y)
 #define DEBUG_WRITE(x) Serial.write(x)
+#define DEBUG_PRINT_HEX(x) Serial.print(x, HEX)
+#define DEBUG_PRINTLN_HEX(x) Serial.println(x, HEX)
 #else
 #define DEBUG_PRINT(x)
 #define DEBUG_PRINTLN(x)
 #define DEBUG_PRINT_DEC(x, y)
 #define DEBUG_PRINTLN_DEC(x, y)
 #define DEBUG_WRITE(x)
+#define DEBUG_PRINT_HEX(x)
+#define DEBUG_PRINTLN_HEX(x) 
 #endif
 
 // ----------------------------------------------------------------------------
@@ -286,7 +290,7 @@ void setup() {
   Wire.setClock(400000);     // Set I2C clock to 400 kHz
   SPI.begin();               // Start SPI communications
   analogReadResolution(14);  // Set ADC resolution to 14 bits
-
+  
   // Output startup information.
   DEBUG_PRINTLN();
   printLine();
@@ -296,9 +300,9 @@ void setup() {
 
   // Initialize peripherals.
   configureRtc();   // Set up the Real-Time Clock.
+  configureWdt();   // Set up Watchdog Timer.
   configureOled();  // Set up the OLED display.
   displayBoot();
-  configureWdt();   // Set up Watchdog Timer.
   configureSd();    // Set up microSD card.
   displaySdInfo();
 
