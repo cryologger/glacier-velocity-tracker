@@ -1,7 +1,7 @@
 ![License](https://img.shields.io/github/license/adamgarbo/Cryologger_Glacier_Velocity_Tracker)
 ![Release](https://img.shields.io/github/v/release/adamgarbo/Cryologger_Glacier_Velocity_Tracker)
 ![Issues](https://img.shields.io/github/issues/adamgarbo/Cryologger_Glacier_Velocity_Tracker)
-[![DOI](https://zenodo.org/badge/248303047.svg)](https://doi.org/10.5281/zenodo.10522852)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18805258.svg)](https://doi.org/10.5281/zenodo.18805258)
 
 # Cryologger - Glacier Velocity Tracker (GVT)
 ### Note: This documentation is currently under development.
