@@ -31,7 +31,7 @@ float readBattery() {
 // with connected I2C devices.
 void enablePullups() {
   Wire.setPullups(1);
-  myDelay(2);  // Allow bus lines to stabilize
+  myDelay(2);  // Allow bus lines to stabilize.
 }
 
 // Disable internal I2C pull-ups to reduce leakage and potential bus errors.
