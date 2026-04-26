@@ -1,7 +1,7 @@
 /*
   Cryologger - Glacier Velocity Tracker (GVT)
-  Version: 3.0.4
-  Date: February 27, 2026
+  Version: 3.0.5
+  Date: April 16, 2026
   Author: Adam Garbo
   License: GPLv3. See license file for more information.
 
@@ -13,8 +13,8 @@
   - Pololu 5V 600mA Step-Down Voltage Regulator D36V6F5
 
   Description:
-  This sketch integrates the RTC, microSD, GNSS, OLED display, and WDT modules 
-  to implement a glacier velocity measurement and logging system.
+  Firmware for logging raw multi-frequency GNSS data for glacier velocity 
+  measurements using PPP processing.
 */
 
 // ----------------------------------------------------------------------------
@@ -64,11 +64,11 @@ char uid[20] = "GVT_26_TST";  // Default unique identifier (UID)
 // ----------------------------------------------------------------------------
 // Libraries                          Version     Comments
 // ----------------------------------------------------------------------------
-#include <ArduinoJson.h>              // 7.4.2
+#include <ArduinoJson.h>              // 7.4.3
 #include <RTC.h>                      // 1.2      Apollo3 Core v1.2.3
 #include <SdFat.h>                    // 2.3.0
-#include <SparkFun_Qwiic_OLED.h>      // 1.0.13
-#include <SparkFun_u-blox_GNSS_v3.h>  // 3.1.10
+#include <SparkFun_Qwiic_OLED.h>      // 1.0.15
+#include <SparkFun_u-blox_GNSS_v3.h>  // 3.1.13
 #include <SPI.h>                      //          Apollo3 Core v1.2.3
 #include <WDT.h>                      // 0.1      Apollo3 Core v1.2.3
 #include <Wire.h>                     //          Apollo3 Core v1.2.3
@@ -101,7 +101,7 @@ char uid[20] = "GVT_26_TST";  // Default unique identifier (UID)
 #define DEBUG_PRINTLN_DEC(x, y)
 #define DEBUG_WRITE(x)
 #define DEBUG_PRINT_HEX(x)
-#define DEBUG_PRINTLN_HEX(x) 
+#define DEBUG_PRINTLN_HEX(x)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ byte alarmSeasonalEndDay = SEASONAL_END_DAY;
 byte alarmSeasonalEndMonth = SEASONAL_END_MONTH;
 
 // ----------------------------------------------------------------------------
-// GNSS Measurement Rate & Satellite Signal Enables
+// GNSS Measurement Rate & Satellite Signal Configuration
 // ----------------------------------------------------------------------------
 unsigned int gnssMeasurementRate = GNSS_MEASUREMENT_RATE;
 byte gnssGpsEnabled = GNSS_GPS_ENABLED;
@@ -271,9 +271,9 @@ struct Timer {
 void setup() {
 
 #if DEBUG
-  Serial.begin(115200);  // Initialize Serial for debugging
-  // while (!Serial);     // Optionally wait for Serial Monitor connection
-  blinkLed(2, 1000);  // Blink LED to signal startup
+  Serial.begin(115200);  // Initialize Serial for debugging.
+  // while (!Serial);     // Optionally wait for Serial Monitor connection.
+  blinkLed(2, 1000);  // Blink LED to signal startup.
 #endif
 
   // Initialize pin modes for peripheral power control and LED indicator.
@@ -286,12 +286,12 @@ void setup() {
   peripheralPowerOn();
 
   // Initialize communication protocols.
-  Wire.begin();              // Start I2C communications
-  Wire.setClock(400000);     // Set I2C clock to 400 kHz
-  SPI.begin();               // Start SPI communications
-  analogReadResolution(14);  // Set ADC resolution to 14 bits
-  
-  // Output startup information.
+  Wire.begin();              // Start I2C communications.
+  Wire.setClock(400000);     // Set I2C clock to 400 kHz.
+  SPI.begin();               // Start SPI communications.
+  analogReadResolution(14);  // Set ADC resolution to 14 bits.
+
+  // Output startup information
   DEBUG_PRINTLN();
   printLine();
   DEBUG_PRINTLN("Cryologger - Glacier Velocity Tracker");
@@ -303,7 +303,7 @@ void setup() {
   configureWdt();   // Set up Watchdog Timer.
   configureOled();  // Set up the OLED display.
   displayBoot();
-  configureSd();    // Set up microSD card.
+  configureSd();  // Set up microSD card.
   displaySdInfo();
 
   // Load configuration from microSD card.
@@ -352,10 +352,11 @@ void setup() {
   printGnssSettings();
 
   // Configure additional devices and logging parameters.
-  syncRtc();          // Synchronize RTC with GNSS
-  checkDate();        // Update the current date
-  createDebugFile();  // Create a debug log file on SD
-  setSleepAlarm();    // Set the RTC alarm based on operation mode
+  syncRtc();          // Synchronize RTC with GNSS.
+  readRtc();          // Refresh current RTC time.
+  checkDate();        // Update the current date.
+  createDebugFile();  // Create a debug log file on SD.
+  setSleepAlarm();    // Set the RTC alarm based on operation mode.
 
   DEBUG_PRINT("[Setup] Info: Datetime ");
   printDateTime();
@@ -368,7 +369,7 @@ void setup() {
 // Main Loop
 // ----------------------------------------------------------------------------
 void loop() {
-  // Process RTC alarm events.
+  // Process RTC alarm events
   if (alarmFlag) {
     DEBUG_PRINT("[Main] Info: Alarm trigger ");
     printDateTime();
@@ -378,18 +379,18 @@ void loop() {
     setLoggingAlarm();  // Schedule the wake-up alarm (end of logging period).
     getLogFileName();   // Generate a new log file name with a timestamp.
 
-    // If we have just transitioned to seasonal mode, restore power
-    if (operationMode == CONTINUOUS && !seasonalPowerInitFlag) {
+    // Check operating mode and restore peripherals.
+    if (operationMode == CONTINUOUS) {
+      if (!seasonalPowerInitFlag) {
+        restorePeripherals();
+        seasonalPowerInitFlag = true;
+      }
+    } else {
+      seasonalPowerInitFlag = false;
       restorePeripherals();
-      seasonalPowerInitFlag = true;
     }
 
-    // If not in continuous mode, reinitialize peripherals
-    if (operationMode != CONTINUOUS) {
-      restorePeripherals();
-    }
-
-    // If the date has changed (daily logging), re-sync the RTC.
+    // Re-sync the RTC if the date has changed (daily logging).
     if (checkDate()) {
       DEBUG_PRINTLN("[Main] Info: Daily RTC sync required...");
       syncRtc();
