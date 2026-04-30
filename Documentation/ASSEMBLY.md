@@ -59,7 +59,7 @@ This guide is focused on the assembly of the Cryologger (i.e., group 1), however
 | Component | Product | Quantity | Cost (USD) | 
 | --- | --- | :---: | :---: | 
 | Solar Panel | [Ameresco Solar 20 Watt Solar Panel 20J<sup>2</sup>](https://www.amerescosolar.com/20j-ameresco-solar-20-watt-solar-panel) | 1 |  $99.00 |
-| Solar Panel Bracket | [Ameresco Solar HPM18-30 Solar Panel Pole Mount<sup>2</sup>](https://www.amerescosolar.com/hpm18-30solar-panel-pole-mount) | 1 |  $39.00 
+| Solar Panel Bracket | [Ameresco Solar HPM18-30 Solar Panel Pole Mount<sup>1,2</sup>](https://www.amerescosolar.com/hpm18-30solar-panel-pole-mount) | 1 |  $39.00 
 | Solar Charge Controller | [Genasun GV-5 5A MPPT Solar Charge Controller](https://sunforgellc.com/product/gv-5/?attribute_pa_battery_voltage=12v-lead-acid&attribute_pa_battery-type=lead-acid) | 1 |  $85.00 |
 | Solar Panel Power Cable | [Polarwire Arctic Ultraflex Blue Twin Trailer Cable AUF-TC162](https://store.polarwire.com/arctic-trailer-cable-16-2-gray-16ga-2-conductors/) | Variable | $0.55/ft |
 | Solar Panel Cable Gland | [Heyco M4340 M20 Cable Gland](https://octopart.com/m4340-heyco-2298364?r=sp) | 2 | $5.94 |
