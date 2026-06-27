@@ -544,7 +544,7 @@ void displayDeepSleep() {
   oled.text(0, 0, "Entering deep sleep.");
   oled.display();
   disablePullups();
-  myDelay(3000);
+  myDelay(1000);
 }
 
 // ----------------------------------------------------------------------------
