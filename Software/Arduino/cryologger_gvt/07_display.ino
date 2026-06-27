@@ -553,7 +553,7 @@ void displayDeepSleep() {
 void displayOff() {
   if (!online.oled) return;
   enablePullups();
-  oled.displayPower(1);
+  oled.displayPower(0);
   disablePullups();
 }
 
@@ -563,7 +563,7 @@ void displayOff() {
 void displayOn() {
   if (!online.oled) return;
   enablePullups();
-  oled.displayPower(0);
+  oled.displayPower(1);
   disablePullups();
 }
 
