@@ -48,7 +48,7 @@ void createDebugFile() {
   // Write CSV header if necessary.
   if (debugFile.size() == 0) {
     debugFile.println(
-      "datetime,battery,online_microsd,online_gnss,online_log_gnss,online_log_debug,"
+      "datetime,battery,temperature,online_microsd,online_gnss,online_log_gnss,online_log_debug,"
       "timer_battery,timer_microsd,timer_gnss,timer_sync_rtc,timer_log_gnss,timer_log_debug,"
       "rtc_sync_flag,rtc_drift,bytes_written,max_buffer_bytes,wdt_counter_max,"
       "write_fail_counter,sync_fail_counter,close_fail_counter,debug_counter");
@@ -121,6 +121,8 @@ void logDebug() {
   debugFile.print(",");
   debugFile.print(readBattery());
   debugFile.print(",");
+  debugFile.print(readInternalTemp());
+  debugFile.print(",");
   debugFile.print(online.microSd);
   debugFile.print(",");
   debugFile.print(online.gnss);
@@ -183,6 +185,8 @@ void logDebug() {
   DEBUG_PRINT(dateTime);
   DEBUG_PRINT(",");
   DEBUG_PRINT(readBattery());
+  DEBUG_PRINT(",");
+  DEBUG_PRINT(readInternalTemp());
   DEBUG_PRINT(",");
   DEBUG_PRINT(online.microSd);
   DEBUG_PRINT(",");

@@ -40,6 +40,20 @@ void disablePullups() {
 }
 
 // ----------------------------------------------------------------------------
+// Reads the internal Apollo3 / Artemis processor die temperature.
+// Returns temperature in degrees Celsius.
+// ----------------------------------------------------------------------------
+float readInternalTemp() {
+  float temperature = getInternalTemp();
+
+  //DEBUG_PRINT("[POWER] Info: Internal MCU temperature = ");
+  //DEBUG_PRINT(temperature);
+  //DEBUG_PRINTLN(" C");
+
+  return temperature;
+}
+
+// ----------------------------------------------------------------------------
 // Enter deep sleep mode to conserve power.
 // Disables peripherals (I2C, SPI, ADC, etc.), turns off unused GPIO pads,
 // powers down external devices, and configures the system to wake up on an RTC
