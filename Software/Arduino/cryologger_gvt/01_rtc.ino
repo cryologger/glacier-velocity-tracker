@@ -56,19 +56,19 @@ void configureRtc() {
 void setLoggingAlarm() {
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);  // Clear pending RTC alarms
 
-  // Update the operation mode first (DAILY, ROLLING, or CONTINUOUS).
+  // Update the operation mode first (DAILY, ROLLING, or CONTINUOUS)
   checkOperationMode();
 
   switch (operationMode) {
     case DAILY:
       DEBUG_PRINTLN("[RTC] Info: Setting daily logging alarm.");
-      alarmModeLogging = 4;  // match hour/minute for daily stop.
+      alarmModeLogging = 4;  // match hour/minute for daily stop
       rtc.setAlarm(alarmStopHour, alarmStopMinute, 0, 0, 0, 0);
       break;
 
     case ROLLING:
       DEBUG_PRINTLN("[RTC] Info: Setting rolling logging alarm.");
-      // If alarmAwakeHours > 0, we match daily hours; otherwise, just hourly.
+      // If alarmAwakeHours > 0, we match daily hours; otherwise, just hourly
       alarmModeLogging = (alarmAwakeHours > 0) ? 4 : 5;
       rtc.setAlarm((rtc.hour + alarmAwakeHours + ((rtc.minute + alarmAwakeMinutes) / 60)) % 24,
                    (rtc.minute + alarmAwakeMinutes) % 60,
@@ -77,12 +77,12 @@ void setLoggingAlarm() {
 
     case CONTINUOUS:
       DEBUG_PRINTLN("[RTC] Info: Continuous logging mode. New file at midnight.");
-      rtc.setAlarm(0, 0, 0, 0, 0, 0);  // e.g. Roll files at 00:00:00.
+      rtc.setAlarm(0, 0, 0, 0, 0, 0);  // e.g. Roll files at 00:00:00
       alarmModeLogging = 4;
       break;
   }
 
-  // Apply the chosen alarm mode in the RTC.
+  // Apply the chosen alarm mode in the RTC
   rtc.setAlarmMode(alarmModeLogging);
   alarmFlag = false;
 
@@ -99,19 +99,19 @@ void setLoggingAlarm() {
 void setSleepAlarm() {
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);  // Clear pending RTC alarms.
 
-  // Always update the operation mode first.
+  // Always update the operation mode first
   checkOperationMode();
 
   switch (operationMode) {
     case DAILY:
       // On the last day before seasonal logging, sleep until midnight instead
-      // of the normal daily start time.
+      // of the normal daily start time
       if (seasonalLoggingMode && isLastDayBeforeSeasonalLogging() && isLastDayLoggingComplete()) {
         rtc.setAlarm(0, 0, 0, 0, 0, 0);
         DEBUG_PRINTLN("[RTC] Info: Last day before seasonal. Sleeping until midnight.");
         alarmModeSleep = 4;
       } else {
-        // Normal daily sleep until next day's start hour/minute.
+        // Normal daily sleep until next day's start hour/minute
         rtc.setAlarm(alarmStartHour, alarmStartMinute, 0, 0, 0, 0);
         DEBUG_PRINTLN("[RTC] Info: Setting normal daily sleep alarm.");
         alarmModeSleep = 4;
@@ -120,7 +120,7 @@ void setSleepAlarm() {
       break;
 
     case ROLLING:
-      // Rolling sleep intervals.
+      // Rolling sleep intervals
       DEBUG_PRINTLN("[RTC] Info: Setting rolling sleep alarm.");
       rtc.setAlarm((rtc.hour + alarmSleepHours + ((rtc.minute + alarmSleepMinutes) / 60)) % 24,
                    (rtc.minute + alarmSleepMinutes) % 60,
@@ -130,13 +130,13 @@ void setSleepAlarm() {
       break;
 
     case CONTINUOUS:
-      // In continuous mode, we don't go to sleep at all.
+      // In continuous mode, we don't go to sleep at all
       DEBUG_PRINTLN("[RTC] Info: Continuous mode. No sleep alarm.");
       alarmFlag = true;  // signals immediate handling
       return;
   }
 
-  // Set the chosen alarm mode and print.
+  // Set the chosen alarm mode and print
   rtc.setAlarmMode(alarmModeSleep);
   DEBUG_PRINT("[RTC] Info: Sleeping until ");
   printAlarm();
@@ -202,7 +202,7 @@ bool checkDate() {
   DEBUG_PRINT(" New date: ");
   DEBUG_PRINTLN(dateNew);
 
-  // If it's the first time, we only initialize and do not consider it a change.
+  // If it's the first time, we only initialize and do not consider it a change
   if (firstTimeFlag) {
     dateCurrent = dateNew;
     return false;
@@ -334,14 +334,14 @@ void checkOperationMode() {
   }
 
   // If seasonal logging is enabled and it's currently the seasonal window,
-  // switch to continuous mode. Otherwise, use normalOperationMode.
+  // switch to continuous mode. Otherwise, use normalOperationMode
   if (seasonalLoggingMode == ENABLED && isSeasonalLoggingPeriod()) {
     operationMode = CONTINUOUS;
   } else {
     operationMode = normalOperationMode;
   }
 
-  // Debug output for the chosen mode.
+  // Debug output for the chosen mode
   DEBUG_PRINT("[RTC] Info: Operation mode = ");
   if (operationMode == DAILY) DEBUG_PRINTLN("DAILY.");
   else if (operationMode == ROLLING) DEBUG_PRINTLN("ROLLING.");
