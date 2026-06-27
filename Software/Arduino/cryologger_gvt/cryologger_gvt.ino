@@ -187,6 +187,7 @@ volatile bool wdtFlag = false;    // Set by Watchdog Timer ISR
 volatile int wdtCounter = 0;      // Count of WDT interrupts
 volatile int wdtCounterMax = 0;   // Maximum WDT interrupt count observed
 
+bool firstDeploymentFlag = true;     // Forces immediate logging on first wake to confirm system operation
 bool seasonalPowerInitFlag = false;  // Tracks if peripherals were restored for seasonal mode
 bool gnssConfigFlag = true;          // Indicates if GNSS module needs reconfiguration
 bool rtcSyncFlag = false;            // Indicates if RTC is synchronized with GNSS

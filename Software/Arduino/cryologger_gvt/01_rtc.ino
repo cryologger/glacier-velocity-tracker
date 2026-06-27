@@ -104,6 +104,16 @@ void setSleepAlarm() {
 
   switch (operationMode) {
     case DAILY:
+      // First power-up after deployment: run one logging session immediately
+      // so operators can confirm the system is working, then resume the normal
+      // daily schedule on every cycle afterward
+      if (firstDeploymentFlag) {
+        firstDeploymentFlag = false;
+        DEBUG_PRINTLN("[RTC] Info: Deployment-day run - logging immediately");
+        alarmFlag = true;
+        return;
+      }
+
       // On the last day before seasonal logging, sleep until midnight instead
       // of the normal daily start time
       if (seasonalLoggingMode && isLastDayBeforeSeasonalLogging() && isLastDayLoggingComplete()) {
@@ -132,7 +142,7 @@ void setSleepAlarm() {
     case CONTINUOUS:
       // In continuous mode, we don't go to sleep at all
       DEBUG_PRINTLN("[RTC] Info: Continuous mode. No sleep alarm.");
-      alarmFlag = true;  // signals immediate handling
+      alarmFlag = true;  // Signals immediate handling
       return;
   }
 
