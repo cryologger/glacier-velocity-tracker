@@ -13,7 +13,7 @@
 // down power to conserve energy.
 // ----------------------------------------------------------------------------
 void configureSd() {
-  unsigned long loopStartTime = millis();  // Start loop timer.
+  unsigned long loopStartTime = millis();  // Start loop timer
 
   // Check if microSD is already initialized.
   if (online.microSd) {
@@ -21,37 +21,37 @@ void configureSd() {
     return;
   }
 
-  displayInitialize("microSD");  // Display OLED message.
+  displayInitialize("microSD");  // Display OLED message
 
-  // Attempt microSD initialization with a maximum of 2 retries.
+  // Attempt microSD initialization with a maximum of 2 retries
   for (int attempt = 1; attempt <= 2; attempt++) {
     if (sd.begin(PIN_SD_CS, SD_SCK_MHZ(24))) {
       online.microSd = true;  // Set flag.
       DEBUG_PRINTLN("[microSD] Info: Initialized successfully.");
-      displaySuccess();  // Display OLED success message.
+      displaySuccess();  // Display OLED success message
 
       // Get storage information
       getSdSpaceInfo();
       getSdFileCount();
-      break;  // Exit retry loop on success.
+      break;  // Exit retry loop on success
     }
 
     DEBUG_PRINTLN("[microSD] Warning: Initialization failed. Retrying...");
-    displayErrorMicrosd1();  // Display OLED error message.
-    myDelay(2000);           // Non-blocking delay before retry.
+    displayErrorMicrosd1();  // Display OLED error message
+    myDelay(2000);           // Non-blocking delay before retry
 
-    // On second failure, log error and disable peripherals.
+    // On second failure, log error and disable peripherals
     if (attempt == 2) {
       DEBUG_PRINTLN("[microSD] Error: Failed to initialize.");
       online.microSd = false;  // Set flag.
 
-      displayErrorMicrosd2();  // Display OLED failure message.
-      qwiicPowerOff();         // Disable power to Qwiic connector.
-      peripheralPowerOff();    // Disable power to peripherals.
+      displayErrorMicrosd2();  // Display OLED failure message
+      qwiicPowerOff();         // Disable power to Qwiic connector
+      peripheralPowerOff();    // Disable power to peripherals
     }
   }
 
-  timer.microSd = millis() - loopStartTime;  // Stop loop timer.
+  timer.microSd = millis() - loopStartTime;  // Stop loop timer
 }
 
 // ---------------------------------------------------------------------------

@@ -11,32 +11,46 @@
 // a gain/offset correction. Returns the voltage in volts.
 // ----------------------------------------------------------------------------
 float readBattery() {
-  unsigned long startTime = micros();  // Record function start time.
+  unsigned long startTime = micros();  // Record function start time
 
-  // Measure the ADC reading from the battery voltage divider on A0.
+  // Measure the ADC reading from the battery voltage divider on A0
   reading = analogRead(A0);
 
-  // Convert ADC reading to voltage using the scaling factor and offset.
-  float voltage = reading / 452.89;  // Apply ADC linear gain.
-  voltage += -0.13;                  // Apply ADC linear offset.
+  // Convert ADC reading to voltage using the scaling factor and offset
+  float voltage = reading / 452.89;  // Apply ADC linear gain
+  voltage += -0.13;                  // Apply ADC linear offset
 
   //DEBUG_PRINT("[POWER] Info: ADC = "); DEBUG_PRINTLN(reading);
   //DEBUG_PRINT("[POWER] Info: Voltage = "); DEBUG_PRINTLN(voltage);
 
-  timer.voltage = micros() - startTime;  // Record execution time.
+  timer.voltage = micros() - startTime;  // Record execution time
   return voltage;
 }
 
 // Enable internal I2C pull-ups to maintain stable communication
-// with connected I2C devices.
+// with connected I2C devices
 void enablePullups() {
   Wire.setPullups(1);
   myDelay(2);  // Allow bus lines to stabilize
 }
 
-// Disable internal I2C pull-ups to reduce leakage and potential bus errors.
+// Disable internal I2C pull-ups to reduce leakage and potential bus errors
 void disablePullups() {
   Wire.setPullups(0);
+}
+
+// ----------------------------------------------------------------------------
+// Reads the internal Apollo3 / Artemis processor die temperature.
+// Returns temperature in degrees Celsius.
+// ----------------------------------------------------------------------------
+float readInternalTemp() {
+  float temperature = getInternalTemp();
+
+  //DEBUG_PRINT("[POWER] Info: Internal MCU temperature = ");
+  //DEBUG_PRINT(temperature);
+  //DEBUG_PRINTLN(" C");
+
+  return temperature;
 }
 
 // ----------------------------------------------------------------------------
@@ -46,25 +60,25 @@ void disablePullups() {
 // or WDT interrupt.
 // ----------------------------------------------------------------------------
 void goToSleep() {
-  firstTimeFlag = false;  // Clear the first-time flag.
+  firstTimeFlag = false;  // Clear the first-time flag
 
-  // Skip deep sleep if operating in continuous logging mode.
+  // Skip deep sleep if operating in continuous logging mode
   if (operationMode == CONTINUOUS) {
     DEBUG_PRINTLN("[POWER] Info: System is in continuous mode. Skipping sleep...");
     return;
   } else {
-    alarmFlag = false;  // Ensure the alarm flag is cleared.
+    alarmFlag = false;  // Ensure the alarm flag is cleared
   }
 
-  // Display deep sleep message on OLED.
+  // Display deep sleep message on OLED
   displayDeepSleep();
 
 #if DEBUG
-  Serial.flush();  // Flush the serial port.
-  Serial.end();    // Close Serial port to save power.
+  Serial.flush();  // Flush the serial port
+  Serial.end();    // Close Serial port to save power
 #endif
 
-  // Disable peripherals and reduce leakage.
+  // Disable peripherals and reduce leakage
   disablePullups();
   Wire.end();
   SPI.end();
@@ -73,7 +87,7 @@ void goToSleep() {
   // Turn off the built-in LED.
   digitalWrite(LED_BUILTIN, LOW);
 
-  // Disable hardware peripherals.
+  // Disable hardware peripherals
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_IOM0);
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_IOM1);
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_IOM2);
@@ -84,58 +98,58 @@ void goToSleep() {
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART0);
   am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_UART1);
 
-  // Disable all GPIO pads except: G1 (33), G2 (34), A0, LED_BUILTIN (19).
+  // Disable all GPIO pads except: G1 (33), G2 (34), A0, LED_BUILTIN (19)
   for (int pin = 0; pin < 50; pin++) {
     if ((pin != 33) && (pin != 34) && (pin != A0) && (pin != 19)) {
       am_hal_gpio_pinconfig(pin, g_AM_HAL_GPIO_DISABLE);
     }
   }
 
-  // Power off external devices.
+  // Power off external devices
   qwiicPowerOff();
   peripheralPowerOff();
 
-  // Clear all online status flags.
+  // Clear all online status flags
   online.gnss = false;
   online.microSd = false;
   online.oled = false;
   online.logGnss = false;
   online.logDebug = false;
 
-  // Configure memory power settings for deep sleep.
+  // Configure memory power settings for deep sleep
   am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_ALL);
   am_hal_pwrctrl_memory_deepsleep_retain(AM_HAL_PWRCTRL_MEM_SRAM_384K);
 
-  // Configure system timer for RTC.
+  // Configure system timer for RTC
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
   am_hal_stimer_config(AM_HAL_STIMER_XTAL_32KHZ);
 
-  // Enter deep sleep.
+  // Enter deep sleep
   am_hal_sysctrl_sleep(AM_HAL_SYSCTRL_SLEEP_DEEP);
 
   /*
-     Processor now sleeps and awaits an RTC or WDT interrupt.
+     Processor now sleeps and awaits an RTC or WDT interrupt
   */
 
-  wakeUp();  // Reinitialize system upon waking.
+  wakeUp();  // Reinitialize system upon waking
 }
 
 // ----------------------------------------------------------------------------
 // Wake up from deep sleep and reinitialize system components.
 // ----------------------------------------------------------------------------
 void wakeUp() {
-  // Reconfigure system timer to use the high-frequency clock.
+  // Reconfigure system timer to use the high-frequency clock
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
   am_hal_stimer_config(AM_HAL_STIMER_HFRC_3MHZ);
 
-  // Re-enable ADC, I2C, and SPI.
+  // Re-enable ADC, I2C, and SPI
   ap3_adc_setup();
   Wire.begin();
   Wire.setClock(400000);
   SPI.begin();
 
 #if DEBUG
-  Serial.begin(115200);  // Reopen Serial for debugging.
+  Serial.begin(115200);  // Reopen Serial for debugging
 #endif
 }
 
@@ -145,11 +159,11 @@ void wakeUp() {
 // ----------------------------------------------------------------------------
 void restorePeripherals() {
   DEBUG_PRINTLN("[Power] Info: Restoring power to peripherals.");
-  qwiicPowerOn();       // Re-enable power to I2C devices.
-  peripheralPowerOn();  // Re-enable power to peripherals.
-  resetOled();          // Reset/reconfigure the OLED display.
-  configureSd();        // Reinitialize the microSD card.
-  configureGnss();      // Reinitialize the GNSS receiver.
+  qwiicPowerOn();       // Re-enable power to I2C devices
+  peripheralPowerOn();  // Re-enable power to peripherals
+  resetOled();          // Reset/reconfigure the OLED display
+  configureSd();        // Reinitialize the microSD card
+  configureGnss();      // Reinitialize the GNSS receiver
 }
 
 // ----------------------------------------------------------------------------
@@ -157,7 +171,7 @@ void restorePeripherals() {
 // ----------------------------------------------------------------------------
 void qwiicPowerOn() {
   digitalWrite(PIN_QWIIC_POWER, HIGH);
-  myDelay(2500);  // Non-blocking delay to allow Qwiic devices time to power up.
+  myDelay(2500);  // Non-blocking delay to allow Qwiic devices time to power up
 }
 
 void qwiicPowerOff() {
@@ -169,7 +183,7 @@ void qwiicPowerOff() {
 // ----------------------------------------------------------------------------
 void peripheralPowerOn() {
   digitalWrite(PIN_MICROSD_POWER, HIGH);
-  myDelay(250);  // Non-blocking delay to allow peripherals time to power up.
+  myDelay(250);  // Non-blocking delay to allow peripherals time to power up
 }
 
 void peripheralPowerOff() {
@@ -191,7 +205,7 @@ void blinkLed(byte ledFlashes, unsigned int ledDelay) {
       i++;
     }
   }
-  digitalWrite(LED_BUILTIN, LOW);  // Ensure LED is off after blinking.
+  digitalWrite(LED_BUILTIN, LOW);  // Ensure LED is off after blinking
 }
 
 // ----------------------------------------------------------------------------
@@ -202,6 +216,6 @@ void blinkLed(byte ledFlashes, unsigned int ledDelay) {
 void myDelay(unsigned long ms) {
   unsigned long start = millis();
   while (millis() - start < ms) {
-    petDog();  // Reset the WDT during the delay.
+    petDog();  // Reset the WDT during the delay
   }
 }

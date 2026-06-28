@@ -544,7 +544,7 @@ void displayDeepSleep() {
   oled.text(0, 0, "Entering deep sleep.");
   oled.display();
   disablePullups();
-  myDelay(3000);
+  myDelay(1000);
 }
 
 // ----------------------------------------------------------------------------
@@ -553,7 +553,7 @@ void displayDeepSleep() {
 void displayOff() {
   if (!online.oled) return;
   enablePullups();
-  oled.displayPower(1);
+  oled.displayPower(0);
   disablePullups();
 }
 
@@ -563,7 +563,7 @@ void displayOff() {
 void displayOn() {
   if (!online.oled) return;
   enablePullups();
-  oled.displayPower(0);
+  oled.displayPower(1);
   disablePullups();
 }
 
