@@ -56,14 +56,11 @@ void configureGnss() {
       // Second failure
       DEBUG_PRINTLN("[GNSS] Error: u-blox failed to initialize! Please check wiring.");
       displayFailure();
-
-      online.gnss = false;
-      logDebug();  // Log system debug information
-
-      // Disable power to Qwiic connector
-      qwiicPowerOff();
-      // Disable power to peripherals
-      peripheralPowerOff();
+      online.gnss = false;     // Clear GNSS flag
+      logDebug();              // Log system debug information
+      online.microSd = false;  // Clear microSD flag
+      qwiicPowerOff();         // Disable power to Qwiic connector
+      peripheralPowerOff();    // Disable power to peripherals
     }
   }
 
@@ -274,14 +271,13 @@ void logGnss() {
     // O_APPEND - Seek to the end of the file prior to each write
     // O_WRITE  - Open the file for writing
     if (!logFile.open(logFileName, O_CREAT | O_APPEND | O_WRITE)) {
-      DEBUG_PRINT("[GNSS] Warning: Failed to create log file");
+      DEBUG_PRINT("[GNSS] Warning: Failed to create log file ");
       DEBUG_PRINTLN(logFileName);
       return;
-    } else {
-      online.logGnss = true;
-      DEBUG_PRINT("[GNSS] Info: Created log file ");
-      DEBUG_PRINTLN(logFileName);
     }
+    online.logGnss = true;
+    DEBUG_PRINT("[GNSS] Info: Created log file ");
+    DEBUG_PRINTLN(logFileName);
 
     // Update file create timestamp.
     updateFileCreate(&logFile);
@@ -387,7 +383,7 @@ void logGnss() {
               displayScreenIndex = 0;
             }
           } else {
-            displayOff();  // Put OLED display into sleep mode
+            displayOff();          // Put OLED display into sleep mode
             displayDebug = false;  // Clear flag
           }
         }

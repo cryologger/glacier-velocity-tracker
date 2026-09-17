@@ -140,9 +140,10 @@ void setSleepAlarm() {
       break;
 
     case CONTINUOUS:
-      // In continuous mode, we don't go to sleep at all
+      // In continuous mode, don't enter deep sleep 
       DEBUG_PRINTLN("[RTC] Info: Continuous mode. No sleep alarm.");
-      alarmFlag = true;  // Signals immediate handling
+      firstDeploymentFlag = false;  // Clear deployment-day flag
+      alarmFlag = true;             // Set alarm flag
       return;
   }
 
@@ -349,6 +350,7 @@ void checkOperationMode() {
     operationMode = CONTINUOUS;
   } else {
     operationMode = normalOperationMode;
+    seasonalPowerInitFlag = false; // Clear flag
   }
 
   // Debug output for the chosen mode

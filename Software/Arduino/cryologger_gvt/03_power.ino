@@ -66,8 +66,12 @@ void goToSleep() {
   if (operationMode == CONTINUOUS) {
     DEBUG_PRINTLN("[POWER] Info: System is in continuous mode. Skipping sleep...");
     return;
-  } else {
-    alarmFlag = false;  // Ensure the alarm flag is cleared
+  }
+
+  // Skip deep sleep if an alarm fired after the check in loop()
+  if (alarmFlag) {
+    DEBUG_PRINTLN("[POWER] Info: Alarm pending. Skipping sleep...");
+    return;
   }
 
   // Display deep sleep message on OLED
