@@ -1,9 +1,10 @@
 /*
-  Cryologger - Glacier Velocity Tracker (GVT)
-  Version: 3.0.5
-  Date: June 27, 2026
-  Author: Adam Garbo
-  License: GPLv3. See license file for more information.
+  Title:      Cryologger - Glacier Velocity Tracker (GVT)
+  Author:     Adam Garbo
+  Version:    3.0.6
+  Date:       September 17, 2026
+  Copyright:  (C) Adam Garbo
+  License:    GPLv3. See LICENSE file for more information.
 
   Components:
   - SparkFun Artemis Processor
@@ -12,9 +13,12 @@
   - SparkFun Qwiic OLED Display
   - Pololu 5V 600mA Step-Down Voltage Regulator D36V6F5
 
-  Description:
-  This sketch integrates the RTC, microSD, GNSS, OLED display, and WDT modules 
-  to implement a glacier velocity measurement and logging system.
+  Board Definitions:
+  - SparkFun Apollo3 Boards v1.2.3
+
+  Comments:
+  - Developed for autonomous, long-term glacier velocity monitoring.
+  - Tested using SparkFun Apollo3 Boards v1.2.3. Other versions may behave differently.
 */
 
 // ----------------------------------------------------------------------------
@@ -28,9 +32,9 @@ char uid[20] = "GVT_26_TST";  // Default unique identifier (UID)
 #define OPERATION_MODE DAILY  // Options: DAILY, ROLLING, CONTINUOUS
 
 // Daily mode parameters (only used if OPERATION_MODE == DAILY)
-#define DAILY_START_HOUR 19   // Logging start hour (UTC)
+#define DAILY_START_HOUR 17   // Logging start hour (UTC)
 #define DAILY_START_MINUTE 0  // Logging start minute (UTC)
-#define DAILY_STOP_HOUR 22    // Logging stop hour (UTC)
+#define DAILY_STOP_HOUR 20    // Logging stop hour (UTC)
 #define DAILY_STOP_MINUTE 0   // Logging stop minute (UTC)
 
 // Rolling mode parameters (only used if OPERATION_MODE == ROLLING)
@@ -42,14 +46,14 @@ char uid[20] = "GVT_26_TST";  // Default unique identifier (UID)
 // Seasonal logging override
 // If ENABLED and the current date is within the seasonal window,
 // we switch to CONTINUOUS mode automatically.
-#define SEASONAL_LOGGING_MODE ENABLED  // ENABLED or DISABLED
-#define SEASONAL_START_DAY 1           // Seasonal logging start day
-#define SEASONAL_START_MONTH 6         // Seasonal logging start month
-#define SEASONAL_END_DAY 30            // Seasonal logging stop day
-#define SEASONAL_END_MONTH 9           // Seasonal logging stop month
+#define SEASONAL_LOGGING_MODE DISABLED  // ENABLED or DISABLED
+#define SEASONAL_START_DAY 1            // Seasonal logging start day
+#define SEASONAL_START_MONTH 6          // Seasonal logging start month
+#define SEASONAL_END_DAY 30             // Seasonal logging stop day
+#define SEASONAL_END_MONTH 9            // Seasonal logging stop month
 
 // GNSS Satellite Signal configuration (0=DISABLE, 1=ENABLE)
-#define GNSS_MEASUREMENT_RATE 15000
+#define GNSS_MEASUREMENT_RATE 5000
 #define GNSS_GPS_ENABLED 1
 #define GNSS_GLO_ENABLED 1
 #define GNSS_GAL_ENABLED 1
@@ -68,15 +72,15 @@ char uid[20] = "GVT_26_TST";  // Default unique identifier (UID)
 #include <RTC.h>                      // 1.2      Apollo3 Core v1.2.3
 #include <SdFat.h>                    // 2.3.0
 #include <SparkFun_Qwiic_OLED.h>      // 1.0.15
-#include <SparkFun_u-blox_GNSS_v3.h>  // 3.1.14
+#include <SparkFun_u-blox_GNSS_v3.h>  // 3.1.15
 #include <SPI.h>                      //          Apollo3 Core v1.2.3
 #include <WDT.h>                      // 0.1      Apollo3 Core v1.2.3
 #include <Wire.h>                     //          Apollo3 Core v1.2.3
 
 // ----------------------------------------------------------------------------
-// Software & Hardware Versions
+// Firmware & Hardware Versions
 // ----------------------------------------------------------------------------
-#define SOFTWARE_VERSION "3.0.5"
+#define FIRMWARE_VERSION "3.0.6"
 #define HARDWARE_VERSION "2.21"
 
 // ----------------------------------------------------------------------------
@@ -322,9 +326,9 @@ void setup() {
   DEBUG_PRINT("Serial:");
   printTab(3);
   DEBUG_PRINTLN(uid);
-  DEBUG_PRINT("Software Version:");
+  DEBUG_PRINT("Firmware Version:");
   printTab(1);
-  DEBUG_PRINTLN(SOFTWARE_VERSION);
+  DEBUG_PRINTLN(FIRMWARE_VERSION);
   DEBUG_PRINT("Hardware Version:");
   printTab(1);
   DEBUG_PRINTLN(HARDWARE_VERSION);
