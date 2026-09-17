@@ -26,7 +26,7 @@ void configureSd() {
   // Attempt microSD initialization with a maximum of 2 retries
   for (int attempt = 1; attempt <= 2; attempt++) {
     if (sd.begin(PIN_SD_CS, SD_SCK_MHZ(24))) {
-      online.microSd = true;  // Set flag.
+      online.microSd = true;  // Set microSD flag
       DEBUG_PRINTLN("[microSD] Info: Initialized successfully.");
       displaySuccess();  // Display OLED success message
 
@@ -43,9 +43,9 @@ void configureSd() {
     // On second failure, log error and disable peripherals
     if (attempt == 2) {
       DEBUG_PRINTLN("[microSD] Error: Failed to initialize.");
-      online.microSd = false;  // Set flag.
-
+      online.microSd = false;  // Clear microSD flag
       displayErrorMicrosd2();  // Display OLED failure message
+      online.gnss = false;     // Clear GNSS flag
       qwiicPowerOff();         // Disable power to Qwiic connector
       peripheralPowerOff();    // Disable power to peripherals
     }
@@ -106,9 +106,11 @@ bool loadConfigFromSd() {
     tmpSeasonalEndDay, tmpSeasonalEndMonth;
 
   int tmpGnssRate;
-  byte tmpGpsEnabled, tmpGloEnabled,
-    tmpGalEnabled, tmpBdsEnabled,
-    tmpSbasEnabled, tmpQzssEnabled;
+
+  byte tmpGpsEnabled = gnssGpsEnabled, tmpGloEnabled = gnssGloEnabled,
+       tmpGalEnabled = gnssGalEnabled, tmpBdsEnabled = gnssBdsEnabled,
+       tmpSbasEnabled = gnssSbasEnabled, tmpQzssEnabled = gnssQzssEnabled;
+
   // --------------------------
   // Validate each field
   // --------------------------
