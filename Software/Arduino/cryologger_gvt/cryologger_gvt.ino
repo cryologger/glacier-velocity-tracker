@@ -19,6 +19,8 @@
   Comments:
   - Developed for autonomous, long-term glacier velocity monitoring.
   - Tested using SparkFun Apollo3 Boards v1.2.3. Other versions may behave differently.
+  - Sketch uses 131368 bytes (13%) of program storage space. Maximum is 960000 bytes.
+  - Global variables use 54284 bytes of dynamic memory.
 */
 
 // ----------------------------------------------------------------------------

@@ -115,7 +115,7 @@ void displayBoot() {
   oled.setCursor(0, 10);
   oled.print("SWVER:");
   oled.setCursor(42, 10);
-  oled.print(SOFTWARE_VERSION);
+  oled.print(FIRMWARE_VERSION);
   oled.setCursor(0, 20);
   oled.print("HWVER:");
   oled.setCursor(42, 20);
