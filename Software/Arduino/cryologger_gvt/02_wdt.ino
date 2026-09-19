@@ -16,18 +16,21 @@
 */
 
 // ----------------------------------------------------------------------------
-// Configure and enable the Watchdog Timer.
+// Configure and enable the Watchdog Timer (WDT).
 // ----------------------------------------------------------------------------
 void configureWdt() {
-  // Configure the Watchdog Timer (WDT)
-  // Using a 1 Hz clock, 64-second interrupt period, and 128-second reset period.
-  // (Alternative configuration is commented out below)
-  // wdt.configure(WDT_16HZ, 128, 240); // 16 Hz clock: 10-sec interrupt, 15-sec reset period
-  wdt.configure(WDT_1HZ, 64, 128);
+  // Use a 1/16 Hz clock, 256-second interrupt period, and 512-second reset period
+  // Interrupt after 4 minutes 16 seconds and reset after 8 minutes 32 seconds
+  wdt.configure(WDT_1_16HZ, 16, 32);
 
-  // Start the Watchdog Timer
-  wdt.start();
+  // Alternative configuration:
+  // Use a 1 Hz clock, 64-second interrupt period, and 128-second reset period
+  // Interrupt after 1 minute 4 seconds and reset after 2 minutes 8 seconds
+  //wdt.configure(WDT_1HZ, 64, 128);
+
+  wdt.start();  // Start the WDT
 }
+
 // ----------------------------------------------------------------------------
 // Reset ("pet") the Watchdog Timer to prevent an unintended system reset.
 // This function also resets the WDT flag and counter, while recording the
