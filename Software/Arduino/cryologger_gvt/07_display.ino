@@ -227,15 +227,21 @@ void displayLoggingMode() {
   oled.setCursor(0, 0);
   oled.print("Log Mode: ");
 
-  char displayBuffer1[32];
-  char displayBuffer2[32];
+  char displayBuffer1[32] = "";
+  char displayBuffer2[32] = "";
 
   if (operationMode == 1) {
     snprintf(displayBuffer1, sizeof(displayBuffer1),
              "Start time: %02d:%02d", alarmStartHour, alarmStartMinute);
     snprintf(displayBuffer2, sizeof(displayBuffer2),
              "End time: %02d:%02d", alarmStopHour, alarmStopMinute);
-    oled.print("Daily");
+    if (alarmDailyInterval > 1) {
+      char intervalBuffer[12];
+      snprintf(intervalBuffer, sizeof(intervalBuffer), "Every %dd", alarmDailyInterval);
+      oled.print(intervalBuffer);
+    } else {
+      oled.print("Daily");
+    }
   } else if (operationMode == 2) {
     snprintf(displayBuffer1, sizeof(displayBuffer1),
              "Log: %02d hrs %02d min", alarmAwakeHours, alarmAwakeMinutes);
@@ -251,22 +257,31 @@ void displayLoggingMode() {
   oled.text(0, 20, displayBuffer2);
   oled.display();
   disablePullups();
-  myDelay(8000);
+  myDelay(4000);
 }
 
 // ----------------------------------------------------------------------------
-// Display seasonal logging mode status.
-// Shows whether seasonal logging mode is enabled or disabled.
+// Display logging options.
+// Shows deployment and seasonal logging status.
 // ----------------------------------------------------------------------------
-void displaySeasonalMode() {
+void displayLoggingOptions() {
   if (!online.oled) return;
 
   enablePullups();
   oled.erase();
-  oled.setCursor(0, 0);
-  oled.print("Seasonal Mode:");
 
+  // Deployment logging
+  oled.setCursor(0, 0);
+  oled.print("Deployment: ");
+  if (deploymentLogging == ENABLED) {
+    oled.print("Enabled");
+  } else {
+    oled.print("Disabled");
+  }
+
+  // Seasonal logging
   oled.setCursor(0, 10);
+  oled.print("Seasonal: ");
   if (seasonalLoggingMode == ENABLED) {
     oled.print("Enabled");
   } else {

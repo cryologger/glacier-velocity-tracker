@@ -48,6 +48,11 @@ void printLoggingSettings() {
     DEBUG_PRINT(alarmStopHour);
     DEBUG_PRINT(":");
     DEBUG_PRINTLN(alarmStopMinute);
+    DEBUG_PRINT("Interval: ");
+    printTab(2);
+    DEBUG_PRINT("Every ");
+    DEBUG_PRINT(alarmDailyInterval);
+    DEBUG_PRINTLN(alarmDailyInterval == 1 ? " day" : " days");
   }
   if (operationMode == ROLLING) {
     DEBUG_PRINTLN("Rolling");
@@ -68,11 +73,17 @@ void printLoggingSettings() {
     DEBUG_PRINTLN("Continuous");
   }
 
+  DEBUG_PRINT("Deployment logging: ");
+  printTab(1);
+  DEBUG_PRINTLN(deploymentLogging == ENABLED ? "Enabled"
+                                             : "Disabled");
+
   DEBUG_PRINT("Seasonal mode: ");
   printTab(2);
-  DEBUG_PRINTLN(seasonalLoggingMode ? "Enabled"
-                                    : "Disabled");
-  if (seasonalLoggingMode) {
+  DEBUG_PRINTLN(seasonalLoggingMode == ENABLED ? "Enabled"
+                                               : "Disabled");
+
+  if (seasonalLoggingMode == ENABLED) {
     DEBUG_PRINT("Start (MM/DD): ");
     printTab(2);
     DEBUG_PRINT(alarmSeasonalStartMonth);
@@ -249,8 +260,7 @@ void printTimers() {
 // ----------------------------------------------------------------------------
 // Private helper: check if an I2C device ACKs at the given address.
 // ----------------------------------------------------------------------------
-static bool i2cDevicePresent(uint8_t addr)
-{
+static bool i2cDevicePresent(uint8_t addr) {
   Wire.beginTransmission(addr);
   return (Wire.endTransmission() == 0);
 }
@@ -260,8 +270,7 @@ static bool i2cDevicePresent(uint8_t addr)
 // Iterates through all valid 7-bit addresses and prints any responding
 // devices to the debug console. Used for diagnostics and troubleshooting.
 // ----------------------------------------------------------------------------
-static void i2cScan()
-{
+static void i2cScan() {
   DEBUG_PRINTLN("[I2C] Scan start");
   for (uint8_t addr = 1; addr < 127; addr++) {
     Wire.beginTransmission(addr);
