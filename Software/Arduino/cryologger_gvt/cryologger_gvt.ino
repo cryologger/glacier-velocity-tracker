@@ -1,8 +1,8 @@
 /*
   Title:      Cryologger - Glacier Velocity Tracker (GVT)
   Author:     Adam Garbo
-  Version:    3.0.6
-  Date:       September 17, 2026
+  Version:    3.1.0
+  Date:       September 18, 2026
   Copyright:  (C) Adam Garbo
   License:    GPLv3. See LICENSE file for more information.
 
@@ -19,8 +19,8 @@
   Comments:
   - Developed for autonomous, long-term glacier velocity monitoring.
   - Tested using SparkFun Apollo3 Boards v1.2.3. Other versions may behave differently.
-  - Sketch uses 131368 bytes (13%) of program storage space. Maximum is 960000 bytes.
-  - Global variables use 54284 bytes of dynamic memory.
+  - Sketch uses 133448 bytes (13%) of program storage space. Maximum is 960000 bytes.
+  - Global variables use 54300 bytes of dynamic memory.
 */
 
 // ----------------------------------------------------------------------------
@@ -33,11 +33,16 @@ char uid[20] = "GVT_26_TST";  // Default unique identifier (UID)
 // Select the default operation mode (for normal periods when NOT in seasonal)
 #define OPERATION_MODE DAILY  // Options: DAILY, ROLLING, CONTINUOUS
 
+// Deployment logging behaviour (DAILY mode only)
+// ENABLED logs immediately on deployment; DISABLED follows the configured logging schedule
+#define DEPLOYMENT_LOGGING ENABLED
+
 // Daily mode parameters (only used if OPERATION_MODE == DAILY)
 #define DAILY_START_HOUR 17   // Logging start hour (UTC)
 #define DAILY_START_MINUTE 0  // Logging start minute (UTC)
 #define DAILY_STOP_HOUR 20    // Logging stop hour (UTC)
 #define DAILY_STOP_MINUTE 0   // Logging stop minute (UTC)
+#define DAILY_INTERVAL 1      // Log every N days (1-30, 1 = every day)
 
 // Rolling mode parameters (only used if OPERATION_MODE == ROLLING)
 #define ROLLING_AWAKE_HOURS 1    // Awake period (hours)
@@ -47,7 +52,7 @@ char uid[20] = "GVT_26_TST";  // Default unique identifier (UID)
 
 // Seasonal logging override
 // If ENABLED and the current date is within the seasonal window,
-// we switch to CONTINUOUS mode automatically.
+// we switch to CONTINUOUS mode automatically
 #define SEASONAL_LOGGING_MODE DISABLED  // ENABLED or DISABLED
 #define SEASONAL_START_DAY 1            // Seasonal logging start day
 #define SEASONAL_START_MONTH 6          // Seasonal logging start month
@@ -55,7 +60,7 @@ char uid[20] = "GVT_26_TST";  // Default unique identifier (UID)
 #define SEASONAL_END_MONTH 9            // Seasonal logging stop month
 
 // GNSS Satellite Signal configuration (0=DISABLE, 1=ENABLE)
-#define GNSS_MEASUREMENT_RATE 5000
+#define GNSS_MEASUREMENT_RATE 1000
 #define GNSS_GPS_ENABLED 1
 #define GNSS_GLO_ENABLED 1
 #define GNSS_GAL_ENABLED 1
@@ -78,11 +83,12 @@ char uid[20] = "GVT_26_TST";  // Default unique identifier (UID)
 #include <SPI.h>                      //          Apollo3 Core v1.2.3
 #include <WDT.h>                      // 0.1      Apollo3 Core v1.2.3
 #include <Wire.h>                     //          Apollo3 Core v1.2.3
+#include <time.h>                     //          gmtime_r()
 
 // ----------------------------------------------------------------------------
 // Firmware & Hardware Versions
 // ----------------------------------------------------------------------------
-#define FIRMWARE_VERSION "3.0.6"
+#define FIRMWARE_VERSION "3.1.0"
 #define HARDWARE_VERSION "2.21"
 
 // ----------------------------------------------------------------------------
@@ -120,8 +126,8 @@ char uid[20] = "GVT_26_TST";  // Default unique identifier (UID)
 // ----------------------------------------------------------------------------
 // Peripheral Object Instantiations
 // ----------------------------------------------------------------------------
-APM3_RTC rtc;          // Real-Time Clock
-APM3_WDT wdt;          // Watchdog Timer
+APM3_RTC rtc;          // Real-Time Clock (RTC)
+APM3_WDT wdt;          // Watchdog Timer (WDT)
 SdFs sd;               // SD card filesystem
 FsFile configFile;     // Configuration file on SD
 FsFile logFile;        // Log file on SD
@@ -138,7 +144,7 @@ enum OperationMode : uint8_t {
   CONTINUOUS = 3
 };
 
-enum SeasonalMode : bool {
+enum EnableMode : bool {
   DISABLED = 0,
   ENABLED = 1,
 };
@@ -147,20 +153,24 @@ enum SeasonalMode : bool {
 // Global Variables for Logging Modes & Times
 // ---------------------------------------------------------------------------
 
-// The user-chosen “normal” operation mode (DAILY/ROLLING/CONTINUOUS)
+// User-chosen “normal” operation mode (DAILY/ROLLING/CONTINUOUS)
 OperationMode operationMode = (OperationMode)OPERATION_MODE;
 
 // Store a copy of that mode so we can revert after seasonal
 OperationMode normalOperationMode = operationMode;
 
-// The seasonal override (ENABLED or DISABLED)
-SeasonalMode seasonalLoggingMode = (SeasonalMode)SEASONAL_LOGGING_MODE;
+// Deployment logging setting (ENABLED or DISABLED)
+EnableMode deploymentLogging = (EnableMode)DEPLOYMENT_LOGGING;
+
+// Seasonal override (ENABLED or DISABLED)
+EnableMode seasonalLoggingMode = (EnableMode)SEASONAL_LOGGING_MODE;
 
 // Daily mode times
 byte alarmStartHour = DAILY_START_HOUR;
 byte alarmStartMinute = DAILY_START_MINUTE;
 byte alarmStopHour = DAILY_STOP_HOUR;
 byte alarmStopMinute = DAILY_STOP_MINUTE;
+byte alarmDailyInterval = DAILY_INTERVAL;
 
 // Rolling mode times
 byte alarmAwakeHours = ROLLING_AWAKE_HOURS;
@@ -189,24 +199,24 @@ byte gnssQzssEnabled = GNSS_QZSS_ENABLED;
 // Global Variables for Logging & System State
 // ----------------------------------------------------------------------------
 volatile bool alarmFlag = false;  // Set by RTC alarm ISR
-volatile bool wdtFlag = false;    // Set by Watchdog Timer ISR
+volatile bool wdtFlag = false;    // Set by WDT ISR
 volatile int wdtCounter = 0;      // Count of WDT interrupts
 volatile int wdtCounterMax = 0;   // Maximum WDT interrupt count observed
 
-bool firstDeploymentFlag = true;     // Forces immediate logging on first wake to confirm system operation
-bool seasonalPowerInitFlag = false;  // Tracks if peripherals were restored for seasonal mode
-bool gnssConfigFlag = true;          // Indicates if GNSS module needs reconfiguration
-bool rtcSyncFlag = false;            // Indicates if RTC is synchronized with GNSS
-bool firstTimeFlag = true;           // True during the first run
+bool firstDeploymentFlag = true;       // Forces immediate logging on first wake to confirm system operation
+bool continuousPowerInitFlag = false;  // Tracks if peripherals were restored for continuous (or seasonal) mode
+bool gnssConfigFlag = true;            // Indicates if GNSS module needs reconfiguration
+bool rtcSyncFlag = false;              // Indicates if RTC is synchronized with GNSS
+bool firstTimeFlag = true;             // True during the first run
 
 // Alarm mode settings for various states
 byte alarmModeInitial = 4;  // Initial RTC alarm mode (default daily)
 byte alarmModeLogging = 4;  // Alarm mode during logging
 byte alarmModeSleep = 4;    // Alarm mode during sleep
 
-// Variables to track date changes
-byte dateCurrent = 0;
-byte dateNew = 0;
+// Variables to track date changes (UTC days since 1970-01-01)
+uint32_t dateCurrent = 0;
+uint32_t dateNew = 0;
 
 // Buffers
 char logFileName[100] = "";
@@ -283,35 +293,35 @@ void setup() {
   blinkLed(2, 1000);  // Blink LED to signal startup
 #endif
 
-  // Initialize pin modes for peripheral power control and LED indicator.
+  // Initialize pin modes for peripheral power control and LED indicator
   pinMode(PIN_QWIIC_POWER, OUTPUT);
   pinMode(PIN_MICROSD_POWER, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
-  // Power on I2C peripherals and other devices.
+  // Power on I2C peripherals and other devices
   qwiicPowerOn();
   peripheralPowerOn();
 
-  // Initialize communication protocols.
+  // Initialize communication protocols
   Wire.begin();              // Start I2C communications
   Wire.setClock(400000);     // Set I2C clock to 400 kHz
   SPI.begin();               // Start SPI communications
   analogReadResolution(14);  // Set ADC resolution to 14 bits
 
-  // Output startup information.
+  // Output startup information
   DEBUG_PRINTLN();
   printLine();
   DEBUG_PRINTLN("Cryologger - Glacier Velocity Tracker");
   printLine();
   DEBUG_PRINTLN("[Setup] Info: Initializing peripherals...");
 
-  // Initialize peripherals.
-  configureRtc();   // Set up the Real-Time Clock
-  configureWdt();   // Set up Watchdog Timer
-  configureOled();  // Set up the OLED display
-  displayBoot();
-  configureSd();  // Set up microSD card
-  displaySdInfo();
+  // Initialize system peripherals
+  configureRtc();   // Initialize RTC
+  configureWdt();   // Initialize WDT
+  configureOled();  // Initialize OLED display
+  displayBoot();    // Display boot information
+  configureSd();    // Initialize microSD card
+  displaySdInfo();  // Display microSD card information
 
   // Load configuration from microSD card
   if (loadConfigFromSd()) {
@@ -319,7 +329,7 @@ void setup() {
   } else {
     DEBUG_PRINTLN("[Setup] Info: Using fallback defaults.");
   }
-  configureGnss();  // Set up GNSS receiver
+  configureGnss();  // Initialize GNSS receiver
   displayGnssModuleInfo();
 
   printLine();
@@ -355,14 +365,14 @@ void setup() {
   displayWelcome();
   printLoggingSettings();
   displayLoggingMode();
-  displaySeasonalMode();
+  displayLoggingOptions();
   printGnssSettings();
 
-  // Configure additional devices and logging parameters
+  // Configure system settings and logging
   syncRtc();          // Synchronize RTC with GNSS
-  checkDate();        // Update the current date
-  createDebugFile();  // Create a debug log file on SD
-  setSleepAlarm();    // Set the RTC alarm based on operation mode
+  checkDate();        // Initialize the current date
+  createDebugFile();  // Create or open debug log file
+  setSleepAlarm();    // Set next RTC wake alarm
 
   DEBUG_PRINT("[Setup] Info: Datetime ");
   printDateTime();
@@ -381,20 +391,10 @@ void loop() {
     printDateTime();
 
     // Update RTC and logging configuration
-    readRtc();          // Refresh current RTC time
-    setLoggingAlarm();  // Schedule the wake-up alarm (end of logging period)
-    getLogFileName();   // Generate a new log file name with a timestamp
-
-    // If we have just transitioned to seasonal mode, restore power
-    if (operationMode == CONTINUOUS && !seasonalPowerInitFlag) {
-      restorePeripherals();
-      seasonalPowerInitFlag = true;
-    }
-
-    // If not in continuous mode, reinitialize peripherals
-    if (operationMode != CONTINUOUS) {
-      restorePeripherals();
-    }
+    readRtc();                    // Refresh current RTC time
+    setLoggingAlarm();            // Schedule the wake-up alarm (end of logging period)
+    getLogFileName();             // Generate a new log file name with a timestamp
+    restoreLoggingPeripherals();  // Restore peripherals as needed
 
     // If the date has changed (daily logging), re-sync the RTC
     if (checkDate()) {
@@ -409,31 +409,31 @@ void loop() {
     clearTimers();    // Reset timers for the next cycle
   }
 
-  // Service the Watchdog Timer if needed
+  // Service the WDT if needed
   if (wdtFlag) {
-    petDog();  // Reset the WDT timer
+    petDog();  // Reset the WDT
   }
 
   // Blink LED as a heartbeat indicator
   blinkLed(1, 100);
 
-  // Enter deep sleep to conserve power until the next event
+  // Enter deep sleep until the next wake event
   goToSleep();
 }
 
 // ----------------------------------------------------------------------------
 // Interrupt Service Routines (ISRs).
 // ----------------------------------------------------------------------------
-// RTC Alarm ISR.
+// RTC Alarm ISR
 extern "C" void am_rtc_isr(void) {
   // Clear the RTC alarm interrupt flag
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);
   alarmFlag = true;
 }
 
-// Watchdog Timer ISR
+// WDT ISR
 extern "C" void am_watchdog_isr(void) {
-  // Clear the Watchdog Timer interrupt flag
+  // Clear the WDT interrupt flag
   wdt.clear();
 
   // Restart the WDT timer if under the threshold
