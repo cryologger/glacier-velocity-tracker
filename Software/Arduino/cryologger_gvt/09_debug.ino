@@ -38,50 +38,58 @@ void printLoggingSettings() {
 
   if (operationMode == DAILY) {
     DEBUG_PRINTLN("Daily");
+
+    char timeBuffer[6];
+
     DEBUG_PRINT("Start: ");
     printTab(3);
-    DEBUG_PRINT(alarmStartHour);
-    DEBUG_PRINT(":");
-    DEBUG_PRINTLN(alarmStartMinute);
+    snprintf(timeBuffer, sizeof(timeBuffer), "%02d:%02d",
+             alarmStartHour, alarmStartMinute);
+    DEBUG_PRINTLN(timeBuffer);
+
     DEBUG_PRINT("Stop: ");
     printTab(3);
-    DEBUG_PRINT(alarmStopHour);
-    DEBUG_PRINT(":");
-    DEBUG_PRINTLN(alarmStopMinute);
+    snprintf(timeBuffer, sizeof(timeBuffer), "%02d:%02d",
+             alarmStopHour, alarmStopMinute);
+    DEBUG_PRINTLN(timeBuffer);
+
     DEBUG_PRINT("Interval: ");
     printTab(2);
-    DEBUG_PRINT("Every ");
-    DEBUG_PRINT(alarmDailyInterval);
-    DEBUG_PRINTLN(alarmDailyInterval == 1 ? " day" : " days");
-  }
-  if (operationMode == ROLLING) {
+
+    if (alarmDailyInterval == 1) {
+      DEBUG_PRINTLN("Every day");
+    } else {
+      DEBUG_PRINT("Every ");
+      DEBUG_PRINT(alarmDailyInterval);
+      DEBUG_PRINTLN(" days");
+    }
+  } else if (operationMode == ROLLING) {
     DEBUG_PRINTLN("Rolling");
+
     DEBUG_PRINT("Logging duration: ");
     printTab(1);
     DEBUG_PRINT(alarmAwakeHours);
-    DEBUG_PRINT(" hours ");
+    DEBUG_PRINT(alarmAwakeHours == 1 ? " hour " : " hours ");
     DEBUG_PRINT(alarmAwakeMinutes);
-    DEBUG_PRINTLN(" minutes");
+    DEBUG_PRINTLN(alarmAwakeMinutes == 1 ? " minute" : " minutes");
+
     DEBUG_PRINT("Sleep duration: ");
     printTab(1);
     DEBUG_PRINT(alarmSleepHours);
-    DEBUG_PRINT(" hours ");
+    DEBUG_PRINT(alarmSleepHours == 1 ? " hour " : " hours ");
     DEBUG_PRINT(alarmSleepMinutes);
-    DEBUG_PRINTLN(" minutes");
-  }
-  if (operationMode == CONTINUOUS) {
+    DEBUG_PRINTLN(alarmSleepMinutes == 1 ? " minute" : " minutes");
+  } else if (operationMode == CONTINUOUS) {
     DEBUG_PRINTLN("Continuous");
   }
 
   DEBUG_PRINT("Deployment logging: ");
   printTab(1);
-  DEBUG_PRINTLN(deploymentLogging == ENABLED ? "Enabled"
-                                             : "Disabled");
+  DEBUG_PRINTLN(deploymentLogging == ENABLED ? "Enabled" : "Disabled");
 
   DEBUG_PRINT("Seasonal mode: ");
   printTab(2);
-  DEBUG_PRINTLN(seasonalLoggingMode == ENABLED ? "Enabled"
-                                               : "Disabled");
+  DEBUG_PRINTLN(seasonalLoggingMode == ENABLED ? "Enabled" : "Disabled");
 
   if (seasonalLoggingMode == ENABLED) {
     DEBUG_PRINT("Start (MM/DD): ");

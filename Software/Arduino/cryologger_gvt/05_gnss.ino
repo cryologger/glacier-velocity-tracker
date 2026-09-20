@@ -218,7 +218,7 @@ void syncRtc() {
 
             // Update logfile timestamp if more than 30 seconds of drift
             if (abs(rtcDrift) > 30) {
-              DEBUG_PRINTLN("[GNSS] Info: Updating logfile timestamp");
+              DEBUG_PRINTLN("[GNSS] Info: Updating logfile timestamp.");
               rtc.getTime();     // Get the RTC's date and time
               getLogFileName();  // Update logfile timestamp
             }
