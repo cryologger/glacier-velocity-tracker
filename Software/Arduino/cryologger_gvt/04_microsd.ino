@@ -92,24 +92,36 @@ bool loadConfigFromSd() {
   // --------------------------
   // Declare local temp variables
   // --------------------------
-  char tmpUid[32];
+  char tmpUid[32] = "";
 
-  OperationMode tmpOpMode;
-  SeasonalMode tmpSeasonalMode;
+  OperationMode tmpOpMode = operationMode;
+  EnableMode tmpDeploymentLogging = deploymentLogging;
+  EnableMode tmpSeasonalMode = seasonalLoggingMode;
 
-  int tmpStartHour, tmpStartMin,
-    tmpStopHour, tmpStopMin,
-    tmpAwakeHours, tmpAwakeMinutes,
-    tmpSleepHours, tmpSleepMinutes;
+  int tmpStartHour = alarmStartHour;
+  int tmpStartMin = alarmStartMinute;
+  int tmpStopHour = alarmStopHour;
+  int tmpStopMin = alarmStopMinute;
+  int tmpDailyInterval = alarmDailyInterval;
 
-  int tmpSeasonalStartDay, tmpSeasonalStartMonth,
-    tmpSeasonalEndDay, tmpSeasonalEndMonth;
+  int tmpAwakeHours = alarmAwakeHours;
+  int tmpAwakeMinutes = alarmAwakeMinutes;
+  int tmpSleepHours = alarmSleepHours;
+  int tmpSleepMinutes = alarmSleepMinutes;
 
-  int tmpGnssRate;
+  int tmpSeasonalStartDay = alarmSeasonalStartDay;
+  int tmpSeasonalStartMonth = alarmSeasonalStartMonth;
+  int tmpSeasonalEndDay = alarmSeasonalEndDay;
+  int tmpSeasonalEndMonth = alarmSeasonalEndMonth;
 
-  byte tmpGpsEnabled = gnssGpsEnabled, tmpGloEnabled = gnssGloEnabled,
-       tmpGalEnabled = gnssGalEnabled, tmpBdsEnabled = gnssBdsEnabled,
-       tmpSbasEnabled = gnssSbasEnabled, tmpQzssEnabled = gnssQzssEnabled;
+  int tmpGnssRate = gnssMeasurementRate;
+
+  byte tmpGpsEnabled = gnssGpsEnabled;
+  byte tmpGloEnabled = gnssGloEnabled;
+  byte tmpGalEnabled = gnssGalEnabled;
+  byte tmpBdsEnabled = gnssBdsEnabled;
+  byte tmpSbasEnabled = gnssSbasEnabled;
+  byte tmpQzssEnabled = gnssQzssEnabled;
 
   // --------------------------
   // Validate each field
@@ -136,6 +148,20 @@ bool loadConfigFromSd() {
     }
   } else {
     DEBUG_PRINTLN("[Config] Error: 'operationMode' missing or invalid.");
+    configValid = false;
+  }
+
+  // deploymentLogging
+  if (doc["deploymentLogging"].is<const char*>()) {
+    const char* deploymentStr = doc["deploymentLogging"].as<const char*>();
+    if (strcmp(deploymentStr, "ENABLED") == 0) tmpDeploymentLogging = ENABLED;
+    else if (strcmp(deploymentStr, "DISABLED") == 0) tmpDeploymentLogging = DISABLED;
+    else {
+      DEBUG_PRINTLN("[Config] Error: 'deploymentLogging' not recognized.");
+      configValid = false;
+    }
+  } else {
+    DEBUG_PRINTLN("[Config] Error: 'deploymentLogging' missing or invalid.");
     configValid = false;
   }
 
@@ -187,9 +213,33 @@ bool loadConfigFromSd() {
     configValid = false;
   }
 
+  // Daily start and stop times must be different
+  if (tmpOpMode == DAILY
+      && tmpStartHour == tmpStopHour
+      && tmpStartMin == tmpStopMin) {
+    DEBUG_PRINTLN("[Config] Error: DAILY start and stop times cannot be equal.");
+    configValid = false;
+  }
+
+  // dailyInterval (optional, keeps compiled default if missing)
+  if (doc["dailyInterval"].is<int>()) {
+    tmpDailyInterval = doc["dailyInterval"].as<int>();
+    if (tmpDailyInterval < 1 || tmpDailyInterval > 30) {
+      DEBUG_PRINTLN("[Config] Error: 'dailyInterval' out of range (1–30).");
+      configValid = false;
+    }
+  } else if (!doc["dailyInterval"].isNull()) {
+    DEBUG_PRINTLN("[Config] Error: 'dailyInterval' invalid.");
+    configValid = false;
+  }
+
   // rollingAwakeHours
   if (doc["rollingAwakeHours"].is<int>()) {
     tmpAwakeHours = doc["rollingAwakeHours"].as<int>();
+    if (tmpAwakeHours < 0 || tmpAwakeHours > 23) {
+      DEBUG_PRINTLN("[Config] Error: 'rollingAwakeHours' out of range (0–23).");
+      configValid = false;
+    }
   } else {
     DEBUG_PRINTLN("[Config] Error: 'rollingAwakeHours' missing or invalid.");
     configValid = false;
@@ -198,6 +248,10 @@ bool loadConfigFromSd() {
   // rollingAwakeMinutes
   if (doc["rollingAwakeMinutes"].is<int>()) {
     tmpAwakeMinutes = doc["rollingAwakeMinutes"].as<int>();
+    if (tmpAwakeMinutes < 0 || tmpAwakeMinutes > 59) {
+      DEBUG_PRINTLN("[Config] Error: 'rollingAwakeMinutes' out of range (0–59).");
+      configValid = false;
+    }
   } else {
     DEBUG_PRINTLN("[Config] Error: 'rollingAwakeMinutes' missing or invalid.");
     configValid = false;
@@ -206,6 +260,10 @@ bool loadConfigFromSd() {
   // rollingSleepHours
   if (doc["rollingSleepHours"].is<int>()) {
     tmpSleepHours = doc["rollingSleepHours"].as<int>();
+    if (tmpSleepHours < 0 || tmpSleepHours > 23) {
+      DEBUG_PRINTLN("[Config] Error: 'rollingSleepHours' out of range (0–23).");
+      configValid = false;
+    }
   } else {
     DEBUG_PRINTLN("[Config] Error: 'rollingSleepHours' missing or invalid.");
     configValid = false;
@@ -214,8 +272,24 @@ bool loadConfigFromSd() {
   // rollingSleepMinutes
   if (doc["rollingSleepMinutes"].is<int>()) {
     tmpSleepMinutes = doc["rollingSleepMinutes"].as<int>();
+    if (tmpSleepMinutes < 0 || tmpSleepMinutes > 59) {
+      DEBUG_PRINTLN("[Config] Error: 'rollingSleepMinutes' out of range (0–59).");
+      configValid = false;
+    }
   } else {
     DEBUG_PRINTLN("[Config] Error: 'rollingSleepMinutes' missing or invalid.");
+    configValid = false;
+  }
+
+  // rollingAwake duration
+  if (tmpAwakeHours == 0 && tmpAwakeMinutes == 0) {
+    DEBUG_PRINTLN("[Config] Error: Rolling awake duration cannot be 0 hours 0 minutes.");
+    configValid = false;
+  }
+
+  // rollingSleep duration
+  if (tmpSleepHours == 0 && tmpSleepMinutes == 0) {
+    DEBUG_PRINTLN("[Config] Error: Rolling sleep duration cannot be 0 hours 0 minutes.");
     configValid = false;
   }
 
@@ -278,6 +352,17 @@ bool loadConfigFromSd() {
     }
   } else {
     DEBUG_PRINTLN("[Config] Error: 'seasonalEndMonth' missing or invalid.");
+    configValid = false;
+  }
+
+  // Validate seasonal calendar dates
+  if (!isValidSeasonalDate(tmpSeasonalStartMonth, tmpSeasonalStartDay)) {
+    DEBUG_PRINTLN("[Config] Error: Seasonal start date is invalid.");
+    configValid = false;
+  }
+
+  if (!isValidSeasonalDate(tmpSeasonalEndMonth, tmpSeasonalEndDay)) {
+    DEBUG_PRINTLN("[Config] Error: Seasonal end date is invalid.");
     configValid = false;
   }
 
@@ -369,11 +454,13 @@ bool loadConfigFromSd() {
 
     operationMode = tmpOpMode;
     normalOperationMode = tmpOpMode;
+    deploymentLogging = tmpDeploymentLogging;
 
     alarmStartHour = tmpStartHour;
     alarmStartMinute = tmpStartMin;
     alarmStopHour = tmpStopHour;
     alarmStopMinute = tmpStopMin;
+    alarmDailyInterval = tmpDailyInterval;
 
     alarmAwakeHours = tmpAwakeHours;
     alarmAwakeMinutes = tmpAwakeMinutes;
