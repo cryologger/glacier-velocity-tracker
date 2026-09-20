@@ -288,12 +288,13 @@ void printAlarm() {
 }
 
 // ----------------------------------------------------------------------------
-// Checks if the day-of-month has changed since last time. This helps detect
-// midnight rollover or other daily boundary events. Returns true if changed.
+// Checks if the calendar date has changed since the last check. Compares the
+// full date (UTC days since 1970-01-01), not just the day of the month, so
+// sessions exactly one month apart are still detected. Returns true if changed.
 // ----------------------------------------------------------------------------
 bool checkDate() {
   rtc.getTime();
-  dateNew = rtc.dayOfMonth;
+  dateNew = rtc.getEpoch() / 86400UL;  // UTC day number
 
   DEBUG_PRINT("[RTC] Info: Current date: ");
   DEBUG_PRINT(dateCurrent);
@@ -306,7 +307,7 @@ bool checkDate() {
     return false;
   }
 
-  // If day-of-month has changed, update and return true
+  // If the date has changed, update and return true
   if (dateNew != dateCurrent) {
     dateCurrent = dateNew;
     return true;
