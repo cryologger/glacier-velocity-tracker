@@ -256,7 +256,6 @@ void logGnss() {
 
   bool displayDebug = true;
   byte displayCounter = 0;
-  bool displayToggle = false;
 
   // Record logging start time.
   logStartTime = rtc.getEpoch();
