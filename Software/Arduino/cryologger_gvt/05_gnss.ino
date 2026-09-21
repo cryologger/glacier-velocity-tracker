@@ -16,8 +16,7 @@
 void configureGnss() {
   unsigned long loopStartTime = millis();  // Start loop timer
 
-  const byte maxAttempts = 3;        // Max number of initialization retries
-  const byte maxDisplayCycles = 90;  // Max OLED display cycles (90 × 10-second cycles = approx. 15 mins)
+  const byte maxAttempts = 3;  // Max number of initialization retries
 
   // Do not initialize the GNSS without a functioning microSD card
   if (!online.microSd) {
@@ -57,7 +56,8 @@ void configureGnss() {
       DEBUG_PRINTLN(".");
 
       displayInitSuccess("GNSS");  // Display OLED success message
-      fetchGnssModuleInfo();       // Get receiver firmware
+      fetchGnssModuleInfo();       // Retrieve receiver information
+      displayGnssModuleInfo();     // Display receiver information
 
       break;  // Exit retry loop on success
     }
@@ -282,6 +282,7 @@ void logGnss() {
   // Start loop timer
   unsigned long loopStartTime = millis();
 
+  const byte maxDisplayCycles = 90;  // Max OLED display cycles (90 × 10-second cycles = approx. 15 mins)
   bool displayDebug = true;
   byte displayCounter = 0;
 

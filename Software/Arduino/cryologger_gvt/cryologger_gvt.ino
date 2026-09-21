@@ -2,7 +2,7 @@
   Title:      Cryologger - Glacier Velocity Tracker (GVT)
   Author:     Adam Garbo
   Version:    3.1.0
-  Date:       September 18, 2026
+  Date:       September 21, 2026
   Copyright:  (C) Adam Garbo
   License:    GPLv3. See LICENSE file for more information.
 
@@ -88,7 +88,7 @@ char uid[20] = "GVT_26_TST";  // Default unique identifier (UID)
 // ----------------------------------------------------------------------------
 // Firmware & Hardware Versions
 // ----------------------------------------------------------------------------
-#define FIRMWARE_VERSION "3.1.0"
+#define FIRMWARE_VERSION "3.1.0-rc"
 #define HARDWARE_VERSION "2.21"
 
 // ----------------------------------------------------------------------------
@@ -257,7 +257,7 @@ long rtcDrift = 0;                   // RTC drift measurement
 
 // Display
 uint8_t displayScreenIndex = 0;  // OLED logging screen display counter
-const uint8_t numScreens = 4;
+const uint8_t numScreens = 3;
 
 // ----------------------------------------------------------------------------
 // Structures for System Status and Timers
@@ -330,7 +330,7 @@ void setup() {
     DEBUG_PRINTLN("[Setup] Info: Using fallback defaults.");
   }
   configureGnss();  // Initialize GNSS receiver
-  displayGnssModuleInfo();
+
 
   printLine();
   DEBUG_PRINTLN("System Information");
