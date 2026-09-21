@@ -320,6 +320,7 @@ void logGnss() {
     gnss.clearMaxFileBufferAvail();  // Reset max file buffer size
 
     DEBUG_PRINTLN("[GNSS] Info: Starting logging...");
+    displayLoggingStart();  // Display OLED message
 
     // Log data until logging alarm triggers.
     while (!alarmFlag) {
@@ -471,6 +472,7 @@ void logGnss() {
       DEBUG_PRINTLN("[GNSS] Info: Log file closed.");
     }
     online.logGnss = false;  // Clear flag
+    DEBUG_PRINTLN("[GNSS] Info: Logging complete.");
   } else {
     online.logGnss = false;  // Clear flag
     DEBUG_PRINTLN("[GNSS] Warning: u-blox offline!");

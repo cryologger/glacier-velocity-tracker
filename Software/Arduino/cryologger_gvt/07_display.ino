@@ -426,6 +426,20 @@ void displaySdInfo() {
 }
 
 // ----------------------------------------------------------------------------
+// Display logging start message.
+// ----------------------------------------------------------------------------
+void displayLoggingStart() {
+  if (!online.oled) return;
+
+  enablePullups();
+  oled.erase();
+  oled.text(0, 0, "Starting logging...");
+  oled.display();
+  disablePullups();
+  myDelay(2000);
+}
+
+// ----------------------------------------------------------------------------
 // Display log file details.
 // Shows the current log file name, file size, and buffer usage.
 // ----------------------------------------------------------------------------

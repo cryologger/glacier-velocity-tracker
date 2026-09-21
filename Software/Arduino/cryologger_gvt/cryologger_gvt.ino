@@ -35,14 +35,14 @@ char uid[20] = "GVT_26_TST";  // Default unique identifier (UID)
 
 // Deployment logging behaviour (DAILY mode only)
 // ENABLED logs immediately on deployment; DISABLED follows the configured logging schedule
-#define DEPLOYMENT_LOGGING ENABLED
+#define DEPLOYMENT_LOGGING DISABLED
 
 // Daily mode parameters (only used if OPERATION_MODE == DAILY)
 #define DAILY_START_HOUR 17   // Logging start hour (UTC)
 #define DAILY_START_MINUTE 0  // Logging start minute (UTC)
-#define DAILY_STOP_HOUR 20    // Logging stop hour (UTC)
+#define DAILY_STOP_HOUR 19    // Logging stop hour (UTC)
 #define DAILY_STOP_MINUTE 0   // Logging stop minute (UTC)
-#define DAILY_INTERVAL 1      // Log every N days (1-30, 1 = every day)
+#define DAILY_INTERVAL 2      // Log every N days (1-30, 1 = every day)
 
 // Rolling mode parameters (only used if OPERATION_MODE == ROLLING)
 #define ROLLING_AWAKE_HOURS 1    // Awake period (hours)
