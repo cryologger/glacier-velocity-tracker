@@ -11,6 +11,15 @@
 */
 
 // ----------------------------------------------------------------------------
+// Debug log CSV header.
+// ----------------------------------------------------------------------------
+const char debugHeader[] =
+  "datetime,battery,temperature,online_microsd,online_gnss,online_log_gnss,online_log_debug,"
+  "timer_battery,timer_microsd,timer_gnss,timer_sync_rtc,timer_log_gnss,timer_log_debug,"
+  "rtc_sync_flag,rtc_drift,bytes_written,max_buffer_bytes,wdt_counter_max,"
+  "write_fail_counter,sync_fail_counter,close_fail_counter,debug_counter";
+
+// ----------------------------------------------------------------------------
 // Create a timestamped log file name.
 // Generates a filename using the current RTC timestamp. This ensures that
 // each log session is uniquely named and avoids overwriting previous logs.
@@ -45,30 +54,27 @@ void createDebugFile() {
   DEBUG_PRINT("[Logging] Info: Created or opened debug file: ");
   DEBUG_PRINTLN(debugFileName);
 
-  // Write CSV header if necessary.
+  // Write CSV header if necessary
   if (debugFile.size() == 0) {
-    debugFile.println(
-      "datetime,battery,temperature,online_microsd,online_gnss,online_log_gnss,online_log_debug,"
-      "timer_battery,timer_microsd,timer_gnss,timer_sync_rtc,timer_log_gnss,timer_log_debug,"
-      "rtc_sync_flag,rtc_drift,bytes_written,max_buffer_bytes,wdt_counter_max,"
-      "write_fail_counter,sync_fail_counter,close_fail_counter,debug_counter");
+    debugFile.println(debugHeader);
     DEBUG_PRINT("[Logging] Info: Header written to ");
     DEBUG_PRINTLN(debugFileName);
   } else {
     DEBUG_PRINT("[Logging] Info: Header already exists in ");
     DEBUG_PRINTLN(debugFileName);
   }
-  // Sync the debug file to ensure integrity.
+
+  // Sync the debug file to ensure integrity
   if (!debugFile.sync()) {
     DEBUG_PRINTLN("[Logging] Warning: Failed to sync debug file.");
   } else {
     DEBUG_PRINTLN("[Logging] Info: Synced debug file.");
   }
 
-  // Update the file creation timestamp.
+  // Update the file creation timestamp
   updateFileCreate(&debugFile);
 
-  // Close the debug file.
+  // Close the debug file
   if (!debugFile.close()) {
     DEBUG_PRINTLN("[Logging] Warning: Failed to close debug file.");
   } else {
@@ -133,13 +139,13 @@ void printDebugRecord(Print &out, const char *dateTime, float battery, float tem
 // and potential failure points.
 // ----------------------------------------------------------------------------
 void logDebug() {
-  // Start loop timer for profiling.
+  // Start loop timer for profiling
   unsigned long loopStartTime = millis();
 
   // Increment debug counter.
   debugCounter++;
 
-  // Check if debug file is open.
+  // Check if debug file is open
   if (debugFile.isOpen()) {
     debugFile.close();
     DEBUG_PRINTLN("[Logging] Info: Debug file closed before reopening.");
@@ -147,20 +153,28 @@ void logDebug() {
     DEBUG_PRINTLN("[Logging] Debug: Debug file is already closed.");
   }
 
-  // Open debug log file.
-  if (!debugFile.open(debugFileName, O_APPEND | O_WRITE)) {
+  // Open debug log file
+  if (!debugFile.open(debugFileName, O_CREAT | O_APPEND | O_WRITE)) {
     DEBUG_PRINT("[Logging] Warning: Failed to open debug file: ");
     DEBUG_PRINTLN(debugFileName);
-    online.logDebug = false;                    // Set flag
+    online.logDebug = false;                    // Clear flag
     timer.logDebug = millis() - loopStartTime;  // Stop loop timer
     return;
+  }
+
+  // Write CSV header if necessary
+  if (debugFile.size() == 0) {
+    debugFile.println(debugHeader);
+    DEBUG_PRINT("[Logging] Info: Header written to ");
+    DEBUG_PRINTLN(debugFileName);
+    updateFileCreate(&debugFile);
   }
 
   online.logDebug = true;  // Set flag
   DEBUG_PRINT("[Logging] Info: Opened debug file: ");
   DEBUG_PRINTLN(debugFileName);
 
-  // Create timestamp string.
+  // Create timestamp string
   char dateTime[30];
   snprintf(dateTime, sizeof(dateTime),
            "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
@@ -177,7 +191,7 @@ void logDebug() {
   // Write the debug record to the log file
   printDebugRecord(debugFile, dateTime, battery, temperature);
 
-  // Sync the debug file to disk.
+  // Sync the debug file to disk
   if (!debugFile.sync()) {
     DEBUG_PRINTLN("[Logging] Warning: Failed to sync debug file.");
     syncFailCounter++;  // Track failed sync attempts
@@ -185,10 +199,10 @@ void logDebug() {
     DEBUG_PRINTLN("[Logging] Info: Synced debug file.");
   }
 
-  // Update file access timestamps.
+  // Update file access timestamps
   updateFileAccess(&debugFile);
 
-  // Close the debug file.
+  // Close the debug file
   if (!debugFile.close()) {
     DEBUG_PRINTLN("[Logging] Warning: Failed to close debug file.");
     closeFailCounter++;  // Track failed close attempts

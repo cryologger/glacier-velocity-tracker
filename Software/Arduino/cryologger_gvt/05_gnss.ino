@@ -81,7 +81,6 @@ void configureGnss() {
 
     online.gnss = false;                                                  // Clear GNSS flag
     displayInitError("GNSS", attempt, maxAttempts, "Check GNSS wiring");  // Display OLED message
-    logDebug();                                                           // Log system debug information
     myDelay(4000);                                                        // Allow final error message to be read
   }
 
