@@ -449,7 +449,7 @@ void logGnss() {
       digitalWrite(LED_BUILTIN, LOW);
     }
 
-    // Print total number of bytes written to SD card.
+    // Print total number of bytes written to SD card
     DEBUG_PRINT("[GNSS] Info: Total bytes written is ");
     DEBUG_PRINTLN(bytesWritten);
 
@@ -459,21 +459,22 @@ void logGnss() {
       syncFailCounter++;  // Count number of failed file syncs
     }
 
-    // Update file access timestamps.
+    // Update file access timestamps
     updateFileAccess(&logFile);
 
-    // Close the log file.
+    // Close the log file
     if (!logFile.close()) {
       DEBUG_PRINTLN("[GNSS] Warning: Failed to close log file!");
       closeFailCounter++;  // Count number of failed file closes
     } else {
       DEBUG_PRINTLN("[GNSS] Info: Log file closed.");
     }
+    online.logGnss = false;  // Clear flag
   } else {
-    online.logGnss = false;
+    online.logGnss = false;  // Clear flag
     DEBUG_PRINTLN("[GNSS] Warning: u-blox offline!");
   }
 
-  // Stop the loop timer.
+  // Stop the loop timer
   timer.logGnss = millis() - loopStartTime;
 }

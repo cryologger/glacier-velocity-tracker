@@ -113,13 +113,6 @@ void goToSleep() {
   qwiicPowerOff();
   peripheralPowerOff();
 
-  // Clear all online status flags
-  online.gnss = false;
-  online.microSd = false;
-  online.oled = false;
-  online.logGnss = false;
-  online.logDebug = false;
-
   // Configure memory power settings for deep sleep
   am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_ALL);
   am_hal_pwrctrl_memory_deepsleep_retain(AM_HAL_PWRCTRL_MEM_SRAM_384K);
@@ -188,6 +181,11 @@ void qwiicPowerOn() {
 
 void qwiicPowerOff() {
   digitalWrite(PIN_QWIIC_POWER, LOW);
+
+  // Clear the status of devices powered by the Qwiic rail
+  online.gnss = false;
+  online.oled = false;
+  online.logGnss = false;
 }
 
 // ----------------------------------------------------------------------------
@@ -201,6 +199,11 @@ void peripheralPowerOn() {
 void peripheralPowerOff() {
   myDelay(250);
   digitalWrite(PIN_MICROSD_POWER, LOW);
+
+  // Clear the status of services dependent on the microSD rail
+  online.microSd = false;
+  online.logGnss = false;
+  online.logDebug = false;
 }
 
 // ----------------------------------------------------------------------------
