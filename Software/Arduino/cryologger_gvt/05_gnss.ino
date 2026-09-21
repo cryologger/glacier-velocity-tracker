@@ -16,7 +16,8 @@
 void configureGnss() {
   unsigned long loopStartTime = millis();  // Start loop timer
 
-  const byte maxAttempts = 3;  // Maximum number of initialization retries
+  const byte maxAttempts = 3;        // Max number of initialization retries
+  const byte maxDisplayCycles = 90;  // Max OLED display cycles (90 × 10-second cycles = approx. 15 mins)
 
   // Do not initialize the GNSS without a functioning microSD card
   if (!online.microSd) {
@@ -383,8 +384,7 @@ void logGnss() {
         if (online.oled && displayDebug) {
 
           // After a specified number of cycles put OLED to sleep (1.2 uA)
-          if (displayCounter <= 100)  // Use >= 0 for testing and <= 100 for deployment
-          {
+          if (displayCounter < maxDisplayCycles) {
             displayCounter++;
 
             // Display the current screen based on displayScreenIndex
