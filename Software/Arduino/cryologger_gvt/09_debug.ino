@@ -39,7 +39,7 @@ void printLoggingSettings() {
   if (operationMode == DAILY) {
     DEBUG_PRINTLN("Daily");
 
-    char timeBuffer[6];
+    char timeBuffer[8];
 
     DEBUG_PRINT("Start: ");
     printTab(3);

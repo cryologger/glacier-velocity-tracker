@@ -25,7 +25,7 @@ void configureOled() {
   bool present = false;
 
   // Wait up to 250 ms for OLED to ACK (power-up / cold start / slow rail)
-  for (uint16_t i = 0; i < 25; i++) { // 25 * 10 ms = 250 ms
+  for (uint16_t i = 0; i < 25; i++) {  // 25 * 10 ms = 250 ms
     if (i2cDevicePresent(OLED_ADDR_1) || i2cDevicePresent(OLED_ADDR_2)) {
       present = true;
       break;
@@ -59,7 +59,6 @@ void configureOled() {
 
   disablePullups();
 #endif
-
 }
 
 // ----------------------------------------------------------------------------
@@ -98,7 +97,6 @@ void resetOled() {
   disablePullups();
 
 #endif
-
 }
 
 // ----------------------------------------------------------------------------
@@ -148,57 +146,75 @@ void displayWelcome() {
 }
 
 // ----------------------------------------------------------------------------
-// Display initialization message.
-// Shows which device is currently being initialized.
+// Display peripheral initialization message.
 // ----------------------------------------------------------------------------
-void displayInitialize(const char *device) {
+void displayInit(const char *device) {
   if (!online.oled) return;
 
   enablePullups();
-  char displayBuffer[24];
-  snprintf(displayBuffer, sizeof(displayBuffer),
-           "Initialize %s...", device);
   oled.erase();
-  oled.text(0, 0, displayBuffer);
-  oled.display();
-  disablePullups();
-}
 
-// ----------------------------------------------------------------------------
-// Display success message.
-// ----------------------------------------------------------------------------
-void displaySuccess() {
-  if (!online.oled) return;
+  oled.setCursor(0, 0);
+  oled.print(device);
+  oled.print(":");
 
-  enablePullups();
-  oled.text(0, 10, "Success!");
+  oled.text(0, 10, "Initializing...");
+
   oled.display();
   disablePullups();
   myDelay(2000);
 }
 
 // ----------------------------------------------------------------------------
-// Display failure message.
+// Display peripheral initialization success.
 // ----------------------------------------------------------------------------
-void displayFailure() {
+void displayInitSuccess(const char *device) {
   if (!online.oled) return;
 
   enablePullups();
-  oled.text(0, 10, "Failed!");
+  oled.erase();
+
+  oled.setCursor(0, 0);
+  oled.print(device);
+  oled.print(":");
+
+  oled.text(0, 10, "Initialized.");
+
   oled.display();
   disablePullups();
+  myDelay(2000);
 }
 
 // ----------------------------------------------------------------------------
-// Display reattempt message.
+// Display peripheral initialization error.
+// Shows the failed attempt and whether another attempt will be made.
 // ----------------------------------------------------------------------------
-void displayReattempt() {
-  if (!online.oled) return;
+void displayInitError(const char *device, byte attempt, byte maxAttempts,
+                      const char *finalMessage) {
+  if (!online.oled || !firstTimeFlag) return;
+
+  char attemptBuffer[24];
+  snprintf(attemptBuffer, sizeof(attemptBuffer),
+           "Attempt %d of %d failed", attempt, maxAttempts);
 
   enablePullups();
-  oled.text(0, 10, "Failed! Reattempting...");
+  oled.erase();
+
+  oled.setCursor(0, 0);
+  oled.print(device);
+  oled.print(":");
+
+  oled.text(0, 10, attemptBuffer);
+
+  if (attempt < maxAttempts) {
+    oled.text(0, 20, "Reattempting...");
+  } else {
+    oled.text(0, 20, finalMessage);
+  }
+
   oled.display();
   disablePullups();
+  myDelay(2000);
 }
 
 // ----------------------------------------------------------------------------
@@ -360,35 +376,6 @@ void displayRtcOffset(long drift) {
   oled.display();
   disablePullups();
   myDelay(2000);
-}
-
-// ----------------------------------------------------------------------------
-// Display microSD initialization error (first attempt).
-// ----------------------------------------------------------------------------
-void displayErrorMicrosd1() {
-  if (!online.oled || !firstTimeFlag) return;
-  enablePullups();
-  oled.erase();
-  oled.text(0, 0, "Error: microSD");
-  oled.text(0, 10, "failed to initialize!");
-  oled.text(0, 20, "Reattempting...");
-  oled.display();
-  disablePullups();
-  myDelay(4000);
-}
-
-// ----------------------------------------------------------------------------
-// Display microSD initialization error (second attempt).
-// ----------------------------------------------------------------------------
-void displayErrorMicrosd2() {
-  if (!online.oled || !firstTimeFlag) return;
-  enablePullups();
-  oled.erase();
-  oled.text(0, 0, "Error: microSD");
-  oled.text(0, 10, "second attempt failed!");
-  oled.display();
-  disablePullups();
-  myDelay(4000);
 }
 
 // ----------------------------------------------------------------------------

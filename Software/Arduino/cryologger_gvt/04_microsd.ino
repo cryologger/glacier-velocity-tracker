@@ -8,47 +8,62 @@
 
 // ----------------------------------------------------------------------------
 // Configure and initialize the microSD card.
+//
 // This function attempts to initialize the microSD card and sets the
-// appropriate online flag. If initialization fails, it retries before shutting
-// down power to conserve energy.
+// appropriate online flag. If initialization fails, it retries before returning
+// with the microSD offline.
 // ----------------------------------------------------------------------------
 void configureSd() {
   unsigned long loopStartTime = millis();  // Start loop timer
 
-  // Check if microSD is already initialized.
+  const byte maxAttempts = 3;  // Maximum number of initialization attempts
+
+  // Check if microSD is already initialized
   if (online.microSd) {
     DEBUG_PRINTLN("[microSD] Info: Already initialized.");
     return;
   }
 
-  displayInitialize("microSD");  // Display OLED message
+  displayInit("microSD");  // Display OLED message
 
-  // Attempt microSD initialization with a maximum of 2 retries
-  for (int attempt = 1; attempt <= 2; attempt++) {
+  // Attempt microSD initialization with a maximum of 3 retries
+  for (byte attempt = 1; attempt <= maxAttempts; attempt++) {
     if (sd.begin(PIN_SD_CS, SD_SCK_MHZ(24))) {
       online.microSd = true;  // Set microSD flag
-      DEBUG_PRINTLN("[microSD] Info: Initialized successfully.");
-      displaySuccess();  // Display OLED success message
+
+      DEBUG_PRINT("[microSD] Info: Initialized successfully on attempt ");
+      DEBUG_PRINT(attempt);
+      DEBUG_PRINTLN(".");
+
+      displayInitSuccess("microSD");  // Display OLED message
 
       // Get storage information
       getSdSpaceInfo();
       getSdFileCount();
+
       break;  // Exit retry loop on success
     }
 
-    DEBUG_PRINTLN("[microSD] Warning: Initialization failed. Retrying...");
-    displayErrorMicrosd1();  // Display OLED error message
-    myDelay(2000);           // Non-blocking delay before retry
+    // Reattempt microSD initialization
+    if (attempt < maxAttempts) {
+      DEBUG_PRINT("[microSD] Warning: Initialization attempt ");
+      DEBUG_PRINT(attempt);
+      DEBUG_PRINTLN(" failed. Reattempting...");
 
-    // On second failure, log error and disable peripherals
-    if (attempt == 2) {
-      DEBUG_PRINTLN("[microSD] Error: Failed to initialize.");
-      online.microSd = false;  // Clear microSD flag
-      displayErrorMicrosd2();  // Display OLED failure message
-      online.gnss = false;     // Clear GNSS flag
-      qwiicPowerOff();         // Disable power to Qwiic connector
-      peripheralPowerOff();    // Disable power to peripherals
+      displayInitError("microSD", attempt, maxAttempts, "Check microSD card");  // Display OLED message
+      myDelay(2000);                                                            // Delay before retry
+
+      continue;
     }
+
+    // On final failure, display the error
+    DEBUG_PRINT("[microSD] Error: Initialization failed after ");
+    DEBUG_PRINT(maxAttempts);
+    DEBUG_PRINTLN(" attempts.");
+
+    online.microSd = false;                                                   // Clear microSD flag
+    displayInitError("microSD", attempt, maxAttempts, "Check microSD card");  // Display OLED error message
+    myDelay(2000);                                                            // Allow the final error message to be read
   }
 
   timer.microSd = millis() - loopStartTime;  // Stop loop timer
@@ -92,7 +107,7 @@ bool loadConfigFromSd() {
   // --------------------------
   // Declare local temp variables
   // --------------------------
-  char tmpUid[32] = "";
+  char tmpUid[sizeof(uid)] = "";
 
   OperationMode tmpOpMode = operationMode;
   EnableMode tmpDeploymentLogging = deploymentLogging;
@@ -129,8 +144,31 @@ bool loadConfigFromSd() {
 
   // uid
   if (doc["uid"].is<const char*>()) {
-    strncpy(tmpUid, doc["uid"].as<const char*>(), sizeof(tmpUid) - 1);
-    tmpUid[sizeof(tmpUid) - 1] = '\0';
+    const char* val = doc["uid"].as<const char*>();
+    size_t len = strlen(val);
+    bool uidValid = true;
+
+    if (len == 0 || len >= sizeof(uid)) {
+      DEBUG_PRINTLN("[Config] Error: 'uid' is empty or too long.");
+      uidValid = false;
+    }
+
+    // Check for invalid filename characters
+    for (size_t i = 0; uidValid && i < len; i++) {
+      if ((unsigned char)val[i] < 0x20
+          || val[i] == '"' || val[i] == '*' || val[i] == '/'
+          || val[i] == ':' || val[i] == '<' || val[i] == '>'
+          || val[i] == '?' || val[i] == '\\' || val[i] == '|') {
+        DEBUG_PRINTLN("[Config] Error: 'uid' contains invalid filename characters.");
+        uidValid = false;
+      }
+    }
+
+    if (uidValid) {
+      strcpy(tmpUid, val);
+    } else {
+      configValid = false;
+    }
   } else {
     DEBUG_PRINTLN("[Config] Error: 'uid' missing or invalid.");
     configValid = false;
@@ -282,13 +320,13 @@ bool loadConfigFromSd() {
   }
 
   // rollingAwake duration
-  if (tmpAwakeHours == 0 && tmpAwakeMinutes == 0) {
+  if (tmpOpMode == ROLLING && tmpAwakeHours == 0 && tmpAwakeMinutes == 0) {
     DEBUG_PRINTLN("[Config] Error: Rolling awake duration cannot be 0 hours 0 minutes.");
     configValid = false;
   }
 
   // rollingSleep duration
-  if (tmpSleepHours == 0 && tmpSleepMinutes == 0) {
+  if (tmpOpMode == ROLLING && tmpSleepHours == 0 && tmpSleepMinutes == 0) {
     DEBUG_PRINTLN("[Config] Error: Rolling sleep duration cannot be 0 hours 0 minutes.");
     configValid = false;
   }
@@ -387,6 +425,9 @@ bool loadConfigFromSd() {
       DEBUG_PRINTLN("[Config] Error: 'gnssGpsEnabled' must be 0 or 1.");
       configValid = false;
     }
+  } else {
+    DEBUG_PRINTLN("[Config] Error: 'gnssGpsEnabled' missing or invalid.");
+    configValid = false;
   }
 
   // gnssGloEnabled
@@ -398,6 +439,9 @@ bool loadConfigFromSd() {
       DEBUG_PRINTLN("[Config] Error: 'gnssGloEnabled' must be 0 or 1.");
       configValid = false;
     }
+  } else {
+    DEBUG_PRINTLN("[Config] Error: 'gnssGloEnabled' missing or invalid.");
+    configValid = false;
   }
 
   // gnssGalEnabled
@@ -409,6 +453,9 @@ bool loadConfigFromSd() {
       DEBUG_PRINTLN("[Config] Error: 'gnssGalEnabled' must be 0 or 1.");
       configValid = false;
     }
+  } else {
+    DEBUG_PRINTLN("[Config] Error: 'gnssGalEnabled' missing or invalid.");
+    configValid = false;
   }
 
   // gnssBdsEnabled
@@ -420,6 +467,9 @@ bool loadConfigFromSd() {
       DEBUG_PRINTLN("[Config] Error: 'gnssBdsEnabled' must be 0 or 1.");
       configValid = false;
     }
+  } else {
+    DEBUG_PRINTLN("[Config] Error: 'gnssBdsEnabled' missing or invalid.");
+    configValid = false;
   }
 
   // gnssSbasEnabled
@@ -442,6 +492,12 @@ bool loadConfigFromSd() {
       DEBUG_PRINTLN("[Config] Error: 'gnssQzssEnabled' must be 0 or 1.");
       configValid = false;
     }
+  }
+
+  // At least one primary GNSS constellation must be enabled
+  if (!tmpGpsEnabled && !tmpGloEnabled && !tmpGalEnabled && !tmpBdsEnabled) {
+    DEBUG_PRINTLN("[Config] Error: At least one of GPS, GLONASS, Galileo, or BeiDou must be enabled.");
+    configValid = false;
   }
 
   // ---------------------------------------

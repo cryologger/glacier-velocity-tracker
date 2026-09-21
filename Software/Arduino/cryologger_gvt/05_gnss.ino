@@ -16,75 +16,102 @@
 void configureGnss() {
   unsigned long loopStartTime = millis();  // Start loop timer
 
-  // Check if GNSS is already initialized.
-  if (online.gnss) {
-    DEBUG_PRINTLN("[GNSS] Info: GNSS already initialized.");
+  const byte maxAttempts = 3;  // Maximum number of initialization retries
+
+  // Do not initialize the GNSS without a functioning microSD card
+  if (!online.microSd) {
+    DEBUG_PRINTLN("[GNSS] Warning: Initialization skipped because microSD is offline.");
+    timer.gnss = millis() - loopStartTime;
     return;
   }
 
-  // Disable internal I2C pull-ups before initialization.
+  // Check if GNSS is already initialized
+  if (online.gnss) {
+    DEBUG_PRINTLN("[GNSS] Info: GNSS already initialized.");
+    timer.gnss = millis() - loopStartTime;
+    return;
+  }
+
+  // Disable internal I2C pull-ups before initialization
   disablePullups();
 
-  // Uncomment to enable GNSS debug messages on Serial.
+  // Uncomment to enable GNSS debug messages on Serial
   //gnss.enableDebugging();
 
-  // Display OLED initialization message.
-  displayInitialize("GNSS");
+  // Display OLED initialization message
+  displayInit("GNSS");
 
-  // Allocate sufficient RAM to store RAWX messages (>2 KB).
+  // Allocate sufficient RAM to store RAWX messages (>2 KB)
   gnss.setFileBufferSize(fileBufferSize);  // Must be called before gnss.begin()
 
-  // Attempt GNSS initialization with a maximum of 2 retries.
-  for (int attempt = 1; attempt <= 2; attempt++) {
+  // Attempt GNSS initialization with a maximum of 3 retries
+  for (byte attempt = 1; attempt <= maxAttempts; attempt++) {
 
     // Try to begin GNSS
     if (gnss.begin()) {
-      online.gnss = true;
-      DEBUG_PRINTLN("[GNSS] Info: u-blox initialized.");
-      displaySuccess();       // Display OLED success message
-      fetchGnssModuleInfo();  // Get receiver firmware
-      break;                  // Exit retry loop on success
+      online.gnss = true;  // Set GNSS flag
+
+      DEBUG_PRINT("[GNSS] Info: u-blox initialized successfully on attempt ");
+      DEBUG_PRINT(attempt);
+      DEBUG_PRINTLN(".");
+
+      displayInitSuccess("GNSS");  // Display OLED success message
+      fetchGnssModuleInfo();       // Get receiver firmware
+
+      break;  // Exit retry loop on success
     }
 
-    // On failed attempt
-    if (attempt < 2) {
-      // First failure
-      DEBUG_PRINTLN("[GNSS] Warning: u-blox failed to initialize. Reattempting...");
-      displayFailure();
-      myDelay(2000);  // Delay before retry
-    } else {
-      // Second failure
-      DEBUG_PRINTLN("[GNSS] Error: u-blox failed to initialize! Please check wiring.");
-      displayFailure();
-      online.gnss = false;     // Clear GNSS flag
-      logDebug();              // Log system debug information
-      online.microSd = false;  // Clear microSD flag
-      qwiicPowerOff();         // Disable power to Qwiic connector
-      peripheralPowerOff();    // Disable power to peripherals
+    // Reattempt GNSS initialization
+    if (attempt < maxAttempts) {
+      DEBUG_PRINT("[GNSS] Warning: Initialization attempt ");
+      DEBUG_PRINT(attempt);
+      DEBUG_PRINTLN(" failed. Reattempting...");
+
+      displayInitError("GNSS", attempt, maxAttempts, "Check GNSS wiring");  // Display OLED message
+      myDelay(2000);                                                        // Delay before retry
+
+      continue;
     }
+
+    // On final failure, display the error
+    DEBUG_PRINT("[GNSS] Error: Initialization failed after ");
+    DEBUG_PRINT(maxAttempts);
+    DEBUG_PRINTLN(" attempts. Please check wiring.");
+
+    online.gnss = false;                                                  // Clear GNSS flag
+    displayInitError("GNSS", attempt, maxAttempts, "Check GNSS wiring");  // Display OLED message
+    logDebug();                                                           // Log system debug information
+    myDelay(4000);                                                        // Allow final error message to be read
   }
 
   // If GNSS was successfully initialized, configure communication/satellite if first run
   if (online.gnss && gnssConfigFlag) {
-    configureGnssInterfaces();  // Communitcation interfaces
+    configureGnssInterfaces();  // Communication interfaces
     configureGnssSignals();     // Satellite signals
     gnssConfigFlag = false;
   }
 
   // Configure u-blox GNSS
   if (online.gnss) {
-    gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
+    configureGnssMessages();                          // Configure message output required for logging
     gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
-    gnss.setMeasurementRate(gnssMeasurementRate);     // Set measurement ratequency (1 nav solution per second)
-    gnss.setAutoPVT(true);                            // Enable automatic NAV-PVT messages
-    gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM-SFRBX messages
-    gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM-RAWX messages
-    gnss.logRXMSFRBX();                               // Enable RXM-SFRBX data logging
-    gnss.logRXMRAWX();                                // Enable RXM-RAWX data logging
   }
 
   // Stop the loop timer
   timer.gnss = millis() - loopStartTime;
+}
+
+// ----------------------------------------------------------------------------
+// Configure u-blox GNSS message output required for logging.
+// ----------------------------------------------------------------------------
+void configureGnssMessages() {
+  gnss.setI2COutput(COM_TYPE_UBX);               // Set the I2C port to output UBX only (disable NMEA)
+  gnss.setMeasurementRate(gnssMeasurementRate);  // Set measurement rate
+  gnss.setAutoPVT(true);                         // Enable automatic NAV-PVT messages
+  gnss.setAutoRXMSFRBX(true, false);             // Enable automatic RXM-SFRBX messages
+  gnss.setAutoRXMRAWX(true, false);              // Enable automatic RXM-RAWX messages
+  gnss.logRXMSFRBX();                            // Enable RXM-SFRBX data logging
+  gnss.logRXMRAWX();                             // Enable RXM-RAWX data logging
 }
 
 // ----------------------------------------------------------------------------
