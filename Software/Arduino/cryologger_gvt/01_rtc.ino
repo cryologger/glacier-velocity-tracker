@@ -56,8 +56,8 @@ void configureRtc() {
 void setLoggingAlarm() {
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);  // Clear pending RTC alarms
 
-  // Update the operation mode first (DAILY, ROLLING, or CONTINUOUS)
-  checkOperationMode();
+  // Update the operation mode (DAILY, ROLLING, or CONTINUOUS)
+  updateOperationMode();
 
   switch (operationMode) {
     case DAILY:
@@ -99,7 +99,7 @@ void setSleepAlarm() {
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);  // Clear pending RTC alarms.
 
   // Always update the operation mode first
-  checkOperationMode();
+  updateOperationMode();
 
   switch (operationMode) {
     case DAILY:
@@ -275,15 +275,32 @@ void printDateTime() {
 }
 
 // ----------------------------------------------------------------------------
-// Retrieves and prints the RTC's configured alarm time in a readable format.
+// Retrieves and prints the RTC's configured alarm time.
 // ----------------------------------------------------------------------------
 void printAlarm() {
   rtc.getAlarm();
+
   char alarmBuffer[30];
-  snprintf(alarmBuffer, sizeof(alarmBuffer),
-           "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
-           rtc.year, rtc.alarmMonth, rtc.alarmDayOfMonth,
-           rtc.alarmHour, rtc.alarmMinute, rtc.alarmSeconds);
+
+  if (rtc.alarmMonth > 0 && rtc.alarmDayOfMonth > 0) {
+    unsigned long alarmYear = 2000 + rtc.year;
+
+    if (rtc.alarmMonth < rtc.month
+        || (rtc.alarmMonth == rtc.month
+            && rtc.alarmDayOfMonth < rtc.dayOfMonth)) {
+      alarmYear++;
+    }
+
+    snprintf(alarmBuffer, sizeof(alarmBuffer),
+             "%04lu-%02lu-%02lu %02lu:%02lu:%02lu",
+             alarmYear, rtc.alarmMonth, rtc.alarmDayOfMonth,
+             rtc.alarmHour, rtc.alarmMinute, rtc.alarmSeconds);
+  } else {
+    snprintf(alarmBuffer, sizeof(alarmBuffer),
+             "%02lu:%02lu:%02lu",
+             rtc.alarmHour, rtc.alarmMinute, rtc.alarmSeconds);
+  }
+
   DEBUG_PRINTLN(alarmBuffer);
 }
 
@@ -393,31 +410,31 @@ bool isValidSeasonalDate(int month, int day) {
 }
 
 // ----------------------------------------------------------------------------
-// Checks if the current date/time is within the seasonal logging period.
-// If so, sets the operation mode to CONTINUOUS. Otherwise, reverts to the
-// normal operation mode (DAILY, ROLLING, etc.). Does not set any alarms.
+// Updates the active operation mode based on the seasonal logging settings.
+// Uses normalOperationMode outside the seasonal logging period.
 // ----------------------------------------------------------------------------
-void checkOperationMode() {
-  DEBUG_PRINTLN("[RTC] Info: Checking operation mode...");
+void updateOperationMode() {
+  DEBUG_PRINTLN("[RTC] Info: Updating operation mode...");
   rtc.getTime();
 
-  // Simple check of seasonal logging mode for debugging purposes.
-  if (seasonalLoggingMode == ENABLED) {
-    DEBUG_PRINTLN("[RTC] Info: Seasonal mode = ENABLED.");
-  } else {
-    DEBUG_PRINTLN("[RTC] Info: Seasonal mode = DISABLED.");
-  }
+  // Print seasonal logging setting
+  DEBUG_PRINT("[RTC] Info: Seasonal mode = ");
+  DEBUG_PRINTLN(seasonalLoggingMode == ENABLED ? "ENABLED." : "DISABLED.");
 
-  // If seasonal logging is enabled and it's currently the seasonal window,
-  // switch to continuous mode. Otherwise, use normalOperationMode
+  // Switch to CONTINUOUS mode during the seasonal logging period
+  // Otherwise, use the configured normal operation mode
   if (seasonalLoggingMode == ENABLED && isSeasonalLoggingPeriod()) {
     operationMode = CONTINUOUS;
   } else {
     operationMode = normalOperationMode;
-    continuousPowerInitFlag = false;  // Clear flag
   }
 
-  // Debug output for the chosen mode
+  // Clear the continuous initialization flag when leaving continuous mode
+  if (operationMode != CONTINUOUS) {
+    continuousPowerInitFlag = false;
+  }
+
+  // Print the active operation mode
   DEBUG_PRINT("[RTC] Info: Operation mode = ");
   if (operationMode == DAILY) DEBUG_PRINTLN("DAILY.");
   else if (operationMode == ROLLING) DEBUG_PRINTLN("ROLLING.");
