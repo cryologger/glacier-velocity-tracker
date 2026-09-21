@@ -178,7 +178,8 @@ void displayInitSuccess(const char *device) {
   oled.print(device);
   oled.print(":");
 
-  oled.text(0, 10, "Initialized.");
+  oled.text(0, 10, "Initialized");
+  oled.text(0, 20, "successfully.");
 
   oled.display();
   disablePullups();

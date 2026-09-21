@@ -149,8 +149,6 @@ void logDebug() {
   if (debugFile.isOpen()) {
     debugFile.close();
     DEBUG_PRINTLN("[Logging] Info: Debug file closed before reopening.");
-  } else {
-    DEBUG_PRINTLN("[Logging] Debug: Debug file is already closed.");
   }
 
   // Open debug log file
