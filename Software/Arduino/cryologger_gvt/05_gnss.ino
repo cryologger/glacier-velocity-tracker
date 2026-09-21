@@ -84,16 +84,19 @@ void configureGnss() {
     myDelay(4000);                                                        // Allow final error message to be read
   }
 
-  // If GNSS was successfully initialized, configure communication/satellite if first run
+  // Configure GNSS interfaces and satellite signals once after initialization
   if (online.gnss && gnssConfigFlag) {
-    configureGnssInterfaces();  // Communication interfaces
-    configureGnssSignals();     // Satellite signals
-    gnssConfigFlag = false;
+    bool interfacesConfigured = configureGnssInterfaces();  // Communication interfaces
+    bool signalsConfigured = configureGnssSignals();        // Satellite signals
+
+    if (interfacesConfigured && signalsConfigured) {
+      gnssConfigFlag = false;
+    }
   }
 
   // Configure u-blox GNSS
   if (online.gnss) {
-    configureGnssMessages();                          // Configure message output required for logging
+    configureGnssMessages();  // Configure message output required for logging
     //gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
   }
 
@@ -117,15 +120,15 @@ void configureGnssMessages() {
 // ----------------------------------------------------------------------------
 // Configure GNSS Communication Interfaces (RAM and BBR).
 // ----------------------------------------------------------------------------
-void configureGnssInterfaces() {
+bool configureGnssInterfaces() {
   bool response = true;
 
   response &= gnss.newCfgValset();                             // Defaults to configuring in RAM and BBR
   response &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);    // Enable I2C
   response &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);    // Disable SPI
-  response &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 0);  // Disable UART1
-  response &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);  // Enable UART2
-  response &= gnss.addCfgValset8(UBLOX_CFG_USB_ENABLED, 0);    // Disable USB
+  response &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 1);  // Enable UART1
+  response &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);  // Disable UART2
+  response &= gnss.addCfgValset8(UBLOX_CFG_USB_ENABLED, 1);    // Enable USB
   response &= gnss.sendCfgValset();                            // Send packet
 
   if (response) {
@@ -133,12 +136,14 @@ void configureGnssInterfaces() {
   } else {
     DEBUG_PRINTLN("[GNSS] Warning: Failed to configure GNSS communication interfaces!");
   }
+
+  return response;
 }
 
 // ----------------------------------------------------------------------------
 // Configure GNSS Satellite Signals (RAM and BBR).
 // ----------------------------------------------------------------------------
-void configureGnssSignals() {
+bool configureGnssSignals() {
   bool response = true;
 
   response &= gnss.newCfgValset();  // Configure in RAM and BBR
@@ -156,6 +161,8 @@ void configureGnssSignals() {
   } else {
     DEBUG_PRINTLN("[GNSS] Warning: Failed to configure GNSS satellite signals!");
   }
+
+  return response;
 }
 
 // ----------------------------------------------------------------------------
