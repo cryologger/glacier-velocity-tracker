@@ -84,20 +84,28 @@ void configureGnss() {
     myDelay(4000);                                                        // Allow final error message to be read
   }
 
-  // Configure GNSS interfaces and satellite signals once after initialization
-  if (online.gnss && gnssConfigFlag) {
-    bool interfacesConfigured = configureGnssInterfaces();  // Communication interfaces
-    bool signalsConfigured = configureGnssSignals();        // Satellite signals
-
-    if (interfacesConfigured && signalsConfigured) {
-      gnssConfigFlag = false;
-    }
-  }
-
   // Configure u-blox GNSS
   if (online.gnss) {
-    configureGnssMessages();  // Configure message output required for logging
-    //gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
+    bool saveConfigFlag = false;
+
+    // Configure communication interfaces and satellite signals once after initialization
+    if (gnssConfigFlag) {
+      bool interfacesConfigured = configureGnssInterfaces();
+      bool signalsConfigured = configureGnssSignals();
+      saveConfigFlag = true;
+
+      if (interfacesConfigured && signalsConfigured) {
+        gnssConfigFlag = false;
+      }
+    }
+
+    // Configure message output required for logging
+    configureGnssMessages();
+
+    // Save communication port settings to flash and BBR after I2C output is configured
+    if (saveConfigFlag) {
+      gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);
+    }
   }
 
   // Stop the loop timer
@@ -314,6 +322,7 @@ void logGnss() {
     if (!logFile.open(logFileName, O_CREAT | O_APPEND | O_WRITE)) {
       DEBUG_PRINT("[GNSS] Warning: Failed to create log file ");
       DEBUG_PRINTLN(logFileName);
+      online.microSd = false;  // Force microSD power cycle and re-initialization
       timer.logGnss = millis() - loopStartTime;
       return;
     }

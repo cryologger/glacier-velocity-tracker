@@ -212,9 +212,19 @@ void peripheralPowerOff() {
 void restoreLoggingPeripherals() {
   // Restore peripherals once when entering continuous mode
   if (operationMode == CONTINUOUS) {
-    if (!continuousPowerInitFlag || !online.gnss || !online.microSd) {
+    if (!continuousPowerInitFlag) {
       restorePeripherals();
       continuousPowerInitFlag = true;
+      return;
+    }
+
+    // Reinitialize a failed peripheral, power cycling first to clear a hung device
+    if (!online.gnss || !online.microSd) {
+      DEBUG_PRINTLN("[Power] Warning: Peripheral offline. Power cycling...");
+      qwiicPowerOff();
+      peripheralPowerOff();
+      myDelay(1000);
+      restorePeripherals();
     }
     return;
   }
