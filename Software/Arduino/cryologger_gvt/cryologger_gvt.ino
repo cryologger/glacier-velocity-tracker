@@ -1,8 +1,8 @@
 /*
   Title:      Cryologger - Glacier Velocity Tracker (GVT)
   Author:     Adam Garbo
-  Version:    3.1.0
-  Date:       September 21, 2026
+  Version:    3.1.0-rc1
+  Date:       September 23, 2026
   Copyright:  (C) Adam Garbo
   License:    GPLv3. See LICENSE file for more information.
 
@@ -88,7 +88,7 @@ char uid[20] = "GVT_26_TST";  // Default unique identifier (UID)
 // ----------------------------------------------------------------------------
 // Firmware & Hardware Versions
 // ----------------------------------------------------------------------------
-#define FIRMWARE_VERSION "3.1.0-rc"
+#define FIRMWARE_VERSION "3.1.0-rc1"
 #define HARDWARE_VERSION "2.21"
 
 // ----------------------------------------------------------------------------

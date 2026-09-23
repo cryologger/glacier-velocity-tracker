@@ -24,23 +24,23 @@
 // ----------------------------------------------------------------------------
 void configureRtc() {
   // Example usage:
-  // rtc.setTime(hour, minute, second, hundredths, day, month, yearOffset);
-  // e.g. rtc.setTime(23, 57, 30, 0, 31, 5, 25);
+  // e.g., rtc.setTime(hour, minute, second, hundredths, day, month, yearOffset);
+  //rtc.setTime(23, 57, 30, 0, 27, 2, 28);
 
   // Scenario 1: Power-on before the seasonal logging period
-  //rtc.setTime(16, 57, 30, 0, 1, 1, 25);
+  //rtc.setTime(16, 57, 30, 0, 1, 1, 26);
 
   // Scenario 2: Power-on day before seasonal logging period prior to daily logging period
-  //rtc.setTime(16, 57, 30, 0, 31, 5, 25);
+  //rtc.setTime(16, 57, 30, 0, 31, 5, 26);
 
   // Scenario 3: Power-on day before seasonal logging period after daily logging period
-  //rtc.setTime(23, 57, 30, 0, 31, 5, 25);
+  //rtc.setTime(23, 57, 30, 0, 31, 5, 26);
 
   // Scenario 4: Power-on during seasonal logging period
-  //rtc.setTime(12, 0, 0, 0, 1, 7, 25);
+  //rtc.setTime(12, 0, 0, 0, 1, 7, 26);
 
   // Scenario 5: Power-on after seasonal logging period
-  //rtc.setTime(16, 57, 30, 0, 1, 10, 25);
+  //rtc.setTime(16, 57, 30, 0, 1, 10, 26);
 
   // Save the initially selected operation mode (DAILY, ROLLING, etc.).
   normalOperationMode = operationMode;
@@ -166,7 +166,9 @@ void setDailyIntervalAlarm(bool afterSession) {
   rtc.getTime();
 
   // Determine whether today's configured start time has passed
-  bool startPassed = (rtc.hour > alarmStartHour) || ((rtc.hour == alarmStartHour) && (rtc.minute >= alarmStartMinute));
+  bool startPassed = (rtc.hour > alarmStartHour)
+                     || ((rtc.hour == alarmStartHour)
+                         && (rtc.minute >= alarmStartMinute));
 
   // Use the next available start time before the first session
   // After a completed session, advance by the configured daily interval
