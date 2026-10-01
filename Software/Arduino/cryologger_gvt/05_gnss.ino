@@ -16,71 +16,96 @@
 void configureGnss() {
   unsigned long loopStartTime = millis();  // Start loop timer
 
-  // Check if GNSS is already initialized.
-  if (online.gnss) {
-    DEBUG_PRINTLN("[GNSS] Info: GNSS already initialized.");
+  const byte maxAttempts = 3;  // Max number of initialization retries
+
+  // Do not initialize the GNSS without a functioning microSD card
+  if (!online.microSd) {
+    DEBUG_PRINTLN("[GNSS] Warning: Initialization skipped because microSD is offline.");
+    timer.gnss = millis() - loopStartTime;
     return;
   }
 
-  // Disable internal I2C pull-ups before initialization.
+  // Check if GNSS is already initialized
+  if (online.gnss) {
+    DEBUG_PRINTLN("[GNSS] Info: GNSS already initialized.");
+    timer.gnss = millis() - loopStartTime;
+    return;
+  }
+
+  // Disable internal I2C pull-ups before initialization
   disablePullups();
 
-  // Uncomment to enable GNSS debug messages on Serial.
+  // Uncomment to enable GNSS debug messages on Serial
   //gnss.enableDebugging();
 
-  // Display OLED initialization message.
-  displayInitialize("GNSS");
+  // Display OLED initialization message
+  displayInit("GNSS");
 
-  // Allocate sufficient RAM to store RAWX messages (>2 KB).
+  // Allocate sufficient RAM to store RAWX messages (>2 KB)
   gnss.setFileBufferSize(fileBufferSize);  // Must be called before gnss.begin()
 
-  // Attempt GNSS initialization with a maximum of 2 retries.
-  for (int attempt = 1; attempt <= 2; attempt++) {
+  // Attempt GNSS initialization with a maximum of 3 retries
+  for (byte attempt = 1; attempt <= maxAttempts; attempt++) {
 
     // Try to begin GNSS
     if (gnss.begin()) {
-      online.gnss = true;
-      DEBUG_PRINTLN("[GNSS] Info: u-blox initialized.");
-      displaySuccess();       // Display OLED success message
-      fetchGnssModuleInfo();  // Get receiver firmware
-      break;                  // Exit retry loop on success
+      online.gnss = true;  // Set GNSS flag
+
+      DEBUG_PRINT("[GNSS] Info: u-blox initialized successfully on attempt ");
+      DEBUG_PRINT(attempt);
+      DEBUG_PRINTLN(".");
+
+      displayInitSuccess("GNSS");  // Display OLED success message
+      fetchGnssModuleInfo();       // Retrieve receiver information
+      displayGnssModuleInfo();     // Display receiver information
+
+      break;  // Exit retry loop on success
     }
 
-    // On failed attempt
-    if (attempt < 2) {
-      // First failure
-      DEBUG_PRINTLN("[GNSS] Warning: u-blox failed to initialize. Reattempting...");
-      displayFailure();
-      myDelay(2000);  // Delay before retry
-    } else {
-      // Second failure
-      DEBUG_PRINTLN("[GNSS] Error: u-blox failed to initialize! Please check wiring.");
-      displayFailure();
-      online.gnss = false;     // Clear GNSS flag
-      logDebug();              // Log system debug information
-      online.microSd = false;  // Clear microSD flag
-      qwiicPowerOff();         // Disable power to Qwiic connector
-      peripheralPowerOff();    // Disable power to peripherals
-    }
-  }
+    // Reattempt GNSS initialization
+    if (attempt < maxAttempts) {
+      DEBUG_PRINT("[GNSS] Warning: Initialization attempt ");
+      DEBUG_PRINT(attempt);
+      DEBUG_PRINTLN(" failed. Reattempting...");
 
-  // If GNSS was successfully initialized, configure communication/satellite if first run
-  if (online.gnss && gnssConfigFlag) {
-    configureGnssInterfaces();  // Communitcation interfaces
-    configureGnssSignals();     // Satellite signals
-    gnssConfigFlag = false;
+      displayInitError("GNSS", attempt, maxAttempts, "Check GNSS wiring");  // Display OLED message
+      myDelay(2000);                                                        // Delay before retry
+
+      continue;
+    }
+
+    // On final failure, display the error
+    DEBUG_PRINT("[GNSS] Error: Initialization failed after ");
+    DEBUG_PRINT(maxAttempts);
+    DEBUG_PRINTLN(" attempts. Please check wiring.");
+
+    online.gnss = false;                                                  // Clear GNSS flag
+    displayInitError("GNSS", attempt, maxAttempts, "Check GNSS wiring");  // Display OLED message
+    myDelay(4000);                                                        // Allow final error message to be read
   }
 
   // Configure u-blox GNSS
   if (online.gnss) {
-    gnss.setI2COutput(COM_TYPE_UBX);                  // Set the I2C port to output UBX only (disable NMEA)
-    gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);  // Save communications port settings to flash and BBR
-    gnss.setMeasurementRate(gnssMeasurementRate);     // Set measurement ratequency (1 nav solution per second)
-    gnss.setAutoPVT(true);                            // Enable automatic NAV-PVT messages
-    gnss.setAutoRXMSFRBX(true, false);                // Enable automatic RXM-SFRBX messages
-    gnss.setAutoRXMRAWX(true, false);                 // Enable automatic RXM-RAWX messages
-    gnss.logRXMSFRBX();                               // Enable RXM-SFRBX data logging
-    gnss.logRXMRAWX();                                // Enable RXM-RAWX data logging
+    bool saveConfigFlag = false;
+
+    // Configure communication interfaces and satellite signals once after initialization
+    if (gnssConfigFlag) {
+      bool interfacesConfigured = configureGnssInterfaces();
+      bool signalsConfigured = configureGnssSignals();
+      saveConfigFlag = true;
+
+      if (interfacesConfigured && signalsConfigured) {
+        gnssConfigFlag = false;
+      }
+    }
+
+    // Configure message output required for logging
+    configureGnssMessages();
+
+    // Save communication port settings to flash and BBR after I2C output is configured
+    if (saveConfigFlag) {
+      gnss.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);
+    }
   }
 
   // Stop the loop timer
@@ -88,17 +113,30 @@ void configureGnss() {
 }
 
 // ----------------------------------------------------------------------------
+// Configure u-blox GNSS message output required for logging.
+// ----------------------------------------------------------------------------
+void configureGnssMessages() {
+  gnss.setI2COutput(COM_TYPE_UBX);               // Set the I2C port to output UBX only (disable NMEA)
+  gnss.setMeasurementRate(gnssMeasurementRate);  // Set measurement rate
+  gnss.setAutoPVT(true);                         // Enable automatic NAV-PVT messages
+  gnss.setAutoRXMSFRBX(true, false);             // Enable automatic RXM-SFRBX messages
+  gnss.setAutoRXMRAWX(true, false);              // Enable automatic RXM-RAWX messages
+  gnss.logRXMSFRBX();                            // Enable RXM-SFRBX data logging
+  gnss.logRXMRAWX();                             // Enable RXM-RAWX data logging
+}
+
+// ----------------------------------------------------------------------------
 // Configure GNSS Communication Interfaces (RAM and BBR).
 // ----------------------------------------------------------------------------
-void configureGnssInterfaces() {
+bool configureGnssInterfaces() {
   bool response = true;
 
   response &= gnss.newCfgValset();                             // Defaults to configuring in RAM and BBR
   response &= gnss.newCfgValset8(UBLOX_CFG_I2C_ENABLED, 1);    // Enable I2C
   response &= gnss.addCfgValset8(UBLOX_CFG_SPI_ENABLED, 0);    // Disable SPI
-  response &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 0);  // Disable UART1
-  response &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);  // Enable UART2
-  response &= gnss.addCfgValset8(UBLOX_CFG_USB_ENABLED, 0);    // Disable USB
+  response &= gnss.addCfgValset8(UBLOX_CFG_UART1_ENABLED, 1);  // Enable UART1
+  response &= gnss.addCfgValset8(UBLOX_CFG_UART2_ENABLED, 0);  // Disable UART2
+  response &= gnss.addCfgValset8(UBLOX_CFG_USB_ENABLED, 1);    // Enable USB
   response &= gnss.sendCfgValset();                            // Send packet
 
   if (response) {
@@ -106,12 +144,14 @@ void configureGnssInterfaces() {
   } else {
     DEBUG_PRINTLN("[GNSS] Warning: Failed to configure GNSS communication interfaces!");
   }
+
+  return response;
 }
 
 // ----------------------------------------------------------------------------
 // Configure GNSS Satellite Signals (RAM and BBR).
 // ----------------------------------------------------------------------------
-void configureGnssSignals() {
+bool configureGnssSignals() {
   bool response = true;
 
   response &= gnss.newCfgValset();  // Configure in RAM and BBR
@@ -129,6 +169,8 @@ void configureGnssSignals() {
   } else {
     DEBUG_PRINTLN("[GNSS] Warning: Failed to configure GNSS satellite signals!");
   }
+
+  return response;
 }
 
 // ----------------------------------------------------------------------------
@@ -218,7 +260,7 @@ void syncRtc() {
 
             // Update logfile timestamp if more than 30 seconds of drift
             if (abs(rtcDrift) > 30) {
-              DEBUG_PRINTLN("[GNSS] Info: Updating logfile timestamp");
+              DEBUG_PRINTLN("[GNSS] Info: Updating logfile timestamp.");
               rtc.getTime();     // Get the RTC's date and time
               getLogFileName();  // Update logfile timestamp
             }
@@ -254,14 +296,21 @@ void logGnss() {
   // Start loop timer
   unsigned long loopStartTime = millis();
 
+  // Reset logging statistics
+  bytesWritten = 0;
+  maxBufferBytes = 0;
+  writeFailCounter = 0;
+  syncFailCounter = 0;
+  closeFailCounter = 0;
+
+  // Clear logging flag
+  online.logGnss = false;
+
+  const byte maxDisplayCycles = 30;  // Max OLED display cycles (30 × 10-second cycles = approx. 5 mins)
   bool displayDebug = true;
   byte displayCounter = 0;
-  bool displayToggle = false;
 
-  // Record logging start time.
-  logStartTime = rtc.getEpoch();
-
-  // Check if microSD and u-blox GNSS initialized successfully.
+  // Check if microSD and u-blox GNSS initialized successfully
   if (online.microSd && online.gnss) {
     // Disable internal I2C pull-ups
     disablePullups();
@@ -273,27 +322,33 @@ void logGnss() {
     if (!logFile.open(logFileName, O_CREAT | O_APPEND | O_WRITE)) {
       DEBUG_PRINT("[GNSS] Warning: Failed to create log file ");
       DEBUG_PRINTLN(logFileName);
+      online.microSd = false;  // Force microSD power cycle and re-initialization
+      timer.logGnss = millis() - loopStartTime;
       return;
     }
-    online.logGnss = true;
+
     DEBUG_PRINT("[GNSS] Info: Created log file ");
     DEBUG_PRINTLN(logFileName);
 
-    // Update file create timestamp.
+    // Update file create timestamp
     updateFileCreate(&logFile);
 
-    // Reset counters.
-    bytesWritten = 0;
-    writeFailCounter = 0;
-    syncFailCounter = 0;
-    closeFailCounter = 0;
+    // Display OLED message before clearing the buffer so any delay occurs before logging starts
+    displayLoggingStart();
 
-    gnss.clearFileBuffer();          // Clear file buffer
-    gnss.clearMaxFileBufferAvail();  // Reset max file buffer size
+    // Clear GNSS file buffer and reset maximum buffer size
+    gnss.clearFileBuffer();
+    gnss.clearMaxFileBufferAvail();
+
+    // Record logging start time
+    logStartTime = rtc.getEpoch();
 
     DEBUG_PRINTLN("[GNSS] Info: Starting logging...");
 
-    // Log data until logging alarm triggers.
+    // Initialize periodic logging timer
+    previousMillis = millis();
+
+    // Log data until logging alarm triggers
     while (!alarmFlag) {
       petDog();  // Reset watchdog
 
@@ -314,17 +369,24 @@ void logGnss() {
         // Extract exactly sdWriteSize bytes from the UBX file buffer and put them into myBuffer
         gnss.extractFileBufferData((uint8_t *)&myBuffer, sdWriteSize);
 
-        // Write exactly sdWriteSize bytes from myBuffer to the ubxDataFile on the SD card
-        if (!logFile.write(myBuffer, sdWriteSize)) {
-          DEBUG_PRINTLN("[GNSS] Warning: Failed to write to log file!");
-          writeFailCounter++;  // Count number of failed writes to microSD
+        // Write exactly sdWriteSize bytes from myBuffer to the log file
+        size_t written = logFile.write(myBuffer, sdWriteSize);
+
+        // Update bytesWritten with the number of bytes actually written
+        bytesWritten += written;
+
+        // Check for an incomplete write
+        if (written != sdWriteSize) {
+          DEBUG_PRINT("[GNSS] Warning: Incomplete write to log file (");
+          DEBUG_PRINT(written);
+          DEBUG_PRINT("/");
+          DEBUG_PRINT(sdWriteSize);
+          DEBUG_PRINTLN(" bytes).");
+          writeFailCounter++;
         }
 
-        // Update bytesWritten
-        bytesWritten += sdWriteSize;
-
         // If SD writing is slow or there is a lot of data to write, keep checking for the arrival of new data
-        gnss.checkUblox();  // Check for the arrival of new data and process it
+        gnss.checkUblox();
 
         // Turn off LED
         digitalWrite(LED_BUILTIN, LOW);
@@ -350,15 +412,14 @@ void logGnss() {
 
         // Warn if fileBufferSize was more than 80% full
         if (maxBufferBytes > ((fileBufferSize / 5) * 4)) {
-          DEBUG_PRINTLN("[GNSS] Warning: File buffer >80 % full. Data loss may have occurrred.");
+          DEBUG_PRINTLN("[GNSS] Warning: File buffer >80 % full. Data loss may have occurred.");
         }
 
         // Display logging information to OLED display
         if (online.oled && displayDebug) {
 
           // After a specified number of cycles put OLED to sleep (1.2 uA)
-          if (displayCounter <= 100)  // Use >= 0 for testing and <= 100 for deployment
-          {
+          if (displayCounter < maxDisplayCycles) {
             displayCounter++;
 
             // Display the current screen based on displayScreenIndex
@@ -387,6 +448,7 @@ void logGnss() {
             displayDebug = false;  // Clear flag
           }
         }
+
         previousMillis = millis();  // Update previousMillis
       }
     }
@@ -413,17 +475,36 @@ void logGnss() {
       // Extract bytesToWrite bytes from the UBX file buffer and put them into myBuffer
       gnss.extractFileBufferData((uint8_t *)&myBuffer, bytesToWrite);
 
-      // Write bytesToWrite bytes from myBuffer to the ubxDataFile on the SD card
-      logFile.write(myBuffer, bytesToWrite);
+      // Write bytesToWrite bytes from myBuffer to the log file
+      size_t written = logFile.write(myBuffer, bytesToWrite);
 
-      bytesWritten += bytesToWrite;    // Update bytesWritten
-      remainingBytes -= bytesToWrite;  // Decrement remainingBytes
+      // Update bytesWritten with the number of bytes actually written
+      bytesWritten += written;
 
-      // Turn off LED.
+      // Check for an incomplete write
+      if (written != bytesToWrite) {
+        DEBUG_PRINT("[GNSS] Warning: Incomplete write to log file (");
+        DEBUG_PRINT(written);
+        DEBUG_PRINT("/");
+        DEBUG_PRINT(bytesToWrite);
+        DEBUG_PRINTLN(" bytes).");
+        writeFailCounter++;
+      }
+
+      // These bytes have already been removed from the GNSS buffer
+      remainingBytes -= bytesToWrite;
+
+      // Turn off LED
       digitalWrite(LED_BUILTIN, LOW);
     }
 
-    // Print total number of bytes written to SD card.
+    // Record maximum GNSS file buffer usage
+    maxBufferBytes = gnss.getMaxFileBufferAvail();
+
+    // Record whether GNSS data was written during this session
+    online.logGnss = (bytesWritten > 0);
+
+    // Print total number of bytes written to SD card
     DEBUG_PRINT("[GNSS] Info: Total bytes written is ");
     DEBUG_PRINTLN(bytesWritten);
 
@@ -433,21 +514,23 @@ void logGnss() {
       syncFailCounter++;  // Count number of failed file syncs
     }
 
-    // Update file access timestamps.
+    // Update file access timestamps
     updateFileAccess(&logFile);
 
-    // Close the log file.
+    // Close the log file
     if (!logFile.close()) {
       DEBUG_PRINTLN("[GNSS] Warning: Failed to close log file!");
       closeFailCounter++;  // Count number of failed file closes
     } else {
       DEBUG_PRINTLN("[GNSS] Info: Log file closed.");
     }
+
+    DEBUG_PRINTLN("[GNSS] Info: Logging complete.");
+
   } else {
-    online.logGnss = false;
-    DEBUG_PRINTLN("[GNSS] Warning: u-blox offline!");
+    DEBUG_PRINTLN("[GNSS] Warning: microSD or u-blox offline!");
   }
 
-  // Stop the loop timer.
+  // Stop the loop timer
   timer.logGnss = millis() - loopStartTime;
 }
