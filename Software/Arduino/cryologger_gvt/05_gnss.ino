@@ -306,7 +306,7 @@ void logGnss() {
   // Clear logging flag
   online.logGnss = false;
 
-  const byte maxDisplayCycles = 90;  // Max OLED display cycles (90 × 10-second cycles = approx. 15 mins)
+  const byte maxDisplayCycles = 30;  // Max OLED display cycles (30 × 10-second cycles = approx. 5 mins)
   bool displayDebug = true;
   byte displayCounter = 0;
 
