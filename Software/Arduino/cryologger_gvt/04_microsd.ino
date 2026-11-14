@@ -8,47 +8,62 @@
 
 // ----------------------------------------------------------------------------
 // Configure and initialize the microSD card.
+//
 // This function attempts to initialize the microSD card and sets the
-// appropriate online flag. If initialization fails, it retries before shutting
-// down power to conserve energy.
+// appropriate online flag. If initialization fails, it retries before returning
+// with the microSD offline.
 // ----------------------------------------------------------------------------
 void configureSd() {
   unsigned long loopStartTime = millis();  // Start loop timer
 
-  // Check if microSD is already initialized.
+  const byte maxAttempts = 3;  // Maximum number of initialization attempts
+
+  // Check if microSD is already initialized
   if (online.microSd) {
     DEBUG_PRINTLN("[microSD] Info: Already initialized.");
     return;
   }
 
-  displayInitialize("microSD");  // Display OLED message
+  displayInit("microSD");  // Display OLED message
 
-  // Attempt microSD initialization with a maximum of 2 retries
-  for (int attempt = 1; attempt <= 2; attempt++) {
+  // Attempt microSD initialization with a maximum of 3 retries
+  for (byte attempt = 1; attempt <= maxAttempts; attempt++) {
     if (sd.begin(PIN_SD_CS, SD_SCK_MHZ(24))) {
       online.microSd = true;  // Set microSD flag
-      DEBUG_PRINTLN("[microSD] Info: Initialized successfully.");
-      displaySuccess();  // Display OLED success message
+
+      DEBUG_PRINT("[microSD] Info: Initialized successfully on attempt ");
+      DEBUG_PRINT(attempt);
+      DEBUG_PRINTLN(".");
+
+      displayInitSuccess("microSD");  // Display OLED message
 
       // Get storage information
       getSdSpaceInfo();
       getSdFileCount();
+
       break;  // Exit retry loop on success
     }
 
-    DEBUG_PRINTLN("[microSD] Warning: Initialization failed. Retrying...");
-    displayErrorMicrosd1();  // Display OLED error message
-    myDelay(2000);           // Non-blocking delay before retry
+    // Reattempt microSD initialization
+    if (attempt < maxAttempts) {
+      DEBUG_PRINT("[microSD] Warning: Initialization attempt ");
+      DEBUG_PRINT(attempt);
+      DEBUG_PRINTLN(" failed. Reattempting...");
 
-    // On second failure, log error and disable peripherals
-    if (attempt == 2) {
-      DEBUG_PRINTLN("[microSD] Error: Failed to initialize.");
-      online.microSd = false;  // Clear microSD flag
-      displayErrorMicrosd2();  // Display OLED failure message
-      online.gnss = false;     // Clear GNSS flag
-      qwiicPowerOff();         // Disable power to Qwiic connector
-      peripheralPowerOff();    // Disable power to peripherals
+      displayInitError("microSD", attempt, maxAttempts, "Check microSD card");  // Display OLED message
+      myDelay(2000);                                                            // Delay before retry
+
+      continue;
     }
+
+    // On final failure, display the error
+    DEBUG_PRINT("[microSD] Error: Initialization failed after ");
+    DEBUG_PRINT(maxAttempts);
+    DEBUG_PRINTLN(" attempts.");
+
+    online.microSd = false;                                                   // Clear microSD flag
+    displayInitError("microSD", attempt, maxAttempts, "Check microSD card");  // Display OLED error message
+    myDelay(2000);                                                            // Allow the final error message to be read
   }
 
   timer.microSd = millis() - loopStartTime;  // Stop loop timer
@@ -92,24 +107,36 @@ bool loadConfigFromSd() {
   // --------------------------
   // Declare local temp variables
   // --------------------------
-  char tmpUid[32];
+  char tmpUid[sizeof(uid)] = "";
 
-  OperationMode tmpOpMode;
-  SeasonalMode tmpSeasonalMode;
+  OperationMode tmpOpMode = operationMode;
+  EnableMode tmpDeploymentLogging = deploymentLogging;
+  EnableMode tmpSeasonalMode = seasonalLoggingMode;
 
-  int tmpStartHour, tmpStartMin,
-    tmpStopHour, tmpStopMin,
-    tmpAwakeHours, tmpAwakeMinutes,
-    tmpSleepHours, tmpSleepMinutes;
+  int tmpStartHour = alarmStartHour;
+  int tmpStartMin = alarmStartMinute;
+  int tmpStopHour = alarmStopHour;
+  int tmpStopMin = alarmStopMinute;
+  int tmpDailyInterval = alarmDailyInterval;
 
-  int tmpSeasonalStartDay, tmpSeasonalStartMonth,
-    tmpSeasonalEndDay, tmpSeasonalEndMonth;
+  int tmpAwakeHours = alarmAwakeHours;
+  int tmpAwakeMinutes = alarmAwakeMinutes;
+  int tmpSleepHours = alarmSleepHours;
+  int tmpSleepMinutes = alarmSleepMinutes;
 
-  int tmpGnssRate;
+  int tmpSeasonalStartDay = alarmSeasonalStartDay;
+  int tmpSeasonalStartMonth = alarmSeasonalStartMonth;
+  int tmpSeasonalEndDay = alarmSeasonalEndDay;
+  int tmpSeasonalEndMonth = alarmSeasonalEndMonth;
 
-  byte tmpGpsEnabled = gnssGpsEnabled, tmpGloEnabled = gnssGloEnabled,
-       tmpGalEnabled = gnssGalEnabled, tmpBdsEnabled = gnssBdsEnabled,
-       tmpSbasEnabled = gnssSbasEnabled, tmpQzssEnabled = gnssQzssEnabled;
+  int tmpGnssRate = gnssMeasurementRate;
+
+  byte tmpGpsEnabled = gnssGpsEnabled;
+  byte tmpGloEnabled = gnssGloEnabled;
+  byte tmpGalEnabled = gnssGalEnabled;
+  byte tmpBdsEnabled = gnssBdsEnabled;
+  byte tmpSbasEnabled = gnssSbasEnabled;
+  byte tmpQzssEnabled = gnssQzssEnabled;
 
   // --------------------------
   // Validate each field
@@ -117,8 +144,31 @@ bool loadConfigFromSd() {
 
   // uid
   if (doc["uid"].is<const char*>()) {
-    strncpy(tmpUid, doc["uid"].as<const char*>(), sizeof(tmpUid) - 1);
-    tmpUid[sizeof(tmpUid) - 1] = '\0';
+    const char* val = doc["uid"].as<const char*>();
+    size_t len = strlen(val);
+    bool uidValid = true;
+
+    if (len == 0 || len >= sizeof(uid)) {
+      DEBUG_PRINTLN("[Config] Error: 'uid' is empty or too long.");
+      uidValid = false;
+    }
+
+    // Check for invalid filename characters
+    for (size_t i = 0; uidValid && i < len; i++) {
+      if ((unsigned char)val[i] < 0x20
+          || val[i] == '"' || val[i] == '*' || val[i] == '/'
+          || val[i] == ':' || val[i] == '<' || val[i] == '>'
+          || val[i] == '?' || val[i] == '\\' || val[i] == '|') {
+        DEBUG_PRINTLN("[Config] Error: 'uid' contains invalid filename characters.");
+        uidValid = false;
+      }
+    }
+
+    if (uidValid) {
+      strcpy(tmpUid, val);
+    } else {
+      configValid = false;
+    }
   } else {
     DEBUG_PRINTLN("[Config] Error: 'uid' missing or invalid.");
     configValid = false;
@@ -136,6 +186,20 @@ bool loadConfigFromSd() {
     }
   } else {
     DEBUG_PRINTLN("[Config] Error: 'operationMode' missing or invalid.");
+    configValid = false;
+  }
+
+  // deploymentLogging
+  if (doc["deploymentLogging"].is<const char*>()) {
+    const char* deploymentStr = doc["deploymentLogging"].as<const char*>();
+    if (strcmp(deploymentStr, "ENABLED") == 0) tmpDeploymentLogging = ENABLED;
+    else if (strcmp(deploymentStr, "DISABLED") == 0) tmpDeploymentLogging = DISABLED;
+    else {
+      DEBUG_PRINTLN("[Config] Error: 'deploymentLogging' not recognized.");
+      configValid = false;
+    }
+  } else {
+    DEBUG_PRINTLN("[Config] Error: 'deploymentLogging' missing or invalid.");
     configValid = false;
   }
 
@@ -187,9 +251,33 @@ bool loadConfigFromSd() {
     configValid = false;
   }
 
+  // Daily start and stop times must be different
+  if (tmpOpMode == DAILY
+      && tmpStartHour == tmpStopHour
+      && tmpStartMin == tmpStopMin) {
+    DEBUG_PRINTLN("[Config] Error: DAILY start and stop times cannot be equal.");
+    configValid = false;
+  }
+
+  // dailyInterval (optional, keeps compiled default if missing)
+  if (doc["dailyInterval"].is<int>()) {
+    tmpDailyInterval = doc["dailyInterval"].as<int>();
+    if (tmpDailyInterval < 1 || tmpDailyInterval > 30) {
+      DEBUG_PRINTLN("[Config] Error: 'dailyInterval' out of range (1–30).");
+      configValid = false;
+    }
+  } else if (!doc["dailyInterval"].isNull()) {
+    DEBUG_PRINTLN("[Config] Error: 'dailyInterval' invalid.");
+    configValid = false;
+  }
+
   // rollingAwakeHours
   if (doc["rollingAwakeHours"].is<int>()) {
     tmpAwakeHours = doc["rollingAwakeHours"].as<int>();
+    if (tmpAwakeHours < 0 || tmpAwakeHours > 23) {
+      DEBUG_PRINTLN("[Config] Error: 'rollingAwakeHours' out of range (0–23).");
+      configValid = false;
+    }
   } else {
     DEBUG_PRINTLN("[Config] Error: 'rollingAwakeHours' missing or invalid.");
     configValid = false;
@@ -198,6 +286,10 @@ bool loadConfigFromSd() {
   // rollingAwakeMinutes
   if (doc["rollingAwakeMinutes"].is<int>()) {
     tmpAwakeMinutes = doc["rollingAwakeMinutes"].as<int>();
+    if (tmpAwakeMinutes < 0 || tmpAwakeMinutes > 59) {
+      DEBUG_PRINTLN("[Config] Error: 'rollingAwakeMinutes' out of range (0–59).");
+      configValid = false;
+    }
   } else {
     DEBUG_PRINTLN("[Config] Error: 'rollingAwakeMinutes' missing or invalid.");
     configValid = false;
@@ -206,6 +298,10 @@ bool loadConfigFromSd() {
   // rollingSleepHours
   if (doc["rollingSleepHours"].is<int>()) {
     tmpSleepHours = doc["rollingSleepHours"].as<int>();
+    if (tmpSleepHours < 0 || tmpSleepHours > 23) {
+      DEBUG_PRINTLN("[Config] Error: 'rollingSleepHours' out of range (0–23).");
+      configValid = false;
+    }
   } else {
     DEBUG_PRINTLN("[Config] Error: 'rollingSleepHours' missing or invalid.");
     configValid = false;
@@ -214,8 +310,24 @@ bool loadConfigFromSd() {
   // rollingSleepMinutes
   if (doc["rollingSleepMinutes"].is<int>()) {
     tmpSleepMinutes = doc["rollingSleepMinutes"].as<int>();
+    if (tmpSleepMinutes < 0 || tmpSleepMinutes > 59) {
+      DEBUG_PRINTLN("[Config] Error: 'rollingSleepMinutes' out of range (0–59).");
+      configValid = false;
+    }
   } else {
     DEBUG_PRINTLN("[Config] Error: 'rollingSleepMinutes' missing or invalid.");
+    configValid = false;
+  }
+
+  // rollingAwake duration
+  if (tmpOpMode == ROLLING && tmpAwakeHours == 0 && tmpAwakeMinutes == 0) {
+    DEBUG_PRINTLN("[Config] Error: Rolling awake duration cannot be 0 hours 0 minutes.");
+    configValid = false;
+  }
+
+  // rollingSleep duration
+  if (tmpOpMode == ROLLING && tmpSleepHours == 0 && tmpSleepMinutes == 0) {
+    DEBUG_PRINTLN("[Config] Error: Rolling sleep duration cannot be 0 hours 0 minutes.");
     configValid = false;
   }
 
@@ -281,6 +393,17 @@ bool loadConfigFromSd() {
     configValid = false;
   }
 
+  // Validate seasonal calendar dates
+  if (!isValidSeasonalDate(tmpSeasonalStartMonth, tmpSeasonalStartDay)) {
+    DEBUG_PRINTLN("[Config] Error: Seasonal start date is invalid.");
+    configValid = false;
+  }
+
+  if (!isValidSeasonalDate(tmpSeasonalEndMonth, tmpSeasonalEndDay)) {
+    DEBUG_PRINTLN("[Config] Error: Seasonal end date is invalid.");
+    configValid = false;
+  }
+
   // gnssMeasurementRate
   if (doc["gnssMeasurementRate"].is<int>()) {
     tmpGnssRate = doc["gnssMeasurementRate"].as<int>();
@@ -302,6 +425,9 @@ bool loadConfigFromSd() {
       DEBUG_PRINTLN("[Config] Error: 'gnssGpsEnabled' must be 0 or 1.");
       configValid = false;
     }
+  } else {
+    DEBUG_PRINTLN("[Config] Error: 'gnssGpsEnabled' missing or invalid.");
+    configValid = false;
   }
 
   // gnssGloEnabled
@@ -313,6 +439,9 @@ bool loadConfigFromSd() {
       DEBUG_PRINTLN("[Config] Error: 'gnssGloEnabled' must be 0 or 1.");
       configValid = false;
     }
+  } else {
+    DEBUG_PRINTLN("[Config] Error: 'gnssGloEnabled' missing or invalid.");
+    configValid = false;
   }
 
   // gnssGalEnabled
@@ -324,6 +453,9 @@ bool loadConfigFromSd() {
       DEBUG_PRINTLN("[Config] Error: 'gnssGalEnabled' must be 0 or 1.");
       configValid = false;
     }
+  } else {
+    DEBUG_PRINTLN("[Config] Error: 'gnssGalEnabled' missing or invalid.");
+    configValid = false;
   }
 
   // gnssBdsEnabled
@@ -335,6 +467,9 @@ bool loadConfigFromSd() {
       DEBUG_PRINTLN("[Config] Error: 'gnssBdsEnabled' must be 0 or 1.");
       configValid = false;
     }
+  } else {
+    DEBUG_PRINTLN("[Config] Error: 'gnssBdsEnabled' missing or invalid.");
+    configValid = false;
   }
 
   // gnssSbasEnabled
@@ -359,6 +494,12 @@ bool loadConfigFromSd() {
     }
   }
 
+  // At least one primary GNSS constellation must be enabled
+  if (!tmpGpsEnabled && !tmpGloEnabled && !tmpGalEnabled && !tmpBdsEnabled) {
+    DEBUG_PRINTLN("[Config] Error: At least one of GPS, GLONASS, Galileo, or BeiDou must be enabled.");
+    configValid = false;
+  }
+
   // ---------------------------------------
   // If configValid is still true, commit
   // ---------------------------------------
@@ -369,11 +510,13 @@ bool loadConfigFromSd() {
 
     operationMode = tmpOpMode;
     normalOperationMode = tmpOpMode;
+    deploymentLogging = tmpDeploymentLogging;
 
     alarmStartHour = tmpStartHour;
     alarmStartMinute = tmpStartMin;
     alarmStopHour = tmpStopHour;
     alarmStopMinute = tmpStopMin;
+    alarmDailyInterval = tmpDailyInterval;
 
     alarmAwakeHours = tmpAwakeHours;
     alarmAwakeMinutes = tmpAwakeMinutes;

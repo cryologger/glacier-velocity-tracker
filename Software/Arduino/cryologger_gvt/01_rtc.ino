@@ -24,23 +24,23 @@
 // ----------------------------------------------------------------------------
 void configureRtc() {
   // Example usage:
-  // rtc.setTime(hour, minute, second, hundredths, day, month, yearOffset);
-  // e.g. rtc.setTime(23, 57, 30, 0, 31, 5, 25);
+  // e.g., rtc.setTime(hour, minute, second, hundredths, day, month, yearOffset);
+  //rtc.setTime(23, 57, 30, 0, 27, 2, 28);
 
   // Scenario 1: Power-on before the seasonal logging period
-  //rtc.setTime(16, 57, 30, 0, 1, 1, 25);
+  //rtc.setTime(16, 57, 30, 0, 1, 1, 26);
 
   // Scenario 2: Power-on day before seasonal logging period prior to daily logging period
-  //rtc.setTime(16, 57, 30, 0, 31, 5, 25);
+  //rtc.setTime(16, 57, 30, 0, 31, 5, 26);
 
   // Scenario 3: Power-on day before seasonal logging period after daily logging period
-  //rtc.setTime(23, 57, 30, 0, 31, 5, 25);
+  //rtc.setTime(23, 57, 30, 0, 31, 5, 26);
 
   // Scenario 4: Power-on during seasonal logging period
-  //rtc.setTime(12, 0, 0, 0, 1, 7, 25);
+  //rtc.setTime(12, 0, 0, 0, 1, 7, 26);
 
   // Scenario 5: Power-on after seasonal logging period
-  //rtc.setTime(16, 57, 30, 0, 1, 10, 25);
+  //rtc.setTime(16, 57, 30, 0, 1, 10, 26);
 
   // Save the initially selected operation mode (DAILY, ROLLING, etc.).
   normalOperationMode = operationMode;
@@ -56,8 +56,8 @@ void configureRtc() {
 void setLoggingAlarm() {
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);  // Clear pending RTC alarms
 
-  // Update the operation mode first (DAILY, ROLLING, or CONTINUOUS)
-  checkOperationMode();
+  // Update the operation mode (DAILY, ROLLING, or CONTINUOUS)
+  updateOperationMode();
 
   switch (operationMode) {
     case DAILY:
@@ -91,41 +91,44 @@ void setLoggingAlarm() {
 }
 
 // ----------------------------------------------------------------------------
-// Schedules the next sleep period after logging is finished. If it's the last
-// day before the seasonal window, we sleep until 00:00, ensuring we switch
-// to continuous mode on the following day. Otherwise, we follow the normal
-// daily or rolling schedule.
+// Schedules the next sleep period after logging is finished. In DAILY mode,
+// sleeps until the start time dailyInterval days later, or until 00:00 if the
+// seasonal window begins first. Otherwise, follows the rolling schedule.
 // ----------------------------------------------------------------------------
 void setSleepAlarm() {
   am_hal_rtc_int_clear(AM_HAL_RTC_INT_ALM);  // Clear pending RTC alarms.
 
   // Always update the operation mode first
-  checkOperationMode();
+  updateOperationMode();
 
   switch (operationMode) {
     case DAILY:
-      // First power-up after deployment: run one logging session immediately
-      // so operators can confirm the system is working, then resume the normal
-      // daily schedule on every cycle afterward
+      // On first power-up, optionally log immediately. Otherwise, schedule
+      // the next available logging period without applying the daily interval
       if (firstDeploymentFlag) {
         firstDeploymentFlag = false;
-        DEBUG_PRINTLN("[RTC] Info: Deployment-day run - logging immediately");
-        alarmFlag = true;
-        return;
+
+        if (deploymentLogging == ENABLED) {
+          DEBUG_PRINTLN("[RTC] Info: Deployment logging = ENABLED.");
+          alarmFlag = true;
+          return;
+        }
+
+        // Deployment logging is disabled, but join an active DAILY period
+        if (isWithinDailyLoggingPeriod()) {
+          DEBUG_PRINTLN("[RTC] Info: Currently within the DAILY logging period.");
+          alarmFlag = true;
+          return;
+        }
+
+        // Outside the active period, sleep until the next start
+        setDailyIntervalAlarm(false);
+
+      } else {
+        // After a completed session, apply the configured interval
+        setDailyIntervalAlarm(true);
       }
 
-      // On the last day before seasonal logging, sleep until midnight instead
-      // of the normal daily start time
-      if (seasonalLoggingMode && isLastDayBeforeSeasonalLogging() && isLastDayLoggingComplete()) {
-        rtc.setAlarm(0, 0, 0, 0, 0, 0);
-        DEBUG_PRINTLN("[RTC] Info: Last day before seasonal. Sleeping until midnight.");
-        alarmModeSleep = 4;
-      } else {
-        // Normal daily sleep until next day's start hour/minute
-        rtc.setAlarm(alarmStartHour, alarmStartMinute, 0, 0, 0, 0);
-        DEBUG_PRINTLN("[RTC] Info: Setting normal daily sleep alarm.");
-        alarmModeSleep = 4;
-      }
       alarmFlag = false;
       break;
 
@@ -140,7 +143,7 @@ void setSleepAlarm() {
       break;
 
     case CONTINUOUS:
-      // In continuous mode, don't enter deep sleep 
+      // In continuous mode, don't enter deep sleep
       DEBUG_PRINTLN("[RTC] Info: Continuous mode. No sleep alarm.");
       firstDeploymentFlag = false;  // Clear deployment-day flag
       alarmFlag = true;             // Set alarm flag
@@ -151,6 +154,92 @@ void setSleepAlarm() {
   rtc.setAlarmMode(alarmModeSleep);
   DEBUG_PRINT("[RTC] Info: Sleeping until ");
   printAlarm();
+}
+
+// ----------------------------------------------------------------------------
+// Sets the sleep alarm to the configured start time on the next logging day.
+// Before the first session, uses the next available start time. After a
+// completed session, advances by the configured daily interval. Wakes at
+// midnight instead if seasonal logging begins first.
+// ----------------------------------------------------------------------------
+void setDailyIntervalAlarm(bool afterSession) {
+  rtc.getTime();
+
+  // Determine whether today's configured start time has passed
+  bool startPassed = (rtc.hour > alarmStartHour)
+                     || ((rtc.hour == alarmStartHour)
+                         && (rtc.minute >= alarmStartMinute));
+
+  // Use the next available start time before the first session
+  // After a completed session, advance by the configured daily interval
+  int daysAhead = startPassed ? 1 : 0;
+
+  if (afterSession) {
+    daysAhead += alarmDailyInterval - 1;
+  }
+
+  // Check if seasonal logging starts before the next logging day
+  int seasonalDaysAhead = daysUntilSeasonalStart();
+  bool seasonalFirst = (seasonalLoggingMode == ENABLED)
+                       && (seasonalDaysAhead > 0)
+                       && (seasonalDaysAhead <= daysAhead);
+
+  // Build alarm date from today. mktime() handles month and year rollover
+  struct tm alarmTime = {};
+  alarmTime.tm_year = rtc.year + 100;
+  alarmTime.tm_mon = rtc.month - 1;
+  alarmTime.tm_mday = rtc.dayOfMonth + (seasonalFirst ? seasonalDaysAhead : daysAhead);
+  mktime(&alarmTime);
+
+  if (seasonalFirst) {
+    rtc.setAlarm(0, 0, 0, 0, alarmTime.tm_mday, alarmTime.tm_mon + 1);
+    DEBUG_PRINTLN("[RTC] Info: Seasonal logging starts before next logging day. Sleeping until midnight.");
+  } else {
+    rtc.setAlarm(alarmStartHour, alarmStartMinute, 0, 0,
+                 alarmTime.tm_mday, alarmTime.tm_mon + 1);
+    DEBUG_PRINTLN("[RTC] Info: Setting daily interval sleep alarm.");
+  }
+
+  alarmModeSleep = 1;  // Match month, day, hour and minute
+}
+
+// ----------------------------------------------------------------------------
+// Checks whether the current RTC time is within the configured DAILY logging
+// period. Supports logging periods that cross midnight.
+// ----------------------------------------------------------------------------
+bool isWithinDailyLoggingPeriod() {
+  rtc.getTime();
+
+  int currentMinutes = rtc.hour * 60 + rtc.minute;
+  int startMinutes = alarmStartHour * 60 + alarmStartMinute;
+  int stopMinutes = alarmStopHour * 60 + alarmStopMinute;
+
+  if (startMinutes < stopMinutes) {
+    // Same-day window, e.g. 17:00 to 20:00
+    return currentMinutes >= startMinutes
+           && currentMinutes < stopMinutes;
+  }
+
+  // Cross-midnight window, e.g. 22:00 to 02:00
+  return currentMinutes >= startMinutes
+         || currentMinutes < stopMinutes;
+}
+
+// ----------------------------------------------------------------------------
+// Returns the number of days from today until the seasonal start date.
+// ----------------------------------------------------------------------------
+int daysUntilSeasonalStart() {
+  rtc.getTime();
+
+  int currentDOY = dayOfYear(rtc.year, rtc.month, rtc.dayOfMonth);
+  int startDOY = dayOfYear(rtc.year, alarmSeasonalStartMonth, alarmSeasonalStartDay);
+
+  int days = startDOY - currentDOY;
+  if (days <= 0) {
+    int daysLeftThisYear = (isLeapYear(rtc.year) ? 366 : 365) - currentDOY;
+    days = daysLeftThisYear + dayOfYear(rtc.year + 1, alarmSeasonalStartMonth, alarmSeasonalStartDay);
+  }
+  return days;
 }
 
 // ----------------------------------------------------------------------------
@@ -188,25 +277,43 @@ void printDateTime() {
 }
 
 // ----------------------------------------------------------------------------
-// Retrieves and prints the RTC's configured alarm time in a readable format.
+// Retrieves and prints the RTC's configured alarm time.
 // ----------------------------------------------------------------------------
 void printAlarm() {
   rtc.getAlarm();
+
   char alarmBuffer[30];
-  snprintf(alarmBuffer, sizeof(alarmBuffer),
-           "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
-           rtc.year, rtc.alarmMonth, rtc.alarmDayOfMonth,
-           rtc.alarmHour, rtc.alarmMinute, rtc.alarmSeconds);
+
+  if (rtc.alarmMonth > 0 && rtc.alarmDayOfMonth > 0) {
+    unsigned long alarmYear = 2000 + rtc.year;
+
+    if (rtc.alarmMonth < rtc.month
+        || (rtc.alarmMonth == rtc.month
+            && rtc.alarmDayOfMonth < rtc.dayOfMonth)) {
+      alarmYear++;
+    }
+
+    snprintf(alarmBuffer, sizeof(alarmBuffer),
+             "%04lu-%02lu-%02lu %02lu:%02lu:%02lu",
+             alarmYear, rtc.alarmMonth, rtc.alarmDayOfMonth,
+             rtc.alarmHour, rtc.alarmMinute, rtc.alarmSeconds);
+  } else {
+    snprintf(alarmBuffer, sizeof(alarmBuffer),
+             "%02lu:%02lu:%02lu",
+             rtc.alarmHour, rtc.alarmMinute, rtc.alarmSeconds);
+  }
+
   DEBUG_PRINTLN(alarmBuffer);
 }
 
 // ----------------------------------------------------------------------------
-// Checks if the day-of-month has changed since last time. This helps detect
-// midnight rollover or other daily boundary events. Returns true if changed.
+// Checks if the calendar date has changed since the last check. Compares the
+// full date (UTC days since 1970-01-01), not just the day of the month, so
+// sessions exactly one month apart are still detected. Returns true if changed.
 // ----------------------------------------------------------------------------
 bool checkDate() {
   rtc.getTime();
-  dateNew = rtc.dayOfMonth;
+  dateNew = rtc.getEpoch() / 86400UL;  // UTC day number
 
   DEBUG_PRINT("[RTC] Info: Current date: ");
   DEBUG_PRINT(dateCurrent);
@@ -219,7 +326,7 @@ bool checkDate() {
     return false;
   }
 
-  // If day-of-month has changed, update and return true
+  // If the date has changed, update and return true
   if (dateNew != dateCurrent) {
     dateCurrent = dateNew;
     return true;
@@ -257,38 +364,11 @@ int dayOfYear(int rtcYear, int month, int day) {
 }
 
 // ----------------------------------------------------------------------------
-// Checks if today is the exact day before alarmSeasonalStartMonth/day. This
-// allows setting a final 'sleep until midnight' so that the next day will
-// be fully within the seasonal logging period.
-// ----------------------------------------------------------------------------
-bool isLastDayBeforeSeasonalLogging() {
-  rtc.getTime();
-  int rtcYear = rtc.year;
-  int currentDOY = dayOfYear(rtcYear, rtc.month, rtc.dayOfMonth);
-
-  // Calculate the day-of-year for the seasonal start date
-  int startDOY = dayOfYear(rtcYear, alarmSeasonalStartMonth, alarmSeasonalStartDay);
-
-  // The "day before" startDOY is simply (startDOY - 1).
-  // If startDOY == 1, the "day before" is the last DOY of the PREVIOUS year (365 or 366).
-  int dayBefore = startDOY - 1;
-  if (dayBefore < 1) {
-    // Wrap around to the previous year's last day-of-year
-    // If we precisely track multi-year transitions, we'd check (rtcYear - 1).
-    // For a repeating annual cycle, we often reuse 'rtcYear' for the day count:
-    dayBefore = isLeapYear(rtcYear) ? 366 : 365;
-  }
-
-  // Return true if current DOY matches the "day before" value
-  return (currentDOY == dayBefore);
-}
-
-// ----------------------------------------------------------------------------
 // Determines if the current day-of-year is within the defined seasonal window,
 // which may wrap around from late in one year to early in the next.
 // ----------------------------------------------------------------------------
 bool isSeasonalLoggingPeriod() {
-  // Retrieve the current RTC date/time.
+  // Retrieve the current RTC date/time
   rtc.getTime();
   int rtcYear = rtc.year;
   int currentDOY = dayOfYear(rtcYear, rtc.month, rtc.dayOfMonth);
@@ -317,43 +397,46 @@ bool isSeasonalLoggingPeriod() {
 }
 
 // ----------------------------------------------------------------------------
-// Checks if the current time is past the daily logging stop hour/minute.
-// Useful if you only want to trigger certain actions after normal logging
-// is finished for the day.
+// Checks whether a month and day form a valid recurring calendar date.
 // ----------------------------------------------------------------------------
-bool isLastDayLoggingComplete() {
-  rtc.getTime();
-  // e.g., if alarmStopHour=15, alarmStopMinute=0 => we check if hour>15 or
-  // hour=15 & minute>=0
-  return ((rtc.hour > alarmStopHour) || ((rtc.hour == alarmStopHour) && (rtc.minute >= alarmStopMinute)));
+bool isValidSeasonalDate(int month, int day) {
+  static const byte daysInMonth[] = {
+    31, 28, 31, 30, 31, 30,
+    31, 31, 30, 31, 30, 31
+  };
+
+  if (month < 1 || month > 12) return false;
+  if (day < 1 || day > daysInMonth[month - 1]) return false;
+
+  return true;
 }
 
 // ----------------------------------------------------------------------------
-// Checks if the current date/time is within the seasonal logging period.
-// If so, sets the operation mode to CONTINUOUS. Otherwise, reverts to the
-// normal operation mode (DAILY, ROLLING, etc.). Does not set any alarms.
+// Updates the active operation mode based on the seasonal logging settings.
+// Uses normalOperationMode outside the seasonal logging period.
 // ----------------------------------------------------------------------------
-void checkOperationMode() {
-  DEBUG_PRINTLN("[RTC] Info: Checking operation mode...");
+void updateOperationMode() {
+  DEBUG_PRINTLN("[RTC] Info: Updating operation mode...");
   rtc.getTime();
 
-  // Simple check of seasonal logging mode for debugging purposes.
-  if (seasonalLoggingMode == ENABLED) {
-    DEBUG_PRINTLN("[RTC] Info: Seasonal mode = ENABLED.");
-  } else {
-    DEBUG_PRINTLN("[RTC] Info: Seasonal mode = DISABLED.");
-  }
+  // Print seasonal logging setting
+  DEBUG_PRINT("[RTC] Info: Seasonal mode = ");
+  DEBUG_PRINTLN(seasonalLoggingMode == ENABLED ? "ENABLED." : "DISABLED.");
 
-  // If seasonal logging is enabled and it's currently the seasonal window,
-  // switch to continuous mode. Otherwise, use normalOperationMode
+  // Switch to CONTINUOUS mode during the seasonal logging period
+  // Otherwise, use the configured normal operation mode
   if (seasonalLoggingMode == ENABLED && isSeasonalLoggingPeriod()) {
     operationMode = CONTINUOUS;
   } else {
     operationMode = normalOperationMode;
-    seasonalPowerInitFlag = false; // Clear flag
   }
 
-  // Debug output for the chosen mode
+  // Clear the continuous initialization flag when leaving continuous mode
+  if (operationMode != CONTINUOUS) {
+    continuousPowerInitFlag = false;
+  }
+
+  // Print the active operation mode
   DEBUG_PRINT("[RTC] Info: Operation mode = ");
   if (operationMode == DAILY) DEBUG_PRINTLN("DAILY.");
   else if (operationMode == ROLLING) DEBUG_PRINTLN("ROLLING.");

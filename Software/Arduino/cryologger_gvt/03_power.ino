@@ -113,13 +113,6 @@ void goToSleep() {
   qwiicPowerOff();
   peripheralPowerOff();
 
-  // Clear all online status flags
-  online.gnss = false;
-  online.microSd = false;
-  online.oled = false;
-  online.logGnss = false;
-  online.logDebug = false;
-
   // Configure memory power settings for deep sleep
   am_hal_pwrctrl_memory_deepsleep_powerdown(AM_HAL_PWRCTRL_MEM_ALL);
   am_hal_pwrctrl_memory_deepsleep_retain(AM_HAL_PWRCTRL_MEM_SRAM_384K);
@@ -128,8 +121,16 @@ void goToSleep() {
   am_hal_stimer_config(AM_HAL_STIMER_CFG_CLEAR | AM_HAL_STIMER_CFG_FREEZE);
   am_hal_stimer_config(AM_HAL_STIMER_XTAL_32KHZ);
 
-  // Enter deep sleep
-  am_hal_sysctrl_sleep(AM_HAL_SYSCTRL_SLEEP_DEEP);
+  // Prevent the RTC ISR from running between the final check and sleep
+  uint32_t interruptState = am_hal_interrupt_master_disable();
+
+  // Enter deep sleep unless an alarm fired during shutdown
+  if (!alarmFlag) {
+    am_hal_sysctrl_sleep(AM_HAL_SYSCTRL_SLEEP_DEEP);
+  }
+
+  // Restore the previous interrupt state and run any pending ISR
+  am_hal_interrupt_master_set(interruptState);
 
   /*
      Processor now sleeps and awaits an RTC or WDT interrupt
@@ -180,6 +181,11 @@ void qwiicPowerOn() {
 
 void qwiicPowerOff() {
   digitalWrite(PIN_QWIIC_POWER, LOW);
+
+  // Clear the status of devices powered by the Qwiic rail
+  online.gnss = false;
+  online.oled = false;
+  online.logGnss = false;
 }
 
 // ----------------------------------------------------------------------------
@@ -193,6 +199,38 @@ void peripheralPowerOn() {
 void peripheralPowerOff() {
   myDelay(250);
   digitalWrite(PIN_MICROSD_POWER, LOW);
+
+  // Clear the status of services dependent on the microSD rail
+  online.microSd = false;
+  online.logGnss = false;
+  online.logDebug = false;
+}
+
+// ----------------------------------------------------------------------------
+// Restores peripheral power as needed before logging.
+// ----------------------------------------------------------------------------
+void restoreLoggingPeripherals() {
+  // Restore peripherals once when entering continuous mode
+  if (operationMode == CONTINUOUS) {
+    if (!continuousPowerInitFlag) {
+      restorePeripherals();
+      continuousPowerInitFlag = true;
+      return;
+    }
+
+    // Reinitialize a failed peripheral, power cycling first to clear a hung device
+    if (!online.gnss || !online.microSd) {
+      DEBUG_PRINTLN("[Power] Warning: Peripheral offline. Power cycling...");
+      qwiicPowerOff();
+      peripheralPowerOff();
+      myDelay(1000);
+      restorePeripherals();
+    }
+    return;
+  }
+
+  // Restore peripherals before each scheduled logging session
+  restorePeripherals();
 }
 
 // ----------------------------------------------------------------------------

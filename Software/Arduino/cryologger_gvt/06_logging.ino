@@ -11,6 +11,15 @@
 */
 
 // ----------------------------------------------------------------------------
+// Debug log CSV header.
+// ----------------------------------------------------------------------------
+const char debugHeader[] =
+  "datetime,battery,temperature,online_microsd,online_gnss,online_log_gnss,online_log_debug,"
+  "timer_battery,timer_microsd,timer_gnss,timer_sync_rtc,timer_log_gnss,timer_log_debug,"
+  "rtc_sync_flag,rtc_drift,bytes_written,max_buffer_bytes,wdt_counter_max,"
+  "write_fail_counter,sync_fail_counter,close_fail_counter,debug_counter";
+
+// ----------------------------------------------------------------------------
 // Create a timestamped log file name.
 // Generates a filename using the current RTC timestamp. This ensures that
 // each log session is uniquely named and avoids overwriting previous logs.
@@ -45,35 +54,82 @@ void createDebugFile() {
   DEBUG_PRINT("[Logging] Info: Created or opened debug file: ");
   DEBUG_PRINTLN(debugFileName);
 
-  // Write CSV header if necessary.
+  // Write CSV header if necessary
   if (debugFile.size() == 0) {
-    debugFile.println(
-      "datetime,battery,temperature,online_microsd,online_gnss,online_log_gnss,online_log_debug,"
-      "timer_battery,timer_microsd,timer_gnss,timer_sync_rtc,timer_log_gnss,timer_log_debug,"
-      "rtc_sync_flag,rtc_drift,bytes_written,max_buffer_bytes,wdt_counter_max,"
-      "write_fail_counter,sync_fail_counter,close_fail_counter,debug_counter");
+    debugFile.println(debugHeader);
     DEBUG_PRINT("[Logging] Info: Header written to ");
     DEBUG_PRINTLN(debugFileName);
   } else {
     DEBUG_PRINT("[Logging] Info: Header already exists in ");
     DEBUG_PRINTLN(debugFileName);
   }
-  // Sync the debug file to ensure integrity.
+
+  // Sync the debug file to ensure integrity
   if (!debugFile.sync()) {
     DEBUG_PRINTLN("[Logging] Warning: Failed to sync debug file.");
   } else {
     DEBUG_PRINTLN("[Logging] Info: Synced debug file.");
   }
 
-  // Update the file creation timestamp.
+  // Update the file creation timestamp
   updateFileCreate(&debugFile);
 
-  // Close the debug file.
+  // Close the debug file
   if (!debugFile.close()) {
     DEBUG_PRINTLN("[Logging] Warning: Failed to close debug file.");
   } else {
     DEBUG_PRINTLN("[Logging] Info: Closed debug file.");
   }
+}
+
+// ----------------------------------------------------------------------------
+// Write a single debug record to the given output stream.
+// Used for both the debug log file and Serial.
+// ----------------------------------------------------------------------------
+void printDebugRecord(Print &out, const char *dateTime, float battery, float temperature) {
+  out.print(dateTime);
+  out.print(",");
+  out.print(battery);
+  out.print(",");
+  out.print(temperature);
+  out.print(",");
+  out.print(online.microSd);
+  out.print(",");
+  out.print(online.gnss);
+  out.print(",");
+  out.print(online.logGnss);
+  out.print(",");
+  out.print(online.logDebug);
+  out.print(",");
+  out.print(timer.voltage);
+  out.print(",");
+  out.print(timer.microSd);
+  out.print(",");
+  out.print(timer.gnss);
+  out.print(",");
+  out.print(timer.syncRtc);
+  out.print(",");
+  out.print(timer.logGnss);
+  out.print(",");
+  out.print(timer.logDebug);
+  out.print(",");
+  out.print(rtcSyncFlag);
+  out.print(",");
+  out.print(rtcDrift);
+  out.print(",");
+  out.print(bytesWritten);
+  out.print(",");
+  out.print(maxBufferBytes);
+  out.print(",");
+  out.print(wdtCounterMax);
+  out.print(",");
+  out.print(writeFailCounter);
+  out.print(",");
+  out.print(syncFailCounter);
+  out.print(",");
+  out.print(closeFailCounter);
+  out.print(",");
+  out.println(debugCounter);
 }
 
 // ----------------------------------------------------------------------------
@@ -83,85 +139,57 @@ void createDebugFile() {
 // and potential failure points.
 // ----------------------------------------------------------------------------
 void logDebug() {
-  // Start loop timer for profiling.
+  // Start loop timer for profiling
   unsigned long loopStartTime = millis();
 
   // Increment debug counter.
   debugCounter++;
 
-  // Check if debug file is open.
+  // Check if debug file is open
   if (debugFile.isOpen()) {
     debugFile.close();
     DEBUG_PRINTLN("[Logging] Info: Debug file closed before reopening.");
-  } else {
-    DEBUG_PRINTLN("[Logging] Debug: Debug file is already closed.");
   }
 
-  // Open debug log file.
-  if (!debugFile.open(debugFileName, O_APPEND | O_WRITE)) {
+  // Open debug log file
+  if (!debugFile.open(debugFileName, O_CREAT | O_APPEND | O_WRITE)) {
     DEBUG_PRINT("[Logging] Warning: Failed to open debug file: ");
     DEBUG_PRINTLN(debugFileName);
-    online.logDebug = false;  // Set flag
+    online.logDebug = false;                    // Clear flag
+    timer.logDebug = millis() - loopStartTime;  // Stop loop timer
     return;
-  } else {
-    DEBUG_PRINT("[Logging] Info: Opened debug file: ");
-    DEBUG_PRINTLN(debugFileName);
-    online.logDebug = true;  // Set flag
   }
 
-  // Create timestamp string.
+  // Write CSV header if necessary
+  if (debugFile.size() == 0) {
+    debugFile.println(debugHeader);
+    DEBUG_PRINT("[Logging] Info: Header written to ");
+    DEBUG_PRINTLN(debugFileName);
+    updateFileCreate(&debugFile);
+  }
+
+  online.logDebug = true;  // Set flag
+  DEBUG_PRINT("[Logging] Info: Opened debug file: ");
+  DEBUG_PRINTLN(debugFileName);
+
+  // Create timestamp string
   char dateTime[30];
   snprintf(dateTime, sizeof(dateTime),
            "20%02lu-%02lu-%02lu %02lu:%02lu:%02lu",
            rtc.year, rtc.month, rtc.dayOfMonth,
            rtc.hour, rtc.minute, rtc.seconds);
 
-  // Log debugging information
-  debugFile.print(dateTime);
-  debugFile.print(",");
-  debugFile.print(readBattery());
-  debugFile.print(",");
-  debugFile.print(readInternalTemp());
-  debugFile.print(",");
-  debugFile.print(online.microSd);
-  debugFile.print(",");
-  debugFile.print(online.gnss);
-  debugFile.print(",");
-  debugFile.print(online.logGnss);
-  debugFile.print(",");
-  debugFile.print(online.logDebug);
-  debugFile.print(",");
-  debugFile.print(timer.voltage);
-  debugFile.print(",");
-  debugFile.print(timer.microSd);
-  debugFile.print(",");
-  debugFile.print(timer.gnss);
-  debugFile.print(",");
-  debugFile.print(timer.syncRtc);
-  debugFile.print(",");
-  debugFile.print(timer.logGnss);
-  debugFile.print(",");
-  debugFile.print(timer.logDebug);
-  debugFile.print(",");
-  debugFile.print(rtcSyncFlag);
-  debugFile.print(",");
-  debugFile.print(rtcDrift);
-  debugFile.print(",");
-  debugFile.print(bytesWritten);
-  debugFile.print(",");
-  debugFile.print(maxBufferBytes);
-  debugFile.print(",");
-  debugFile.print(wdtCounterMax);
-  debugFile.print(",");
-  debugFile.print(writeFailCounter);
-  debugFile.print(",");
-  debugFile.print(syncFailCounter);
-  debugFile.print(",");
-  debugFile.print(closeFailCounter);
-  debugFile.print(",");
-  debugFile.println(debugCounter);
+  // Read sensors once so the file and Serial records match
+  float battery = readBattery();
+  float temperature = readInternalTemp();
 
-  // Sync the debug file to disk.
+  // Stop loop timer before writing so the record carries the current value
+  timer.logDebug = millis() - loopStartTime;
+
+  // Write the debug record to the log file
+  printDebugRecord(debugFile, dateTime, battery, temperature);
+
+  // Sync the debug file to disk
   if (!debugFile.sync()) {
     DEBUG_PRINTLN("[Logging] Warning: Failed to sync debug file.");
     syncFailCounter++;  // Track failed sync attempts
@@ -169,10 +197,10 @@ void logDebug() {
     DEBUG_PRINTLN("[Logging] Info: Synced debug file.");
   }
 
-  // Update file access timestamps.
+  // Update file access timestamps
   updateFileAccess(&debugFile);
 
-  // Close the debug file.
+  // Close the debug file
   if (!debugFile.close()) {
     DEBUG_PRINTLN("[Logging] Warning: Failed to close debug file.");
     closeFailCounter++;  // Track failed close attempts
@@ -180,52 +208,9 @@ void logDebug() {
     DEBUG_PRINTLN("[Logging] Info: Closed debug file.");
   }
 
-  // Print debugging information
+#if DEBUG
+  // Write the same debug record to Serial
   DEBUG_PRINT("[Logging] Info: ");
-  DEBUG_PRINT(dateTime);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(readBattery());
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(readInternalTemp());
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(online.microSd);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(online.gnss);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(online.logGnss);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(online.logDebug);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(timer.voltage);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(timer.microSd);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(timer.gnss);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(timer.syncRtc);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(timer.logGnss);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(timer.logDebug);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(rtcSyncFlag);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(rtcDrift);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(bytesWritten);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(maxBufferBytes);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(wdtCounterMax);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(writeFailCounter);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(syncFailCounter);
-  DEBUG_PRINT(",");
-  DEBUG_PRINT(closeFailCounter);
-  DEBUG_PRINT(",");
-  DEBUG_PRINTLN(debugCounter);
-
-  // Stop loop timer and store execution time.
-  timer.logDebug = millis() - loopStartTime;
+  printDebugRecord(Serial, dateTime, battery, temperature);
+#endif
 }
